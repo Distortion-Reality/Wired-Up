@@ -2,12 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class MovementScript : MonoBehaviour {
 
-public Rigidbody rb;
-
+Rigidbody rb;
 public Transform cam;
-
 public float moveSpeed = 4f;
 
     void Start() {
