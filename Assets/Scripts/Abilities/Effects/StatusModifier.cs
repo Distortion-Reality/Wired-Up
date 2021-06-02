@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-
 public class StatusModifier : Effect
 {
-    int time;
+    readonly int time;
 
     public StatusModifier(int time)
     {

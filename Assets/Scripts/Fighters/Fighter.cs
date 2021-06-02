@@ -1,84 +1,92 @@
-using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
-public abstract class Fighter
+[RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(Rigidbody))]
+public abstract class Fighter : MonoBehaviour
 {
     public enum AbilityStatus
     {
         FREE,
-        EXTENDING,
+        CONNECTING,
         WAITING,
-        USING
+        USING,
+        DISCONNECTING
     }
 
+    Quaternion defaultRotation;
+    readonly float rotationSpeed = 10f;
+
     protected Dictionary<StatisticManager.StatisticId, FighterStatistic> stats;
-    protected List<Ability> abilities;
-    protected List<Ability> assists;
+    protected List<Ability> attacks, assists;
     protected AbilityStatus fighterAbilityStatus = AbilityStatus.FREE;
     protected TargetAbilityManager targetAbilityManager;
     protected Fighter target = null;
 
-    public Fighter(Dictionary<StatisticManager.StatisticId, FighterStatistic> stats,
-        List<Ability> abilities, List<Ability> assists, TargetAbilityManager targetAbilityManager)
+    public Dictionary<StatisticManager.StatisticId, FighterStatistic> Stats { get => stats; }
+    public AbilityStatus FighterAbilityStatus { get => fighterAbilityStatus; set => fighterAbilityStatus = value; }
+    public TargetAbilityManager TargetAbilityManager { get => targetAbilityManager; }
+    public Fighter Target { get => target; }
+
+    // Start is called before the first frame update
+    protected virtual void Start()
     {
-        this.stats = stats;
-        this.abilities = abilities;
-        this.assists = assists;
-        this.targetAbilityManager = targetAbilityManager;
+        defaultRotation = transform.rotation;
     }
 
-    public Dictionary<StatisticManager.StatisticId, FighterStatistic> Stats { get => stats; }
-
-    public List<Ability> Abilities { get => abilities; }
-
-    public List<Ability> Assists { get => assists; }
-
-    public AbilityStatus FighterAbilityStatus { set => fighterAbilityStatus = value; }
-
-    public TargetAbilityManager TargetAbilityManager { get => targetAbilityManager; }
-
-    public Fighter Target
+    // Update is called once per frame
+    protected virtual void Update()
     {
-        get => target;
-        set
+        CheckHP();
+        UpdateRotation();
+    }
+
+    void CheckHP()
+    {
+        if (stats[StatisticManager.StatisticId.HP].CurrentValue <= 0)
+            Die();
+    }
+
+    void UpdateRotation()
+    {
+        if (fighterAbilityStatus != AbilityStatus.FREE &&
+            fighterAbilityStatus != AbilityStatus.DISCONNECTING)
+            transform.rotation = LookAtTargetRotation();
+        else
         {
-            if(fighterAbilityStatus != AbilityStatus.USING)
-            {
-                CheckFighterAbilityStatus();
-                target = value;
-            }
+            Quaternion finalRotation;
+            if (target == null)
+                finalRotation = defaultRotation;
+            else
+                finalRotation = LookAtTargetRotation();
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, finalRotation, rotationSpeed * Time.deltaTime);
         }
     }
 
-    protected void CheckFighterAbilityStatus()
+    Quaternion LookAtTargetRotation()
     {
-        if(fighterAbilityStatus == AbilityStatus.WAITING)
-            InterruptAbility();
-        if(fighterAbilityStatus == AbilityStatus.EXTENDING)
-            EndAbility();
+        return Quaternion.LookRotation(
+            Vector3.ProjectOnPlane(target.transform.position - transform.position, Vector3.up));
     }
 
-    public void TryToUseAbility(Ability ability)
+    protected abstract void UseAbility(Ability ability);
+
+    public abstract void EndAbility();
+
+    protected bool CheckEnergy(Ability ability)
     {
-        if(fighterAbilityStatus != AbilityStatus.USING)
-            if(stats[StatisticManager.StatisticId.Lng].CurrentValue >= ability.Lng)
-            {
-                stats[StatisticManager.StatisticId.Lng].CurrentValue -= ability.Lng;
-                PrepareToUseAbility(ability);
-            }
+        if (stats[StatisticManager.StatisticId.Eng].CurrentValue >= ability.Eng)
+        {
+            stats[StatisticManager.StatisticId.Eng].CurrentValue -= ability.Eng;
+            return true;
+        }
+
+        return false;
     }
 
-    protected abstract void PrepareToUseAbility(Ability ability);
-
-    public abstract void UseAbility(Ability ability);
-
-    public virtual void InterruptAbility()
+    void Die()
     {
-        EndAbility();
-    }
-
-    public virtual void EndAbility()
-    {
-        fighterAbilityStatus = AbilityStatus.FREE;
+        Destroy(gameObject);
     }
 }

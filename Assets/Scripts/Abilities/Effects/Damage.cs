@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-
 public class Damage : Effect
 {
-    int power;
+    readonly int power;
 
     public Damage(int power)
     {

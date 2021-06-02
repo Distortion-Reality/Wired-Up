@@ -1,44 +1,39 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class TargetEnemyAbilityManager : TargetAbilityManager
 {
-    public int neededAbilities = 2;
-    public int maxAbilities = 3;
-    public float waitingTimeSeconds = 3f;
+    public int minAbilities = 2;
+    public float waitingTimeSeconds = 2f;
 
-    protected override void CheckUserAbilityQueue()
+    protected override void CheckUserAbilityQueue(Fighter user)
     {
-        int numAbilities = CountUserAbilityQueue();
-        if(numAbilities == 1 && numAbilities < neededAbilities)
+        if (usersAreUsing)
+            user.FighterAbilityStatus = Fighter.AbilityStatus.USING;
+        else if (userAbilityQueue.Count == 1 && userAbilityQueue.Count < minAbilities)
             StartCoroutine(WaitForOtherAbilities());
     }
 
     IEnumerator WaitForOtherAbilities()
     {
-        yield return new WaitForSeconds(waitingTimeSeconds);
+        float timeSecondsPassed = 0f;
 
-        int numAbilities = CountUserAbilityQueue();
-        if(numAbilities < neededAbilities)
+        while (userAbilityQueue.Count < minAbilities && timeSecondsPassed < waitingTimeSeconds)
+        {
+            yield return null;
+            timeSecondsPassed += Time.deltaTime;
+        }
+
+        if (userAbilityQueue.Count < minAbilities)
             EndAbilities();
-        else if(numAbilities < maxAbilities)
-            DoAbilities();
         else
-            DoRainbowAbility();
+            StartCoroutine(DoAbilities());
     }
 
     void EndAbilities()
     {
-        foreach(UserAbility userAbility in userAbilityQueue)
+        foreach (UserAbility userAbility in userAbilityQueue)
             userAbility.User.EndAbility();
         userAbilityQueue.Clear();
-    }
-
-    void DoRainbowAbility()
-    {
-        SetUserAbilityStatusUsing();
-
-        // UseRainbowAbility
     }
 }

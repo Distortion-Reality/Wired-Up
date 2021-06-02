@@ -7,8 +7,8 @@ public abstract class TargetAbilityManager : MonoBehaviour
 {
     protected class UserAbility
     {
-        Fighter user;
-        Ability ability;
+        readonly Fighter user;
+        readonly Ability ability;
 
         public UserAbility(Fighter user, Ability ability)
         {
@@ -16,44 +16,47 @@ public abstract class TargetAbilityManager : MonoBehaviour
             this.ability = ability;
         }
 
-        public Fighter User { get => user; }
-        public Ability Ability { get => ability; }
+        public Fighter User => user;
+        public Ability Ability => ability;
     }
 
     protected Queue<UserAbility> userAbilityQueue = new Queue<UserAbility>();
+    protected bool usersAreUsing = false;
 
     public void EnqueueUserAbility(Fighter user, Ability ability)
     {
         userAbilityQueue.Enqueue(new UserAbility(user, ability));
-        CheckUserAbilityQueue();
+        CheckUserAbilityQueue(user);
     }
 
-    protected abstract void CheckUserAbilityQueue();
-
-    public int CountUserAbilityQueue()
-    {
-        return userAbilityQueue.Count;
-    }
-
-    public void DequeueUserAbility(Fighter user)
+    public void RemoveUserAbility(Fighter user)
     {
         userAbilityQueue = new Queue<UserAbility>(userAbilityQueue.Where(
-            userAbility => userAbility.User == user));
+            userAbility => userAbility.User != user));
     }
 
-    protected void DoAbilities()
-    {
-        SetUserAbilityStatusUsing();
+    protected abstract void CheckUserAbilityQueue(Fighter user);
 
-        foreach(UserAbility userAbility in userAbilityQueue)
+    protected IEnumerator DoAbilities()
+    {
+        SetUsersAbilityStatusUsing();
+
+        while (userAbilityQueue.Count > 0)
+        {
+            UserAbility userAbility = userAbilityQueue.Dequeue();
             userAbility.Ability.DoAbility(userAbility.User);
 
-        userAbilityQueue.Clear();
+            yield return new WaitWhile(() => userAbility.User.FighterAbilityStatus == Fighter.AbilityStatus.USING);
+        }
+
+        usersAreUsing = false;
     }
 
-    protected void SetUserAbilityStatusUsing()
+    void SetUsersAbilityStatusUsing()
     {
-        foreach(UserAbility userAbility in userAbilityQueue)
+        foreach (UserAbility userAbility in userAbilityQueue)
             userAbility.User.FighterAbilityStatus = Fighter.AbilityStatus.USING;
+
+        usersAreUsing = true;
     }
 }

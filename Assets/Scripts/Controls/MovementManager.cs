@@ -1,18 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class MovementManager : MonoBehaviour
 {
     Rigidbody rb;
-    public Transform cam;
-    public float moveSpeed = 4f;
+    Transform cam;
+    readonly float moveSpeed = 4f;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        cam = Camera.main.transform;
     }
 
     void FixedUpdate()

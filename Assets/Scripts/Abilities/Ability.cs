@@ -1,23 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class Ability
+public class Ability : MonoBehaviour
 {
-    List<Effect> effects;
-    int lng;
+    readonly List<Effect> effects;
+    readonly int eng;
 
-    public Ability(List<Effect> effects, int lng)
+    public Ability(List<Effect> effects, int eng)
     {
         this.effects = effects;
-        this.lng = lng;
+        this.eng = eng;
     }
 
-    public int Lng { get => lng; }
+    public int Eng => eng;
 
     public void DoAbility(Fighter user)
     {
-        foreach(Effect effect in effects)
+        StartCoroutine(ApplyEffects(user));
+    }
+
+    IEnumerator ApplyEffects(Fighter user)
+    {
+        foreach (Effect effect in effects)
             effect.ApplyEffect(user);
+
+        yield return new WaitForSeconds(2f);
 
         user.EndAbility();
     }

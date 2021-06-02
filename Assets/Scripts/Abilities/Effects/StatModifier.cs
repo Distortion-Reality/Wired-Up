@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-
 public class StatModifier : Effect
 {
-    StatisticManager.StatisticId stat;
-    int percentage, time;
+    readonly StatisticManager.StatisticId stat;
+    readonly int percentage, time;
 
     public StatModifier(StatisticManager.StatisticId stat, int percentage, int time)
     {

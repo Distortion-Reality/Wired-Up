@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-
 public class Healing : Effect
 {
-    int amount;
+    readonly int amount;
 
     public Healing(int amount)
     {
