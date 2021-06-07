@@ -139,4 +139,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minAbilities: 2
-  waitingTimeSeconds: 2
+  waitingTimeSeconds: 1.5

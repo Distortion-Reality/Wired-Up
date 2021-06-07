@@ -74,15 +74,20 @@ public abstract class Fighter : MonoBehaviour
 
     public abstract void EndAbility();
 
-    protected bool CheckEnergy(Ability ability)
+    public bool CheckAndUseEnergy(int abilityEnergy)
     {
-        if (stats[StatisticManager.StatisticId.Eng].CurrentValue >= ability.Eng)
+        if (stats[StatisticManager.StatisticId.Nrg].CurrentValue >= abilityEnergy)
         {
-            stats[StatisticManager.StatisticId.Eng].CurrentValue -= ability.Eng;
+            UseEnergy(abilityEnergy);
             return true;
         }
 
         return false;
+    }
+
+    public void UseEnergy(int abilityEnergy)
+    {
+        stats[StatisticManager.StatisticId.Nrg].CurrentValue -= abilityEnergy;
     }
 
     void Die()

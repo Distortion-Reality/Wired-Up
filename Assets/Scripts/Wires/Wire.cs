@@ -11,8 +11,8 @@ public class Wire : MonoBehaviour
 
     bool connectWhenDisconnected = false;
     
-    readonly float extendingSpeed = 15f,
-        retractingSpeed = 30f;
+    readonly float extendingSpeed = 30f,
+        retractingSpeed = 60f;
 
     float Length => wireHead.Length + wireBody.Length;
 

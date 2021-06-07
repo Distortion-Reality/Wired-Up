@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(TargetEnemyAbilityManager))]
 public class Enemy : Fighter
 {
     // Start is called before the first frame update
@@ -12,20 +13,20 @@ public class Enemy : Fighter
         // Statistics initialization
 
         FighterStatistic hp = new FighterStatistic(20);
-        FighterStatistic arm = new FighterStatistic(10);
-        FighterStatistic spd = new FighterStatistic(10);
-        FighterStatistic lng = new FighterStatistic(10);
-        FighterStatistic eng = new FighterStatistic(20);
+        FighterStatistic armor = new FighterStatistic(10);
+        FighterStatistic length = new FighterStatistic(10);
         FighterStatistic intensity = new FighterStatistic(10);
+        FighterStatistic energy = new FighterStatistic(20);
+        FighterStatistic speed = new FighterStatistic(10);
 
         stats = new Dictionary<StatisticManager.StatisticId, FighterStatistic>()
         {
             { StatisticManager.StatisticId.HP, hp },
-            { StatisticManager.StatisticId.Arm, arm },
-            { StatisticManager.StatisticId.Spd, spd },
-            { StatisticManager.StatisticId.Lng, lng },
-            { StatisticManager.StatisticId.Eng, eng },
-            { StatisticManager.StatisticId.Int, intensity }
+            { StatisticManager.StatisticId.Arm, armor },
+            { StatisticManager.StatisticId.Lng, length },
+            { StatisticManager.StatisticId.Int, intensity },
+            { StatisticManager.StatisticId.Nrg, energy },
+            { StatisticManager.StatisticId.Spd, speed }
         };
 
         // Abilities initialization
@@ -70,7 +71,7 @@ public class Enemy : Fighter
 
     protected override void UseAbility(Ability ability)
     {
-        if (CheckEnergy(ability))
+        if (CheckAndUseEnergy(ability.Energy))
         {
             fighterAbilityStatus = AbilityStatus.USING;
             ability.DoAbility(this);

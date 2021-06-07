@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(TargetPlayerAbilityManager))]
 public class Player : Fighter
 {
     Wire wire;
@@ -13,20 +14,20 @@ public class Player : Fighter
         // Statistics initialization
 
         FighterStatistic hp = new FighterStatistic(10);
-        FighterStatistic arm = new FighterStatistic(10);
-        FighterStatistic spd = new FighterStatistic(10);
-        FighterStatistic lng = new FighterStatistic(10);
-        FighterStatistic eng = new FighterStatistic(1000000);
+        FighterStatistic armor = new FighterStatistic(10);
+        FighterStatistic length = new FighterStatistic(10);
         FighterStatistic intensity = new FighterStatistic(10);
+        FighterStatistic energy = new FighterStatistic(1000000);
+        FighterStatistic speed = new FighterStatistic(10);
 
         stats = new Dictionary<StatisticManager.StatisticId, FighterStatistic>()
         {
             { StatisticManager.StatisticId.HP, hp },
-            { StatisticManager.StatisticId.Arm, arm },
-            { StatisticManager.StatisticId.Spd, spd },
-            { StatisticManager.StatisticId.Lng, lng },
-            { StatisticManager.StatisticId.Eng, eng },
-            { StatisticManager.StatisticId.Int, intensity }
+            { StatisticManager.StatisticId.Arm, armor },
+            { StatisticManager.StatisticId.Lng, length },
+            { StatisticManager.StatisticId.Int, intensity },
+            { StatisticManager.StatisticId.Nrg, energy },
+            { StatisticManager.StatisticId.Spd, speed }
         };
 
         // Abilities initialization
@@ -91,7 +92,7 @@ public class Player : Fighter
                     Fighter hitFighter = hit.collider.GetComponent<Fighter>();
                     if (hitFighter != target)
                     {
-                        CheckPlayerAbilityStatus();
+                        CheckAndUpdatePlayerAbilityStatus();
                         target = hitFighter;
                     }
                 }
@@ -100,22 +101,32 @@ public class Player : Fighter
 
     void CheckAbilityInput()
     {
-        if (target != null)
-        {
-            if (Input.GetButtonDown("Ability1"))
-                UseAbility(attacks[0]);
-            else if (Input.GetButtonDown("Ability2"))
-                UseAbility(attacks[1]);
-            else if (Input.GetButtonDown("Ability3"))
-                UseAbility(attacks[2]);
-        }
+        if (target == null)
+            return;
+
+        if (!Input.GetButtonDown("Ability1") && !Input.GetButtonDown("Ability2"))
+            return;
+
+        List<Ability> abilities = target is Player ? assists : attacks;
+
+        int abilityToUse = 0;
+        if (Input.GetButton("AbilityModifier1"))
+            abilityToUse = 2;
+        else if (Input.GetButton("AbilityModifier2"))
+            abilityToUse = 4;
+
+        if (Input.GetButtonDown("Ability2"))
+            abilityToUse++;
+
+        if (abilityToUse < abilities.Count)
+            UseAbility(abilities[abilityToUse]);
     }
 
     protected override void UseAbility(Ability ability)
     {
-        if (CheckEnergy(ability))
+        if (CheckAndUseEnergy(ability.Energy))
         {
-            CheckPlayerAbilityStatus();
+            CheckAndUpdatePlayerAbilityStatus();
             wire.Connect(ability);
         }
     }
@@ -140,7 +151,7 @@ public class Player : Fighter
         wire.StayConnected();
     }
 
-    void CheckPlayerAbilityStatus()
+    void CheckAndUpdatePlayerAbilityStatus()
     {
         if (fighterAbilityStatus == AbilityStatus.WAITING)
             InterruptWaiting();

@@ -1,6 +1,6 @@
 public class TargetPlayerAbilityManager : TargetAbilityManager
 {
-    protected override void CheckUserAbilityQueue(Fighter user)
+    protected override void CheckUserAbilityQueue(UserAbility userAbility)
     {
         StartCoroutine(DoAbilities());
     }
