@@ -29,14 +29,12 @@ public abstract class Fighter : MonoBehaviour
     public TargetAbilityManager TargetAbilityManager { get => targetAbilityManager; }
     public Fighter Target { get => target; }
 
-    // Start is called before the first frame update
-    protected virtual void Start()
+    public virtual void Init()
     {
         defaultRotation = transform.rotation;
     }
 
-    // Update is called once per frame
-    protected virtual void Update()
+    public virtual void BaseTick()
     {
         CheckHP();
         UpdateRotation();
@@ -93,6 +91,6 @@ public abstract class Fighter : MonoBehaviour
 
     void Die()
     {
-        Destroy(gameObject);
+        BoltNetwork.Destroy(gameObject);
     }
 }

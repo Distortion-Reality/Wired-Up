@@ -4,9 +4,8 @@ using Photon.Bolt;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Player))]
-public class MovementManager : EntityBehaviour<IPlayerState>
+public class PlayerManager : FighterManager<IPlayerState>
 {
-    Player player;
     Rigidbody rb;
     Transform cam;
 
@@ -19,20 +18,26 @@ public class MovementManager : EntityBehaviour<IPlayerState>
         dashCooldownSeconds = 5f;
     float nextDashTime = 0f;
 
-    // Start is called before the first frame update
-    void Start()
+    public override void Attached()
     {
-        player = GetComponent<Player>();
+        base.Attached();
+
         rb = GetComponent<Rigidbody>();
         cam = Camera.main.transform;
     }
 
-    // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
+        if (!entity.IsOwner)
+        {
+            return;
+        }
+
         if (Input.GetButtonDown("Dash") && Time.time > nextDashTime &&
-            player.CheckAndUseEnergy(dashCostEnergy))
+            fighter.CheckAndUseEnergy(dashCostEnergy))
             StartCoroutine(Dash());
+
+        base.Update();
     }
 
     public override void SimulateOwner()
@@ -54,10 +59,5 @@ public class MovementManager : EntityBehaviour<IPlayerState>
         yield return new WaitForSeconds(dashDurationSeconds);
 
         moveSpeedMultiplier = 1f;
-    }
-
-    public override void Attached()
-    {
-        state.SetTransforms(state.transform, transform);
     }
 }

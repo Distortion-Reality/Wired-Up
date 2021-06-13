@@ -10,9 +10,9 @@ public class Player : Fighter
     Ability currentAbility = null;
 
     // Start is called before the first frame update
-    protected override void Start()
+    public override void Init()
     {
-        base.Start();
+        base.Init();
 
         // Statistics initialization
 
@@ -72,9 +72,9 @@ public class Player : Fighter
     }
 
     // Update is called once per frame
-    protected override void Update()
+    public override void BaseTick()
     {
-        base.Update();
+        base.BaseTick();
 
         if (fighterAbilityStatus != AbilityStatus.USING)
         {

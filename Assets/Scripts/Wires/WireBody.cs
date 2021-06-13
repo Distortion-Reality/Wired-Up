@@ -13,22 +13,32 @@ public class WireBody : EntityBehaviour<IPlayerState>
 
     Vector3 LocalScale
     {
-        get => transform.parent.localScale;
-        set => transform.parent.localScale = value;
+        get => state.wireBodyScale;
+        set => state.wireBodyScale = value;
     }
 
     public float Length => defaultLength * LocalScale.y;
 
+    void ScaleChanged()
+    {
+        transform.parent.localScale = state.wireBodyScale;
+    }
+
     public override void Attached()
     {
-        state.SetTransforms(state.wireBodyTransform, transform.parent);
+        if (entity.IsOwner)
+        {
+            state.wireBodyScale = transform.parent.localScale;
+        }
+        state.AddCallback("wireBodyScale", ScaleChanged);
+
+        defaultLocalScale = LocalScale;
     }
 
     public void Init(Wire wire, WireHead wireHead)
     {
         player = GetComponentInParent<Player>();
 
-        defaultLocalScale = LocalScale;
         defaultLocalLength = GetComponent<MeshFilter>().mesh.bounds.size.y;
         defaultLength = defaultLocalLength * wire.transform.localScale.y;
 
@@ -49,6 +59,9 @@ public class WireBody : EntityBehaviour<IPlayerState>
 
     void OnTriggerEnter(Collider other)
     {
+        if (!entity.IsOwner)
+            return;
+
         if (other.CompareTag("Terrain"))
             return;
 

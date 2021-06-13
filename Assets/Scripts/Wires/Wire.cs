@@ -36,7 +36,7 @@ public class Wire : EntityBehaviour<IPlayerState>
     void ActiveChanged()
     {
         gameObject.SetActive(state.wireActive);
-        if (gameObject.activeSelf)
+        if (gameObject.activeSelf && entity.IsOwner)
         {
             StartConnecting();
         }

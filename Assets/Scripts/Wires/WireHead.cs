@@ -42,6 +42,9 @@ public class WireHead : EntityBehaviour<IPlayerState>
 
     void OnTriggerEnter(Collider other)
     {
+        if (!entity.IsOwner)
+            return;
+        
         if (other.CompareTag("Terrain"))
             return;
 
