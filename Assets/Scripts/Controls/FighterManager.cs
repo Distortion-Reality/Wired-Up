@@ -1,5 +1,3 @@
-using System.Collections;
-using UnityEngine;
 using Photon.Bolt;
 
 public abstract class FighterManager<T> : EntityBehaviour<T> where T : IFighterState
@@ -14,8 +12,9 @@ public abstract class FighterManager<T> : EntityBehaviour<T> where T : IFighterS
         state.SetTransforms(state.transform, transform);
     }
 
+    // Update is called once per frame
     protected virtual void Update()
     {
-        fighter.BaseTick();
+        fighter.UpdateFrame();
     }
 }

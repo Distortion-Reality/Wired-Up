@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Bolt;
 
@@ -11,6 +9,7 @@ public class EntitySpawner : MonoBehaviour {
     {
         if (BoltNetwork.IsServer)
             BoltNetwork.Instantiate(prefab, transform.position, transform.rotation);
+
         Destroy(gameObject);
     }
 }

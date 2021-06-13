@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using Photon.Bolt;
 
-[RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Player))]
 public class PlayerManager : FighterManager<IPlayerState>
 {
@@ -26,6 +25,7 @@ public class PlayerManager : FighterManager<IPlayerState>
         cam = Camera.main.transform;
     }
 
+    // Update is called once per frame
     protected override void Update()
     {
         if (!entity.IsOwner)

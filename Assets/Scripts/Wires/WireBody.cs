@@ -19,20 +19,19 @@ public class WireBody : EntityBehaviour<IPlayerState>
 
     public float Length => defaultLength * LocalScale.y;
 
-    void ScaleChanged()
-    {
-        transform.parent.localScale = state.wireBodyScale;
-    }
-
     public override void Attached()
     {
         if (entity.IsOwner)
-        {
             state.wireBodyScale = transform.parent.localScale;
-        }
+
         state.AddCallback("wireBodyScale", ScaleChanged);
 
         defaultLocalScale = LocalScale;
+    }
+
+    void ScaleChanged()
+    {
+        transform.parent.localScale = state.wireBodyScale;
     }
 
     public void Init(Wire wire, WireHead wireHead)
@@ -59,10 +58,7 @@ public class WireBody : EntityBehaviour<IPlayerState>
 
     void OnTriggerEnter(Collider other)
     {
-        if (!entity.IsOwner)
-            return;
-
-        if (other.CompareTag("Terrain"))
+        if (!entity.IsOwner || other.CompareTag("Terrain"))
             return;
 
         switch (player.FighterAbilityStatus)

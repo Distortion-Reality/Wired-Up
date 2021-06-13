@@ -1,15 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Bolt;
 
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
 public class Player : Fighter
 {
+    Ability currentAbility = null;
     Wire wire;
 
-    Ability currentAbility = null;
-
-    // Start is called before the first frame update
     public override void Init()
     {
         base.Init();
@@ -68,13 +65,11 @@ public class Player : Fighter
 
         // Wire initialization
         wire = GetComponentInChildren<Wire>(true);
-
     }
 
-    // Update is called once per frame
-    public override void BaseTick()
+    public override void UpdateFrame()
     {
-        base.BaseTick();
+        base.UpdateFrame();
 
         if (fighterAbilityStatus != AbilityStatus.USING)
         {

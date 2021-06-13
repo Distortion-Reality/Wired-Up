@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using System;
+using UdpKit;
 using Photon.Bolt;
 using Photon.Bolt.Matchmaking;
-using UdpKit;
-using System;
 
 public class Menu : GlobalEventListener {
 
@@ -17,8 +14,8 @@ public class Menu : GlobalEventListener {
     {
         if (BoltNetwork.IsServer)
         {
-            string matchName = System.Guid.NewGuid().ToString();
-            BoltMatchmaking.CreateSession(sessionID: matchName, sceneToLoad: "Level1Scene");
+            string matchName = Guid.NewGuid().ToString();
+            BoltMatchmaking.CreateSession(sessionID: matchName, sceneToLoad: "Level2Scene");
         }
     }
 
@@ -34,9 +31,7 @@ public class Menu : GlobalEventListener {
             UdpSession photonSession = session.Value;
 
             if (photonSession.Source == UdpSessionSource.Photon)
-            {
                 BoltMatchmaking.JoinSession(photonSession);
-            }
         }
     }
 }

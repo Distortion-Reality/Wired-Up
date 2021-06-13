@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using Photon.Bolt;
 
@@ -10,6 +9,7 @@ public class EnemyManager : FighterManager<IEnemyState>
         base.Attached();
     }
 
+    // Update is called once per frame
     protected override void Update()
     {
         base.Update();

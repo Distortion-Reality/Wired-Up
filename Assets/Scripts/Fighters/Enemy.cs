@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Bolt;
-
 
 [RequireComponent(typeof(TargetEnemyAbilityManager))]
 public class Enemy : Fighter
@@ -64,9 +62,9 @@ public class Enemy : Fighter
         targetAbilityManager = GetComponent<TargetEnemyAbilityManager>();
     }
 
-    public override void BaseTick()
+    public override void UpdateFrame()
     {
-        base.BaseTick();
+        base.UpdateFrame();
     }
 
     protected override void UseAbility(Ability ability)

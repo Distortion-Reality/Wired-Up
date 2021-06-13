@@ -20,7 +20,23 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     float Extension => Length - defaultLength;
 
-    public void Init()
+    public override void Attached()
+    {
+        Init();
+
+        if (entity.IsOwner)
+            state.wireActive = gameObject.activeSelf;
+
+        state.AddCallback("wireActive", ActiveChanged);
+    }
+
+    void ActiveChanged()
+    {
+        if (!entity.IsOwner)
+            gameObject.SetActive(state.wireActive);
+    }
+
+    void Init()
     {
         player = GetComponentInParent<Player>();
 
@@ -33,32 +49,14 @@ public class Wire : EntityBehaviour<IPlayerState>
         defaultLocalRotation = transform.localRotation;
     }
 
-    void ActiveChanged()
-    {
-        gameObject.SetActive(state.wireActive);
-        if (gameObject.activeSelf && entity.IsOwner)
-        {
-            StartConnecting();
-        }
-    }
-
-    public override void Attached()
-    {
-        Init();
-        if (entity.IsOwner)
-        {
-            state.wireActive = gameObject.activeSelf;
-        }
-        state.AddCallback("wireActive", ActiveChanged);
-    }
-
     public void Connect()
     {
         if (player.FighterAbilityStatus == Fighter.AbilityStatus.DISCONNECTING)
             StartCoroutine(ConnectWhenDisconnected());
         else
         {
-            state.wireActive = true;
+            gameObject.SetActive(true);
+            StartConnecting();
         }
     }
 
@@ -163,6 +161,18 @@ public class Wire : EntityBehaviour<IPlayerState>
         player.FighterAbilityStatus = Fighter.AbilityStatus.FREE;
 
         if (!connectWhenDisconnected)
+            gameObject.SetActive(false);
+    }
+
+    void OnEnable()
+    {
+        if (entity.IsOwner)
+            state.wireActive = true;
+    }
+
+    void OnDisable()
+    {
+        if (entity.IsOwner)
             state.wireActive = false;
     }
 }

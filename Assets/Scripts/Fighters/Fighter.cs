@@ -34,7 +34,7 @@ public abstract class Fighter : MonoBehaviour
         defaultRotation = transform.rotation;
     }
 
-    public virtual void BaseTick()
+    public virtual void UpdateFrame()
     {
         CheckHP();
         UpdateRotation();
