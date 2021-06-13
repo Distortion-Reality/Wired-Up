@@ -35,9 +35,6 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     void ActiveChanged()
     {
-        Debug.Log("------active changed------");
-        Debug.Log(player.gameObject.GetInstanceID());
-        Debug.Log(state.wireActive);
         gameObject.SetActive(state.wireActive);
         if (gameObject.activeSelf)
         {
@@ -48,8 +45,6 @@ public class Wire : EntityBehaviour<IPlayerState>
     public override void Attached()
     {
         Init();
-        Debug.Log("---- attached ----");
-        Debug.Log(player.gameObject.GetInstanceID());
         if (entity.IsOwner)
         {
             state.wireActive = gameObject.activeSelf;
@@ -116,7 +111,7 @@ public class Wire : EntityBehaviour<IPlayerState>
         while (player.FighterAbilityStatus == Fighter.AbilityStatus.CONNECTING)
         {
             if (Length >= player.Stats[StatisticManager.StatisticId.Lng].CurrentValue)
-                Disconnect();
+                player.EndAbility();
             else
             {
                 ApplyLocalExtension(LocalExtension(extendingSpeed));
@@ -143,7 +138,8 @@ public class Wire : EntityBehaviour<IPlayerState>
     IEnumerator Retract()
     {
         Quaternion disconnectingRotation = transform.rotation;
-
+        yield return null;
+        
         while (Extension > 0)
         {
             transform.rotation = disconnectingRotation;
