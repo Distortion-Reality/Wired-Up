@@ -1,12 +1,14 @@
 using System.Collections;
 using UnityEngine;
+using Photon.Bolt;
 
-public class Wire : MonoBehaviour
+public class Wire : EntityBehaviour<IPlayerState>
 {
     Player player;
     WireHead wireHead;
     WireBody wireBody;
 
+    float defaultLength;
     Quaternion defaultLocalRotation;
 
     bool connectWhenDisconnected = false;
@@ -16,24 +18,52 @@ public class Wire : MonoBehaviour
 
     float Length => wireHead.Length + wireBody.Length;
 
-    // Start is called before the first frame update
-    void Start()
+    float Extension => Length - defaultLength;
+
+    public void Init()
     {
         player = GetComponentInParent<Player>();
-        wireHead = GetComponentInChildren<WireHead>();
-        wireBody = GetComponentInChildren<WireBody>();
 
+        wireHead = GetComponentInChildren<WireHead>(true);
+        wireBody = GetComponentInChildren<WireBody>(true);
+        wireHead.Init(this, wireBody);
+        wireBody.Init(this, wireHead);
+
+        defaultLength = Length;
         defaultLocalRotation = transform.localRotation;
     }
 
-    public void Connect(Ability ability)
+    void ActiveChanged()
+    {
+        Debug.Log("------active changed------");
+        Debug.Log(player.gameObject.GetInstanceID());
+        Debug.Log(state.wireActive);
+        gameObject.SetActive(state.wireActive);
+        if (gameObject.activeSelf)
+        {
+            StartConnecting();
+        }
+    }
+
+    public override void Attached()
+    {
+        Init();
+        Debug.Log("---- attached ----");
+        Debug.Log(player.gameObject.GetInstanceID());
+        if (entity.IsOwner)
+        {
+            state.wireActive = gameObject.activeSelf;
+        }
+        state.AddCallback("wireActive", ActiveChanged);
+    }
+
+    public void Connect()
     {
         if (player.FighterAbilityStatus == Fighter.AbilityStatus.DISCONNECTING)
-            StartCoroutine(ConnectWhenDisconnected(ability));
+            StartCoroutine(ConnectWhenDisconnected());
         else
         {
-            gameObject.SetActive(true);
-            StartConnecting(ability);
+            state.wireActive = true;
         }
     }
 
@@ -45,33 +75,40 @@ public class Wire : MonoBehaviour
     public void Disconnect()
     {
         player.FighterAbilityStatus = Fighter.AbilityStatus.DISCONNECTING;
-        wireHead.Ability = null;
         StartCoroutine(Retract());
     }
 
-    void StartConnecting(Ability ability)
+    void StartConnecting()
     {
         player.FighterAbilityStatus = Fighter.AbilityStatus.CONNECTING;
-        wireHead.Ability = ability;
         StartCoroutine(Extend());
     }
 
-    void ApplyExtension(float extension)
+    float LocalExtension(float extendingSpeed)
     {
-        Vector3 translation = Vector3.up * extension;
-        Vector3 scale = translation / wireBody.DefaultLocalLength;
-
-        wireHead.ApplyLocalTranslation(translation);
-        wireBody.ApplyLocalScale(scale);
+        return ConvertToLocal(extendingSpeed * Time.deltaTime);
     }
 
-    IEnumerator ConnectWhenDisconnected(Ability ability)
+    float ConvertToLocal(float value)
+    {
+        return value / transform.localScale.y;
+    }
+
+    void ApplyLocalExtension(float extension)
+    {
+        Vector3 extensionVector = Vector3.up * extension;
+
+        wireHead.ApplyLocalTranslation(extensionVector);
+        wireBody.ApplyLocalScale(extensionVector);
+    }
+
+    IEnumerator ConnectWhenDisconnected()
     {
         connectWhenDisconnected = true;
         yield return new WaitUntil(() => player.FighterAbilityStatus != Fighter.AbilityStatus.DISCONNECTING);
 
         connectWhenDisconnected = false;
-        StartConnecting(ability);
+        StartConnecting();
     }
 
     IEnumerator Extend()
@@ -82,7 +119,7 @@ public class Wire : MonoBehaviour
                 Disconnect();
             else
             {
-                ApplyExtension(extendingSpeed * Time.deltaTime / transform.localScale.y);
+                ApplyLocalExtension(LocalExtension(extendingSpeed));
 
                 yield return null;
             }
@@ -97,7 +134,7 @@ public class Wire : MonoBehaviour
             float distance = Vector3.Magnitude(
                 Vector3.ProjectOnPlane(player.Target.transform.position - player.transform.position, Vector3.up));
 
-            ApplyExtension(distance - Length);
+            ApplyLocalExtension(ConvertToLocal(distance - Length));
 
             yield return null;
         }
@@ -107,21 +144,19 @@ public class Wire : MonoBehaviour
     {
         Quaternion disconnectingRotation = transform.rotation;
 
-        while (wireBody.IsExtended)
+        while (Extension > 0)
         {
             transform.rotation = disconnectingRotation;
+            float retraction = LocalExtension(retractingSpeed);
 
-            float wireBodyLocalExtension = wireBody.LocalScale.y;
-            float retraction = retractingSpeed * Time.deltaTime / transform.localScale.y;
-
-            if (wireBodyLocalExtension <= retraction)
+            if (retraction >= Extension)
             {
-                wireBody.ResetLocalScale();
                 wireHead.ResetLocalPosition();
+                wireBody.ResetLocalScale();
             }
             else
             {
-                ApplyExtension(- retraction);
+                ApplyLocalExtension(- retraction);
 
                 yield return null;
             }
@@ -132,6 +167,6 @@ public class Wire : MonoBehaviour
         player.FighterAbilityStatus = Fighter.AbilityStatus.FREE;
 
         if (!connectWhenDisconnected)
-            gameObject.SetActive(false);
+            state.wireActive = false;
     }
 }

@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1377762806656316181}
   - component: {fileID: 7977736316358103120}
   m_Layer: 0
-  m_Name: Green Player Prefab
+  m_Name: GreenPlayer
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

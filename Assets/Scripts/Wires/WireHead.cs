@@ -1,34 +1,33 @@
 using UnityEngine;
+using Photon.Bolt;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
-public class WireHead : MonoBehaviour
+public class WireHead : EntityBehaviour<IPlayerState>
 {
     Player player;
-    Ability ability = null;
 
     Vector3 defaultLocalPosition;
     float defaultLength;
 
-    public Ability Ability { set => ability = value; }
-
     public float Length => defaultLength * transform.localScale.y;
 
-    // Start is called before the first frame update
-    void Start()
+    public override void Attached()
+    {
+        state.SetTransforms(state.wireHeadTransform, transform);
+    }
+
+    public void Init(Wire wire, WireBody wireBody)
     {
         player = GetComponentInParent<Player>();
 
         defaultLocalPosition = transform.localPosition;
-
-        Wire wire = GetComponentInParent<Wire>();
         defaultLength = GetComponent<MeshFilter>().mesh.bounds.size.y * wire.transform.localScale.y;
 
         Collider wireHeadCollider = GetComponent<Collider>();
         Physics.IgnoreCollision(wireHeadCollider, player.GetComponent<Collider>());
-        Physics.IgnoreCollision(wireHeadCollider,
-            wire.GetComponentInChildren<WireBody>().GetComponent<Collider>());
+        Physics.IgnoreCollision(wireHeadCollider, wireBody.GetComponent<Collider>());
     }
 
     public void ApplyLocalTranslation(Vector3 translation)
@@ -55,7 +54,7 @@ public class WireHead : MonoBehaviour
 
             case Fighter.AbilityStatus.CONNECTING:
                 if (other.CompareTag("Enemy") || other.CompareTag("Player"))
-                    player.EnqueueUserAbilityToTarget(other.GetComponent<Fighter>(), ability);
+                    player.EnqueueUserAbilityToTarget(other.GetComponent<Fighter>());
                 else
                     player.EndAbility();
                 break;

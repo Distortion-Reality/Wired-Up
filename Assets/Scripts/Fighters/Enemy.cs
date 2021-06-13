@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Bolt;
+
 
 [RequireComponent(typeof(TargetEnemyAbilityManager))]
 public class Enemy : Fighter

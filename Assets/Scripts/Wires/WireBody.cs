@@ -1,47 +1,45 @@
 using UnityEngine;
+using Photon.Bolt;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
-public class WireBody : MonoBehaviour
+public class WireBody : EntityBehaviour<IPlayerState>
 {
     Player player;
 
     Vector3 defaultLocalScale;
     float defaultLocalLength, defaultLength;
 
-    public float DefaultLocalLength { get => defaultLocalLength; }
-
-    public Vector3 LocalScale
+    Vector3 LocalScale
     {
         get => transform.parent.localScale;
-        private set => transform.parent.localScale = value;
+        set => transform.parent.localScale = value;
     }
 
     public float Length => defaultLength * LocalScale.y;
 
-    public bool IsExtended => LocalScale.y > defaultLocalScale.y;
+    public override void Attached()
+    {
+        state.SetTransforms(state.wireBodyTransform, transform.parent);
+    }
 
-    // Start is called before the first frame update
-    void Start()
+    public void Init(Wire wire, WireHead wireHead)
     {
         player = GetComponentInParent<Player>();
 
         defaultLocalScale = LocalScale;
         defaultLocalLength = GetComponent<MeshFilter>().mesh.bounds.size.y;
-
-        Wire wire = GetComponentInParent<Wire>();
         defaultLength = defaultLocalLength * wire.transform.localScale.y;
 
         Collider wireBodyCollider = GetComponent<Collider>();
         Physics.IgnoreCollision(wireBodyCollider, player.GetComponent<Collider>());
-        Physics.IgnoreCollision(wireBodyCollider,
-            wire.GetComponentInChildren<WireHead>().GetComponent<Collider>());
+        Physics.IgnoreCollision(wireBodyCollider, wireHead.GetComponent<Collider>());
     }
 
     public void ApplyLocalScale(Vector3 scale)
     {
-        LocalScale += scale;
+        LocalScale += scale / defaultLocalLength;
     }
 
     public void ResetLocalScale()

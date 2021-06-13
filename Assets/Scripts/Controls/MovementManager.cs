@@ -1,9 +1,10 @@
 using System.Collections;
 using UnityEngine;
+using Photon.Bolt;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Player))]
-public class MovementManager : MonoBehaviour
+public class MovementManager : EntityBehaviour<IPlayerState>
 {
     Player player;
     Rigidbody rb;
@@ -34,7 +35,7 @@ public class MovementManager : MonoBehaviour
             StartCoroutine(Dash());
     }
 
-    void FixedUpdate()
+    public override void SimulateOwner()
     {
         float x = Input.GetAxisRaw("Horizontal");
         float z = Input.GetAxisRaw("Vertical");
@@ -53,5 +54,10 @@ public class MovementManager : MonoBehaviour
         yield return new WaitForSeconds(dashDurationSeconds);
 
         moveSpeedMultiplier = 1f;
+    }
+
+    public override void Attached()
+    {
+        state.SetTransforms(state.transform, transform);
     }
 }

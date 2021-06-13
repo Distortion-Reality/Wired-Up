@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Bolt;
 
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
 public class Player : Fighter
 {
     Wire wire;
+
+    Ability currentAbility = null;
 
     // Start is called before the first frame update
     protected override void Start()
@@ -64,8 +67,8 @@ public class Player : Fighter
         targetAbilityManager = GetComponent<TargetPlayerAbilityManager>();
 
         // Wire initialization
-        wire = GetComponentInChildren<Wire>();
-        wire.gameObject.SetActive(false);
+        wire = GetComponentInChildren<Wire>(true);
+
     }
 
     // Update is called once per frame
@@ -127,12 +130,14 @@ public class Player : Fighter
         if (CheckAndUseEnergy(ability.Energy))
         {
             CheckAndUpdatePlayerAbilityStatus();
-            wire.Connect(ability);
+            currentAbility = ability;
+            wire.Connect();
         }
     }
 
     public override void EndAbility()
     {
+        currentAbility = null;
         wire.Disconnect();
     }
 
@@ -142,11 +147,11 @@ public class Player : Fighter
         EndAbility();
     }
 
-    public void EnqueueUserAbilityToTarget(Fighter actualTarget, Ability ability)
+    public void EnqueueUserAbilityToTarget(Fighter actualTarget)
     {
         target = actualTarget;
         fighterAbilityStatus = AbilityStatus.WAITING;
-        target.TargetAbilityManager.EnqueueUserAbility(this, ability);
+        target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
 
         wire.StayConnected();
     }

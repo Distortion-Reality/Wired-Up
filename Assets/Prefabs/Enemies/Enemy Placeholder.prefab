@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 3115242177480150212}
   - component: {fileID: 8811423665481132916}
   - component: {fileID: 4926753982981743751}
+  - component: {fileID: 1160451499801872718}
   m_Layer: 0
   m_Name: Enemy Placeholder
   m_TagString: Enemy
@@ -140,3 +141,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minAbilities: 2
   waitingTimeSeconds: 1.5
+--- !u!114 &1160451499801872718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7446445931601703244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 155943207, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sceneGuid: 
+  _serializerGuid: 799b3f77-3c57-471d-a6ab-aafd43b42df6
+  _prefabId: 1
+  _updateRate: 1
+  _autoFreezeProxyFrames: 0
+  _clientPredicted: 1
+  _allowInstantiateOnClient: 1
+  _persistThroughSceneLoads: 0
+  _sceneObjectDestroyOnDetach: 1
+  _sceneObjectAutoAttach: 1
+  _alwaysProxy: 0
+  _detachOnDisable: 1
+  _allowFirstReplicationWhenFrozen: 0
+  _autoRemoveChildEntities: 0
+  _entityBehaviourQueryOption: 0
+  _entityPriorityCalculatorQueryOption: 1
+  _entityReplicationFilterQueryOption: 1
