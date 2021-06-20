@@ -77,22 +77,17 @@ public class Wire : EntityBehaviour<IPlayerState>
         StartCoroutine(Extend());
     }
 
-    float LocalExtension(float extendingSpeed)
+    float ExtensionThisFrame(float extendingSpeed)
     {
-        return ConvertToLocal(extendingSpeed * Time.deltaTime);
+        return extendingSpeed * Time.deltaTime;
     }
 
-    float ConvertToLocal(float value)
+    void ApplyExtension(float extension)
     {
-        return value / transform.localScale.y;
-    }
+        Vector3 localExtensionVector = Vector3.up * extension / transform.localScale.y;
 
-    void ApplyLocalExtension(float extension)
-    {
-        Vector3 extensionVector = Vector3.up * extension;
-
-        wireHead.ApplyLocalTranslation(extensionVector);
-        wireBody.ApplyLocalScale(extensionVector);
+        wireHead.ApplyLocalTranslation(localExtensionVector);
+        wireBody.ApplyLocalScale(localExtensionVector);
     }
 
     IEnumerator ConnectWhenDisconnected()
@@ -112,8 +107,7 @@ public class Wire : EntityBehaviour<IPlayerState>
                 player.EndAbility();
             else
             {
-                ApplyLocalExtension(LocalExtension(extendingSpeed));
-
+                ApplyExtension(ExtensionThisFrame(extendingSpeed));
                 yield return null;
             }
         }
@@ -127,7 +121,7 @@ public class Wire : EntityBehaviour<IPlayerState>
             float distance = Vector3.Magnitude(
                 Vector3.ProjectOnPlane(player.Target.transform.position - player.transform.position, Vector3.up));
 
-            ApplyLocalExtension(ConvertToLocal(distance - Length));
+            ApplyExtension(distance - Length);
 
             yield return null;
         }
@@ -136,12 +130,12 @@ public class Wire : EntityBehaviour<IPlayerState>
     IEnumerator Retract()
     {
         Quaternion disconnectingRotation = transform.rotation;
-        yield return null;
+        yield return new WaitForEndOfFrame();
         
         while (Extension > 0)
         {
             transform.rotation = disconnectingRotation;
-            float retraction = LocalExtension(retractingSpeed);
+            float retraction = ExtensionThisFrame(retractingSpeed);
 
             if (retraction >= Extension)
             {
@@ -150,7 +144,7 @@ public class Wire : EntityBehaviour<IPlayerState>
             }
             else
             {
-                ApplyLocalExtension(- retraction);
+                ApplyExtension(- retraction);
 
                 yield return null;
             }
