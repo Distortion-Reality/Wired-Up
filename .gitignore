@@ -72,3 +72,7 @@ crashlytics-build.properties
 
 # External Assets
 /[Aa]ssets/External\ Assets/
+
+# Photon Bolt generated file
+/[Aa]ssets/Photon/PhotonBolt/assemblies/bolt.user.dll
+/[Aa]ssets/Photon/PhotonBolt/assemblies/bolt.user.dll.meta
