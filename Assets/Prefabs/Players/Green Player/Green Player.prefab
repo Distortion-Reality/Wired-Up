@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1377762806656316181}
   - component: {fileID: 7977736316358103120}
   m_Layer: 0
-  m_Name: GreenPlayer
+  m_Name: Green Player
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -77,7 +77,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1377762806656316180}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ce8343d166ca18c6b2e0fc62414c8d9, type: 3}
+  m_Script: {fileID: 11500000, guid: f3a374b36524d65cd9a0c1a5378d7399, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1377762806656316181

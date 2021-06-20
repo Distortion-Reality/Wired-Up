@@ -21,7 +21,8 @@ public class TargetEnemyAbilityManager : TargetAbilityManager
     {
         float timeSecondsPassed = 0f;
 
-        while (userAbilityQueue.Count < minAbilities && timeSecondsPassed < waitingTimeSeconds)
+        while (userAbilityQueue.Count > 0 && userAbilityQueue.Count < minAbilities &&
+            timeSecondsPassed < waitingTimeSeconds)
         {
             yield return null;
             timeSecondsPassed += Time.deltaTime;

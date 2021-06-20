@@ -8,7 +8,7 @@ public class PlayerManager : FighterManager<IPlayerState>
     Rigidbody rb;
     Transform cam;
 
-    readonly float moveSpeed = 4f;
+    readonly float moveSpeed = 8f;
     float moveSpeedMultiplier = 1f;
 
     readonly int dashCostEnergy = 5;
