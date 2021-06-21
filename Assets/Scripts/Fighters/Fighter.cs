@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Bolt;
+using System;
 
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
@@ -29,21 +30,18 @@ public abstract class Fighter : MonoBehaviour
     public TargetAbilityManager TargetAbilityManager { get => targetAbilityManager; }
     public Fighter Target { get => target; }
 
+    protected IFighterState state;
+
     public virtual void Init()
     {
         defaultRotation = transform.rotation;
+
+        state = GetComponent<BoltEntity>().GetState<IFighterState>();
     }
 
     public virtual void UpdateFrame()
     {
-        CheckHP();
         UpdateRotation();
-    }
-
-    void CheckHP()
-    {
-        if (stats[StatisticManager.StatisticId.HP].CurrentValue <= 0)
-            Die();
     }
 
     void UpdateRotation()
@@ -87,6 +85,21 @@ public abstract class Fighter : MonoBehaviour
     public void UseEnergy(int abilityEnergy)
     {
         stats[StatisticManager.StatisticId.Nrg].CurrentValue -= abilityEnergy;
+    }
+
+    public void Damage(int amount)
+    {
+        int newHp = Math.Max(0, stats[StatisticManager.StatisticId.HP].CurrentValue - amount);
+        state.hp = newHp;
+        if (newHp == 0)
+            Die();
+    }
+
+    public void Heal(int amount)
+    {
+        int maxHp = stats[StatisticManager.StatisticId.HP].BaseValue;
+        int newHp = Math.Min(maxHp, stats[StatisticManager.StatisticId.HP].CurrentValue + amount);
+        state.hp = newHp;
     }
 
     void Die()

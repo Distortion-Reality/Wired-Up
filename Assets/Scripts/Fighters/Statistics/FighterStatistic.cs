@@ -11,7 +11,11 @@ public class FighterStatistic
         currentValue = baseValue;
     }
 
+    public int BaseValue { get => baseValue;}
+
     public int CurrentValue { get => currentValue; set => currentValue = value; }
+
+    public float PercentageValue { get => ((float) currentValue) / baseValue;}
 
     public void ResetValue()
     {

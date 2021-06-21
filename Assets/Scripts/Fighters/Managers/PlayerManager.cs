@@ -1,12 +1,17 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Bolt;
 
 [RequireComponent(typeof(Player))]
 public class PlayerManager : FighterManager<IPlayerState>
 {
-    Rigidbody rb;
-    Transform cam;
+    private static int alliesIndex = 0;
+    
+    private Rigidbody rb;
+    private Transform cam;
+    private Canvas gui;
+    public GameObject allyInfoPrefab;
 
     readonly float moveSpeed = 8f;
     float moveSpeedMultiplier = 1f;
@@ -23,6 +28,31 @@ public class PlayerManager : FighterManager<IPlayerState>
 
         rb = GetComponent<Rigidbody>();
         cam = Camera.main.transform;
+        gui = FindObjectOfType<Canvas>();
+
+        if (entity.IsOwner)
+        {
+            healthBar = GameObject.Find("PlayerHealthBar").GetComponent<Slider>();
+        }
+        else // Ally
+        {
+            // Create ally UI
+            Color allyColor = Color.green;
+            GameObject allyInfo = Instantiate(allyInfoPrefab, allyInfoPrefab.transform.position, allyInfoPrefab.transform.rotation);
+            Vector3 pos = allyInfo.transform.position;
+            pos.Set(pos.x, pos.y + alliesIndex * 60 , pos.z);
+            allyInfo.transform.SetParent(gui.transform, false);
+
+            TMPro.TextMeshProUGUI allyName = allyInfo.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            allyName.text = entity.Source.RemoteEndPoint.SteamId.Id.ToString();
+
+            allyInfo.gameObject.transform.Find("AllyPortrait").GetComponent<Image>().color = allyColor;
+
+            healthBar = allyInfo.GetComponentInChildren<Slider>();
+            healthBar.gameObject.transform.Find("Fill Area").Find("Fill").GetComponent<Image>().color = allyColor;
+
+            alliesIndex++;
+        }
     }
 
     // Update is called once per frame

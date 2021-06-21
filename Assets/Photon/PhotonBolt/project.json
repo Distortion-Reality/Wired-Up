@@ -4851,6 +4851,23 @@
             "ExtrapolationMaxFrames": 9,
             "SnapMagnitude": 10.0
           }
+        },
+        {
+          "Name": "hp",
+          "Enabled": true,
+          "Expanded": true,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Photon.Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
+            "MaxValue": 255
+          },
+          "AssetSettings": {
+            "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",
+            "ExtrapolationErrorTolerance": 0.25,
+            "_ExtrapolationCorrectionFrames": 6,
+            "ExtrapolationMaxFrames": 9,
+            "SnapMagnitude": 10.0
+          }
         }
       ],
       "IsAbstract": true,

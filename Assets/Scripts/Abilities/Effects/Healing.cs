@@ -9,6 +9,6 @@ public class Healing : Effect
 
     public override void ApplyEffect(Fighter user)
     {
-        user.Target.Stats[StatisticManager.StatisticId.HP].CurrentValue += amount;
+        user.Target.Heal(amount);
     }
 }

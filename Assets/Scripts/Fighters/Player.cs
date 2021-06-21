@@ -71,6 +71,11 @@ public class Player : Fighter
     {
         base.UpdateFrame();
 
+        if (Input.GetKeyDown(KeyCode.L))
+            Damage(1);
+        if (Input.GetKeyDown(KeyCode.M))
+            Heal(1);
+
         if (fighterAbilityStatus != AbilityStatus.USING)
         {
             CheckTargetInput();

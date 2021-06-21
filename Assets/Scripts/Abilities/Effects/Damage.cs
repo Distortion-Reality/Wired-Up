@@ -9,6 +9,6 @@ public class Damage : Effect
 
     public override void ApplyEffect(Fighter user)
     {
-        user.Target.Stats[StatisticManager.StatisticId.HP].CurrentValue -= power;
+        user.Target.Damage(power);
     }
 }
