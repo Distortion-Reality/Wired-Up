@@ -10,12 +10,12 @@ public class Menu : GlobalEventListener {
         BoltLauncher.StartServer();
     }
 
-    public override void BoltStartDone()    
+    public override void BoltStartDone()
     {
         if (BoltNetwork.IsServer)
         {
             string matchName = Guid.NewGuid().ToString();
-            BoltMatchmaking.CreateSession(sessionID: matchName, sceneToLoad: "Level2Scene");
+            BoltMatchmaking.CreateSession(sessionID: matchName, sceneToLoad: "Lobby");
         }
     }
 
