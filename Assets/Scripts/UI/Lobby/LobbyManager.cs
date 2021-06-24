@@ -101,9 +101,4 @@ public class LobbyManager : GlobalEventListener
         if (forceStart) return true;
         return allPlayers.Count == 3 && allPlayers.TrueForAll(player => player.IsReady);
     }
-
-    public override void OnEvent(LobbyStartEvent evnt)
-    {
-        SceneManager.LoadScene("Level2Scene", LoadSceneMode.Single);
-    }
 }
