@@ -18,7 +18,7 @@ public abstract class FighterManager<T> : EntityBehaviour<T> where T : IFighterS
         state.AddCallback("hp", HpChanged);
     }
 
-    public void HpChanged()
+    void HpChanged()
     {
         fighter.Stats[StatisticManager.StatisticId.HP].CurrentValue = state.hp;
         if (healthBar != null)
