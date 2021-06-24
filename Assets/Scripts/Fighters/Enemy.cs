@@ -54,11 +54,15 @@ public class Enemy : Fighter
 
         // Assists initialization
         assists = new List<Ability>();
+
     }
 
     protected override void OnUpdate()
     {
-        
+        if (!target)
+        {
+            target = GameObject.FindWithTag("Player").GetComponent<Player>();
+        }
     }
 
     protected override void UseAbility(Ability ability)
