@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Bolt;
 
 [RequireComponent(typeof(Collider))]
@@ -6,10 +7,11 @@ using Photon.Bolt;
 public abstract class FighterManager<T> : EntityBehaviour<T> where T : IFighterState
 {
     protected Fighter fighter;
-
     protected Rigidbody rb;
 
     readonly float rotationSpeed = 10f;
+
+    protected Slider healthBar;
 
     protected float MoveSpeed => 1.3f * Mathf.Log(10 * fighter.Stats[StatisticManager.StatisticId.Spd].CurrentValue);
     protected abstract Quaternion DefaultRotation { get; }
@@ -23,8 +25,21 @@ public abstract class FighterManager<T> : EntityBehaviour<T> where T : IFighterS
         rb = GetComponent<Rigidbody>();
 
         state.SetTransforms(state.transform, transform);
+        state.hp = fighter.Stats[StatisticManager.StatisticId.HP].CurrentValue;
+        state.AddCallback("hp", HpChanged);
 
         OnAttached();
+    }
+
+    void HpChanged()
+    {
+        fighter.ChangeStat(StatisticManager.StatisticId.HP, state.hp);
+
+        if (healthBar)
+            healthBar.value = fighter.Stats[StatisticManager.StatisticId.HP].PercentageValue;
+
+        if (entity.IsOwner && fighter.Stats[StatisticManager.StatisticId.HP].CurrentValue == 0)
+            fighter.Die();
     }
 
     protected abstract void OnAttached();
@@ -32,10 +47,13 @@ public abstract class FighterManager<T> : EntityBehaviour<T> where T : IFighterS
     // Update is called once per frame
     void Update()
     {
-        if (IsStunned)
+        if (!entity.IsOwner)
             return;
 
-        OnUpdate();
+        if (!IsStunned)
+            OnUpdate();
+
+        fighter.FighterUpdate();
     }
 
     protected abstract void OnUpdate();

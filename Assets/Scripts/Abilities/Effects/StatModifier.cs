@@ -21,10 +21,10 @@ public class StatModifier : Effect
 
     IEnumerator ApplyStatChange(Fighter target)
     {
-        target.ApplyStatChange(statId, stages);
+        target.ChangeStat(statId, stages);
 
         yield return new WaitForSeconds(time);
 
-        target.ApplyStatChange(statId, - stages);
+        target.ChangeStat(statId, - stages);
     }
 }

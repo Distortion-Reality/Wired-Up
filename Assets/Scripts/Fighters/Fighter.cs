@@ -16,6 +16,8 @@ public abstract class Fighter : MonoBehaviour
         STUNNED
     }
 
+    protected IFighterState state;
+
     protected Dictionary<StatisticManager.StatisticId, FighterStatistic> stats;
     protected List<Ability> attacks, assists;
     protected Ability currentAbility = null;
@@ -37,6 +39,8 @@ public abstract class Fighter : MonoBehaviour
 
     public void FighterStart()
     {
+        state = GetComponent<BoltEntity>().GetState<IFighterState>();
+
         targetAbilityManager = GetComponent<TargetAbilityManager>();
         animator = GetComponent<Animator>();
 
@@ -46,16 +50,16 @@ public abstract class Fighter : MonoBehaviour
     protected abstract void OnFighterStart();
 
     // Update is called once per frame
-    void Update()
+    public void FighterUpdate()
     {
         UpdateTarget();
         RegenEnergy();
 
         if (fighterStatus != Status.STUNNED)
-            OnUpdate();
+            OnFighterUpdate();
     }
 
-    protected abstract void OnUpdate();
+    protected abstract void OnFighterUpdate();
 
     void UpdateTarget()
     {
@@ -74,7 +78,7 @@ public abstract class Fighter : MonoBehaviour
         {
             int spd = stats[StatisticManager.StatisticId.Spd].CurrentValue;
             float energyRegen = 2.20738f * Mathf.Log(0.809275f * spd) * Time.deltaTime;
-            ApplyEnergyChange(energyRegen);
+            ChangeEnergy(energyRegen);
         }
     }
 
@@ -107,17 +111,20 @@ public abstract class Fighter : MonoBehaviour
 
     public void UseEnergy(int abilityEnergy)
     {
-        ApplyEnergyChange(- abilityEnergy);
+        ChangeEnergy(- abilityEnergy);
     }
 
-    public void ApplyStatChange(StatisticManager.StatisticId statId, int change)
+    public void ChangeStat(StatisticManager.StatisticId statId, int change)
     {
         stats[statId].ApplyChange(change);
-        if (statId == StatisticManager.StatisticId.HP)
-            CheckHP();
     }
 
-    void ApplyEnergyChange(float change)
+    public void ChangeHP(int change)
+    {
+        state.hp = stats[StatisticManager.StatisticId.HP].CurrentValue;
+    }
+
+    void ChangeEnergy(float change)
     {
         Energy.ApplyChange(change);
     }
@@ -139,13 +146,7 @@ public abstract class Fighter : MonoBehaviour
         }
     }
 
-    void CheckHP()
-    {
-        if (stats[StatisticManager.StatisticId.HP].CurrentValue == 0)
-            Die();
-    }
-
-    void Die()
+    public void Die()
     {
         BoltNetwork.Destroy(gameObject);
     }

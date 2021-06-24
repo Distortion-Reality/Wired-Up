@@ -66,7 +66,7 @@ public class Player : Fighter
         wire = GetComponentInChildren<Wire>(true);
     }
 
-    protected override void OnUpdate()
+    protected override void OnFighterUpdate()
     {
         if (fighterStatus != Status.USING)
         {

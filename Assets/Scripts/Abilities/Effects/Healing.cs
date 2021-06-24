@@ -11,7 +11,6 @@ public class Healing : Effect
 
     protected override void ApplySingleEffect(Fighter user, Fighter target)
     {
-        target.ApplyStatChange(StatisticManager.StatisticId.HP,
-            Mathf.RoundToInt(target.Stats[StatisticManager.StatisticId.HP].BaseValue * percentage));
+        target.ChangeHP(Mathf.RoundToInt(target.Stats[StatisticManager.StatisticId.HP].BaseValue * percentage));
     }
 }

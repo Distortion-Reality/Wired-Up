@@ -12,5 +12,7 @@ public abstract class FighterStatistic
     public int BaseValue { get => baseValue; set => baseValue = value; }
     public int CurrentValue { get => currentValue; }
 
+    public float PercentageValue => ((float) currentValue) / baseValue;
+
     public abstract void ApplyChange(int change);
 }

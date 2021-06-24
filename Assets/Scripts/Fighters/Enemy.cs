@@ -56,7 +56,7 @@ public class Enemy : Fighter
         assists = new List<Ability>();
     }
 
-    protected override void OnUpdate()
+    protected override void OnFighterUpdate()
     {
         
     }
