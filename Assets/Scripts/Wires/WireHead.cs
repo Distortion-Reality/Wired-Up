@@ -47,12 +47,12 @@ public class WireHead : EntityBehaviour<IPlayerState>
 
         switch (player.FighterStatus)
         {
-            case Fighter.Status.WAITING:
+            case Fighter.Status.Waiting:
                 if (other.gameObject != player.Target.gameObject)
                     player.InterruptWaiting();
                 break;
 
-            case Fighter.Status.CONNECTING:
+            case Fighter.Status.Connecting:
                 if (other.CompareTag("Enemy") || other.CompareTag("Player") ||
                     other.CompareTag("Interactable") && other.CompareTag(player.Target.tag))
                     player.EnqueueUserAbilityToTarget(other.GetComponent<Fighter>());

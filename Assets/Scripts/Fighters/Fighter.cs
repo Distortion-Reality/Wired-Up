@@ -1,27 +1,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Bolt;
 
+[RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Animator))]
 public abstract class Fighter : MonoBehaviour
 {
     public enum Status
     {
-        FREE,
-        CONNECTING,
-        WAITING,
-        USING,
-        DISCONNECTING,
-        STUNNED
+        Free,
+        Connecting,
+        Waiting,
+        Using,
+        Disconnecting,
+        Stunned
     }
 
+    protected BoltEntity entity;
     protected IFighterState state;
+
+    protected Rigidbody rb;
+    const float RotationSpeed = 10f;
+
+    protected Slider healthBar;
 
     protected Dictionary<StatisticManager.StatisticId, FighterStatistic> stats;
     protected List<Ability> attacks, assists;
     protected Ability currentAbility = null;
-    protected Status fighterStatus = Status.FREE;
+    protected Status fighterStatus = Status.Free;
     TargetAbilityManager targetAbilityManager;
     protected Fighter target = null;
     Animator animator;
@@ -55,7 +64,7 @@ public abstract class Fighter : MonoBehaviour
         UpdateTarget();
         RegenEnergy();
 
-        if (fighterStatus != Status.STUNNED)
+        if (fighterStatus != Status.Stunned)
             OnFighterUpdate();
     }
 
@@ -63,7 +72,7 @@ public abstract class Fighter : MonoBehaviour
 
     void UpdateTarget()
     {
-        if (target != null && TargetDistance > TargetRange && fighterStatus == Status.FREE)
+        if (target != null && TargetDistance > TargetRange && fighterStatus == Status.Free)
             target = null;
     }
 
@@ -142,7 +151,7 @@ public abstract class Fighter : MonoBehaviour
 
             yield return new WaitForSeconds(time);
 
-            fighterStatus = Status.FREE;
+            fighterStatus = Status.Free;
         }
     }
 

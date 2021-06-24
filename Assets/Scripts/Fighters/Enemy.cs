@@ -63,13 +63,13 @@ public class Enemy : Fighter
 
     protected override void UseAbility(Ability ability)
     {
-        fighterStatus = Status.USING;
+        fighterStatus = Status.Using;
         ability.DoAbility(this);
     }
 
     public override void EndAbility()
     {
         base.EndAbility();
-        fighterStatus = Status.FREE;
+        fighterStatus = Status.Free;
     }
 }

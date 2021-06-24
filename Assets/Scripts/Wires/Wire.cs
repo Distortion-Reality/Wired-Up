@@ -51,7 +51,7 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     public void Connect()
     {
-        if (player.FighterStatus == Fighter.Status.DISCONNECTING)
+        if (player.FighterStatus == Fighter.Status.Disconnecting)
             StartCoroutine(ConnectWhenDisconnected());
         else
         {
@@ -67,13 +67,13 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     public void Disconnect()
     {
-        player.FighterStatus = Fighter.Status.DISCONNECTING;
+        player.FighterStatus = Fighter.Status.Disconnecting;
         StartCoroutine(Retract());
     }
 
     void StartConnecting()
     {
-        player.FighterStatus = Fighter.Status.CONNECTING;
+        player.FighterStatus = Fighter.Status.Connecting;
         StartCoroutine(Extend());
     }
 
@@ -99,7 +99,7 @@ public class Wire : EntityBehaviour<IPlayerState>
     IEnumerator ConnectWhenDisconnected()
     {
         connectWhenDisconnected = true;
-        yield return new WaitUntil(() => player.FighterStatus != Fighter.Status.DISCONNECTING);
+        yield return new WaitUntil(() => player.FighterStatus != Fighter.Status.Disconnecting);
 
         connectWhenDisconnected = false;
         StartConnecting();
@@ -107,7 +107,7 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     IEnumerator Extend()
     {
-        while (player.FighterStatus == Fighter.Status.CONNECTING)
+        while (player.FighterStatus == Fighter.Status.Connecting)
         {
             if (Length >= player.AbilityRange)
                 player.EndAbility();
@@ -121,8 +121,8 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     IEnumerator AdjustExtension()
     {
-        while (player.FighterStatus == Fighter.Status.WAITING ||
-            player.FighterStatus == Fighter.Status.USING)
+        while (player.FighterStatus == Fighter.Status.Waiting ||
+            player.FighterStatus == Fighter.Status.Using)
         {
             ApplyExtension(player.TargetDistance - Length);
 
@@ -152,7 +152,7 @@ public class Wire : EntityBehaviour<IPlayerState>
 
         transform.localRotation = defaultLocalRotation;
 
-        player.FighterStatus = Fighter.Status.FREE;
+        player.FighterStatus = Fighter.Status.Free;
 
         if (!connectWhenDisconnected)
             gameObject.SetActive(false);

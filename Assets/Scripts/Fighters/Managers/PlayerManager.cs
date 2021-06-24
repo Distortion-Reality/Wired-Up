@@ -56,7 +56,7 @@ public class PlayerManager : FighterManager<IPlayerState>
     protected override void OnUpdate()
     {
         if (Input.GetButtonDown("Dash") && Time.time > nextDashTime &&
-            fighter.FighterStatus == Fighter.Status.FREE &&
+            fighter.FighterStatus == Fighter.Status.Free &&
             fighter.CheckAndUseEnergy(dashEnergy))
             StartCoroutine(Dash());
     }

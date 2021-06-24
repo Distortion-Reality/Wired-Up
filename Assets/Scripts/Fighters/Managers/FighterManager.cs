@@ -15,7 +15,7 @@ public abstract class FighterManager<T> : EntityBehaviour<T> where T : IFighterS
 
     protected float MoveSpeed => 1.3f * Mathf.Log(10 * fighter.Stats[StatisticManager.StatisticId.Spd].CurrentValue);
     protected abstract Quaternion DefaultRotation { get; }
-    protected bool IsStunned => fighter.FighterStatus == Fighter.Status.STUNNED;
+    protected bool IsStunned => fighter.FighterStatus == Fighter.Status.Stunned;
 
     public override void Attached()
     {
@@ -73,8 +73,8 @@ public abstract class FighterManager<T> : EntityBehaviour<T> where T : IFighterS
     void UpdateRotation()
     {
         Quaternion rotation;
-        if (fighter.FighterStatus != Fighter.Status.FREE &&
-            fighter.FighterStatus != Fighter.Status.DISCONNECTING)
+        if (fighter.FighterStatus != Fighter.Status.Free &&
+            fighter.FighterStatus != Fighter.Status.Disconnecting)
             rotation = LookAtTargetRotation();
         else
         {

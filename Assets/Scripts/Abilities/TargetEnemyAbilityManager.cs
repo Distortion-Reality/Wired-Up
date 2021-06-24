@@ -11,7 +11,7 @@ public class TargetEnemyAbilityManager : TargetAbilityManager
         if (usersAreUsing)
         {
             userAbility.UseEnergy();
-            userAbility.User.FighterStatus = Fighter.Status.USING;
+            userAbility.User.FighterStatus = Fighter.Status.Using;
         }
         else if (userAbilityQueue.Count == 1)
             StartCoroutine(WaitForOtherAbilities());

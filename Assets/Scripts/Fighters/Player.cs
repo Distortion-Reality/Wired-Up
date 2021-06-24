@@ -68,10 +68,10 @@ public class Player : Fighter
 
     protected override void OnFighterUpdate()
     {
-        if (fighterStatus != Status.USING)
+        if (fighterStatus != Status.Using)
         {
             CheckTargetInput();
-            if (fighterStatus != Status.DISCONNECTING && target)
+            if (fighterStatus != Status.Disconnecting && target)
                 CheckAbilityInput();
         }
     }
@@ -159,7 +159,7 @@ public class Player : Fighter
     public void EnqueueUserAbilityToTarget(Fighter actualTarget)
     {
         target = actualTarget;
-        fighterStatus = Status.WAITING;
+        fighterStatus = Status.Waiting;
         target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
 
         wire.StayConnected();
@@ -167,9 +167,9 @@ public class Player : Fighter
 
     void CheckAndUpdatePlayerStatus()
     {
-        if (fighterStatus == Status.WAITING)
+        if (fighterStatus == Status.Waiting)
             InterruptWaiting();
-        else if (fighterStatus == Status.CONNECTING)
+        else if (fighterStatus == Status.Connecting)
             EndAbility();
     }
 }
