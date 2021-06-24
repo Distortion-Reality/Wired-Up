@@ -1,9 +1,7 @@
-public class FighterStatistic
+public abstract class FighterStatistic
 {
-    readonly int baseValue;
-    int currentValue;
-
-    public FighterStatistic() : this(0) { }
+    protected int baseValue;
+    protected int currentValue;
 
     public FighterStatistic(int baseValue)
     {
@@ -11,10 +9,8 @@ public class FighterStatistic
         currentValue = baseValue;
     }
 
-    public int CurrentValue { get => currentValue; set => currentValue = value; }
+    public int BaseValue { get => baseValue; set => baseValue = value; }
+    public int CurrentValue { get => currentValue; }
 
-    public void ResetValue()
-    {
-        currentValue = baseValue;
-    }
+    public abstract void ApplyChange(int change);
 }

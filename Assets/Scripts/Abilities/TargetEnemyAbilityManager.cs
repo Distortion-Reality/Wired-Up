@@ -4,14 +4,14 @@ using UnityEngine;
 public class TargetEnemyAbilityManager : TargetAbilityManager
 {
     public int minAbilities = 2;
-    public float waitingTimeSeconds = 1.5f;
+    public float waitingTime = 1.5f;
 
     protected override void CheckUserAbilityQueue(UserAbility userAbility)
     {
         if (usersAreUsing)
         {
             userAbility.UseEnergy();
-            userAbility.User.FighterAbilityStatus = Fighter.AbilityStatus.USING;
+            userAbility.User.FighterStatus = Fighter.Status.USING;
         }
         else if (userAbilityQueue.Count == 1)
             StartCoroutine(WaitForOtherAbilities());
@@ -19,13 +19,13 @@ public class TargetEnemyAbilityManager : TargetAbilityManager
 
     IEnumerator WaitForOtherAbilities()
     {
-        float timeSecondsPassed = 0f;
+        float elapsedTime = 0f;
 
         while (userAbilityQueue.Count > 0 && userAbilityQueue.Count < minAbilities &&
-            timeSecondsPassed < waitingTimeSeconds)
+            elapsedTime < waitingTime)
         {
             yield return null;
-            timeSecondsPassed += Time.deltaTime;
+            elapsedTime += Time.deltaTime;
         }
 
         if (userAbilityQueue.Count < minAbilities)

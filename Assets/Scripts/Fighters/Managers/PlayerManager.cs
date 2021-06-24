@@ -5,49 +5,48 @@ using Photon.Bolt;
 [RequireComponent(typeof(Player))]
 public class PlayerManager : FighterManager<IPlayerState>
 {
-    Rigidbody rb;
     Transform cam;
 
-    readonly float moveSpeed = 8f;
     float moveSpeedMultiplier = 1f;
 
-    readonly int dashCostEnergy = 5;
+    readonly int dashEnergy = 5;
     readonly float dashMultiplier = 2f,
-        dashDurationSeconds = 0.5f,
-        dashCooldownSeconds = 5f;
+        dashDuration = 0.25f,
+        dashCooldown = 5f;
     float nextDashTime = 0f;
 
-    public override void Attached()
-    {
-        base.Attached();
+    protected override Quaternion DefaultRotation =>
+        new Quaternion(transform.rotation.x, cam.rotation.y, transform.rotation.z, cam.rotation.w);
 
-        rb = GetComponent<Rigidbody>();
+    protected override void OnAttached()
+    {
         cam = Camera.main.transform;
     }
 
-    // Update is called once per frame
-    protected override void Update()
+    protected override void OnUpdate()
     {
         if (!entity.IsOwner)
-        {
             return;
-        }
 
         if (Input.GetButtonDown("Dash") && Time.time > nextDashTime &&
-            fighter.CheckAndUseEnergy(dashCostEnergy))
+            fighter.FighterStatus == Fighter.Status.FREE &&
+            fighter.CheckAndUseEnergy(dashEnergy))
             StartCoroutine(Dash());
-
-        base.Update();
     }
 
-    public override void SimulateOwner()
+    protected override void OnSimulateOwner()
+    {
+        UpdateMovement();
+    }
+
+    void UpdateMovement()
     {
         float x = Input.GetAxisRaw("Horizontal");
         float z = Input.GetAxisRaw("Vertical");
 
         Vector3 dir = cam.right * x + cam.forward * z;
         dir.Normalize();
-        dir *= moveSpeedMultiplier * moveSpeed;
+        dir *= moveSpeedMultiplier * MoveSpeed;
         dir.y = rb.velocity.y;
         rb.velocity = dir;
     }
@@ -55,8 +54,8 @@ public class PlayerManager : FighterManager<IPlayerState>
     IEnumerator Dash()
     {
         moveSpeedMultiplier = dashMultiplier;
-        nextDashTime = Time.time + dashDurationSeconds + dashCooldownSeconds;
-        yield return new WaitForSeconds(dashDurationSeconds);
+        nextDashTime = Time.time + dashDuration + dashCooldown;
+        yield return new WaitForSeconds(dashDuration);
 
         moveSpeedMultiplier = 1f;
     }

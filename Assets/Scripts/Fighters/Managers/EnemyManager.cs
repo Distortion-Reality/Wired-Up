@@ -4,14 +4,20 @@ using Photon.Bolt;
 [RequireComponent(typeof(Enemy))]
 public class EnemyManager : FighterManager<IEnemyState>
 {
-    public override void Attached()
+    protected override Quaternion DefaultRotation => transform.rotation;
+
+    protected override void OnAttached()
     {
-        base.Attached();
+        
     }
 
-    // Update is called once per frame
-    protected override void Update()
+    protected override void OnUpdate()
     {
-        base.Update();
+
+    }
+
+    protected override void OnSimulateOwner()
+    {
+        
     }
 }

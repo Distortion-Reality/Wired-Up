@@ -4,21 +4,18 @@ using UnityEngine;
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
 public class Player : Fighter
 {
-    Ability currentAbility = null;
     Wire wire;
 
-    public override void Init()
+    protected override void OnFighterStart()
     {
-        base.Init();
-
         // Statistics initialization
 
-        FighterStatistic hp = new FighterStatistic(10);
-        FighterStatistic armor = new FighterStatistic(10);
-        FighterStatistic length = new FighterStatistic(10);
-        FighterStatistic intensity = new FighterStatistic(10);
-        FighterStatistic energy = new FighterStatistic(1000000);
-        FighterStatistic speed = new FighterStatistic(10);
+        FighterRangedStatistic hp = new FighterRangedStatistic(10);
+        FighterStatistic armor = new FighterBuffableStatistic(10);
+        FighterStatistic length = new FighterBuffableStatistic(50);
+        FighterStatistic intensity = new FighterBuffableStatistic(10);
+        FighterEnergy energy = new FighterEnergy(100);
+        FighterStatistic speed = new FighterBuffableStatistic(50);
 
         stats = new Dictionary<StatisticManager.StatisticId, FighterStatistic>()
         {
@@ -36,19 +33,19 @@ public class Player : Fighter
         {
             new Damage(10)
         };
-        Ability ability1 = new Ability(effects1, 5);
+        Ability ability1 = new Ability(effects1, 5, "");
 
         List<Effect> effects2 = new List<Effect>()
         {
             new StatModifier(StatisticManager.StatisticId.Int, 10, 10)
         };
-        Ability ability2 = new Ability(effects2, 5);
+        Ability ability2 = new Ability(effects2, 5, "");
 
         List<Effect> effects3 = new List<Effect>()
         {
             new Healing(10)
         };
-        Ability ability3 = new Ability(effects3, 5);
+        Ability ability3 = new Ability(effects3, 5, "");
 
         attacks = new List<Ability>()
         {
@@ -60,21 +57,16 @@ public class Player : Fighter
         // Assists initialization
         assists = new List<Ability>();
 
-        // TargetAbilityManager initialization
-        targetAbilityManager = GetComponent<TargetPlayerAbilityManager>();
-
         // Wire initialization
         wire = GetComponentInChildren<Wire>(true);
     }
 
-    public override void UpdateFrame()
+    protected override void OnUpdate()
     {
-        base.UpdateFrame();
-
-        if (fighterAbilityStatus != AbilityStatus.USING)
+        if (fighterStatus != Status.USING)
         {
             CheckTargetInput();
-            if (fighterAbilityStatus != AbilityStatus.DISCONNECTING)
+            if (fighterStatus != Status.DISCONNECTING)
                 CheckAbilityInput();
         }
     }
@@ -85,12 +77,13 @@ public class Player : Fighter
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
-                if (hit.collider.CompareTag("Enemy") || hit.collider.CompareTag("Player"))
+                if (hit.collider.CompareTag("Enemy") || hit.collider.CompareTag("Player") &&
+                    DistanceFrom(hit.transform) <= TargetRange)
                 {
                     Fighter hitFighter = hit.collider.GetComponent<Fighter>();
                     if (hitFighter != target)
                     {
-                        CheckAndUpdatePlayerAbilityStatus();
+                        CheckAndUpdatePlayerStatus();
                         target = hitFighter;
                     }
                 }
@@ -107,32 +100,29 @@ public class Player : Fighter
 
         List<Ability> abilities = target is Player ? assists : attacks;
 
-        int abilityToUse = 0;
+        int selectedAbility = 0;
         if (Input.GetButton("AbilityModifier1"))
-            abilityToUse = 2;
+            selectedAbility = 2;
         else if (Input.GetButton("AbilityModifier2"))
-            abilityToUse = 4;
+            selectedAbility = 4;
 
         if (Input.GetButtonDown("Ability2"))
-            abilityToUse++;
+            selectedAbility++;
 
-        if (abilityToUse < abilities.Count)
-            UseAbility(abilities[abilityToUse]);
+        if (selectedAbility < abilities.Count)
+            SelectAbility(abilities[selectedAbility]);
     }
 
     protected override void UseAbility(Ability ability)
     {
-        if (CheckAndUseEnergy(ability.Energy))
-        {
-            CheckAndUpdatePlayerAbilityStatus();
-            currentAbility = ability;
-            wire.Connect();
-        }
+        CheckAndUpdatePlayerStatus();
+        currentAbility = ability;
+        wire.Connect();
     }
 
     public override void EndAbility()
     {
-        currentAbility = null;
+        base.EndAbility();
         wire.Disconnect();
     }
 
@@ -145,17 +135,17 @@ public class Player : Fighter
     public void EnqueueUserAbilityToTarget(Fighter actualTarget)
     {
         target = actualTarget;
-        fighterAbilityStatus = AbilityStatus.WAITING;
+        fighterStatus = Status.WAITING;
         target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
 
         wire.StayConnected();
     }
 
-    void CheckAndUpdatePlayerAbilityStatus()
+    void CheckAndUpdatePlayerStatus()
     {
-        if (fighterAbilityStatus == AbilityStatus.WAITING)
+        if (fighterStatus == Status.WAITING)
             InterruptWaiting();
-        else if (fighterAbilityStatus == AbilityStatus.CONNECTING)
+        else if (fighterStatus == Status.CONNECTING)
             EndAbility();
     }
 }

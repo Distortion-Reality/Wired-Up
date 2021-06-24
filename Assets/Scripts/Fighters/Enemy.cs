@@ -1,22 +1,19 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(TargetEnemyAbilityManager))]
 public class Enemy : Fighter
 {
-    public override void Init()
+    protected override void OnFighterStart()
     {
-        base.Init();
-
         // Statistics initialization
 
-        FighterStatistic hp = new FighterStatistic(20);
-        FighterStatistic armor = new FighterStatistic(10);
-        FighterStatistic length = new FighterStatistic(10);
-        FighterStatistic intensity = new FighterStatistic(10);
-        FighterStatistic energy = new FighterStatistic(20);
-        FighterStatistic speed = new FighterStatistic(10);
+        FighterRangedStatistic hp = new FighterRangedStatistic(20);
+        FighterStatistic armor = new FighterBuffableStatistic(10);
+        FighterStatistic length = new FighterBuffableStatistic(10);
+        FighterStatistic intensity = new FighterBuffableStatistic(10);
+        FighterEnergy energy = new FighterEnergy(20);
+        FighterStatistic speed = new FighterBuffableStatistic(50);
 
         stats = new Dictionary<StatisticManager.StatisticId, FighterStatistic>()
         {
@@ -34,19 +31,19 @@ public class Enemy : Fighter
         {
             new Damage(10)
         };
-        Ability ability1 = new Ability(effects1, 5);
+        Ability ability1 = new Ability(effects1, 5, "");
 
         List<Effect> effects2 = new List<Effect>()
         {
             new StatModifier(StatisticManager.StatisticId.Int, 10, 10)
         };
-        Ability ability2 = new Ability(effects2, 5);
+        Ability ability2 = new Ability(effects2, 5, "");
 
         List<Effect> effects3 = new List<Effect>()
         {
             new Healing(10)
         };
-        Ability ability3 = new Ability(effects3, 5);
+        Ability ability3 = new Ability(effects3, 5, "");
 
         attacks = new List<Ability>()
         {
@@ -57,27 +54,22 @@ public class Enemy : Fighter
 
         // Assists initialization
         assists = new List<Ability>();
-
-        // TargetAbilityManager initialization
-        targetAbilityManager = GetComponent<TargetEnemyAbilityManager>();
     }
 
-    public override void UpdateFrame()
+    protected override void OnUpdate()
     {
-        base.UpdateFrame();
+        
     }
 
     protected override void UseAbility(Ability ability)
     {
-        if (CheckAndUseEnergy(ability.Energy))
-        {
-            fighterAbilityStatus = AbilityStatus.USING;
-            ability.DoAbility(this);
-        }
+        fighterStatus = Status.USING;
+        ability.DoAbility(this);
     }
 
     public override void EndAbility()
     {
-        fighterAbilityStatus = AbilityStatus.FREE;
+        base.EndAbility();
+        fighterStatus = Status.FREE;
     }
 }
