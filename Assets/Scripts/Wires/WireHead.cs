@@ -53,8 +53,8 @@ public class WireHead : EntityBehaviour<IPlayerState>
                 break;
 
             case Fighter.Status.CONNECTING:
-                if (other.CompareTag("Enemy") || other.CompareTag("Player") &&
-                    other.CompareTag(player.Target.tag))
+                if (other.CompareTag("Enemy") || other.CompareTag("Player") ||
+                    other.CompareTag("Interactable") && other.CompareTag(player.Target.tag))
                     player.EnqueueUserAbilityToTarget(other.GetComponent<Fighter>());
                 else
                     player.EndAbility();

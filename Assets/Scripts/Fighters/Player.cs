@@ -4,6 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
 public class Player : Fighter
 {
+    Ability interaction;
     Wire wire;
 
     protected override void OnFighterStart()
@@ -57,6 +58,10 @@ public class Player : Fighter
         // Assists initialization
         assists = new List<Ability>();
 
+        // Interaction ability initialization
+        List<Effect> interactionEffects = new List<Effect>();
+        interaction = new Ability(interactionEffects, 5, "");
+
         // Wire initialization
         wire = GetComponentInChildren<Wire>(true);
     }
@@ -66,7 +71,7 @@ public class Player : Fighter
         if (fighterStatus != Status.USING)
         {
             CheckTargetInput();
-            if (fighterStatus != Status.DISCONNECTING)
+            if (fighterStatus != Status.DISCONNECTING && target)
                 CheckAbilityInput();
         }
     }
@@ -75,10 +80,9 @@ public class Player : Fighter
     {
         if (Input.GetButtonDown("Target"))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit))
-                if (hit.collider.CompareTag("Enemy") || hit.collider.CompareTag("Player") &&
-                    DistanceFrom(hit.transform) <= TargetRange)
+            Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+            if (Physics.Raycast(ray, out RaycastHit hit, LayerMask.GetMask("Player", "Enemy", "Interactable")))
+                if (DistanceFrom(hit.transform) <= TargetRange)
                 {
                     Fighter hitFighter = hit.collider.GetComponent<Fighter>();
                     if (hitFighter != target)
@@ -92,25 +96,45 @@ public class Player : Fighter
 
     void CheckAbilityInput()
     {
-        if (target == null)
+        int abilityIndex;
+        if (Input.GetButtonDown("Ability1"))
+            abilityIndex = 0;
+        else if (Input.GetButtonDown("Ability2"))
+            abilityIndex = 1;
+        else
             return;
 
-        if (!Input.GetButtonDown("Ability1") && !Input.GetButtonDown("Ability2"))
-            return;
+        int skillSet = 0;
+        if (Input.GetButton("SkillSet2"))
+            skillSet = 1;
+        else if (Input.GetButton("SkillSet3"))
+            skillSet = 2;
 
-        List<Ability> abilities = target is Player ? assists : attacks;
+        Ability ability = null;
+        if (target.CompareTag("Interactable") && abilityIndex == 1 && skillSet == 0)
+            ability = interaction;
+        else
+        {
+            List<Ability> abilities;
+            int offset;
+            if (target.CompareTag("Player"))
+            {
+                abilities = assists;
+                offset = 1;
+            }
+            else
+            {
+                abilities = attacks;
+                offset = 2;
+            }
 
-        int selectedAbility = 0;
-        if (Input.GetButton("AbilityModifier1"))
-            selectedAbility = 2;
-        else if (Input.GetButton("AbilityModifier2"))
-            selectedAbility = 4;
+            abilityIndex = offset * skillSet + abilityIndex;
+            if (abilityIndex < abilities.Count)
+                ability = abilities[abilityIndex];
+        }
 
-        if (Input.GetButtonDown("Ability2"))
-            selectedAbility++;
-
-        if (selectedAbility < abilities.Count)
-            SelectAbility(abilities[selectedAbility]);
+        if (ability)
+            SelectAbility(ability);
     }
 
     protected override void UseAbility(Ability ability)
