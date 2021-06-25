@@ -20,12 +20,16 @@ public abstract class Fighter : MonoBehaviour
     }
 
     protected BoltEntity entity;
-    protected IFighterState state;
+    protected IFighterState State { get => entity.GetState<IFighterState>(); }
 
     protected Rigidbody rb;
     const float RotationSpeed = 10f;
 
     protected Slider healthBar;
+
+    protected float MoveSpeed => 1.3f * Mathf.Log(10 * stats[StatisticManager.StatisticId.Spd].CurrentValue);
+    protected abstract Quaternion DefaultRotation { get; }
+    protected bool IsStunned => fighterStatus == Fighter.Status.Stunned;
 
     protected Dictionary<StatisticManager.StatisticId, FighterStatistic> stats;
     protected List<Ability> attacks, assists;
@@ -46,29 +50,37 @@ public abstract class Fighter : MonoBehaviour
     protected float TargetRange => 2 * AbilityRange;
     public float TargetDistance => DistanceFrom(target.transform);
 
-    public void FighterStart()
+    public virtual void EntityStart()
     {
-        state = GetComponent<BoltEntity>().GetState<IFighterState>();
-
+        entity = GetComponent<BoltEntity>();
+        rb = GetComponent<Rigidbody>();
         targetAbilityManager = GetComponent<TargetAbilityManager>();
         animator = GetComponent<Animator>();
 
-        OnFighterStart();
+        InitStats();
+
+        // Setup Bolt states
+        State.SetTransforms(State.transform, transform);
+        State.hp = stats[StatisticManager.StatisticId.HP].CurrentValue;
+        State.AddCallback("hp", HpChanged);
     }
 
-    protected abstract void OnFighterStart();
+    protected abstract void InitStats();
 
     // Update is called once per frame
-    public void FighterUpdate()
+    public virtual void OwnerUpdate()
     {
         UpdateTarget();
         RegenEnergy();
-
-        if (fighterStatus != Status.Stunned)
-            OnFighterUpdate();
     }
 
-    protected abstract void OnFighterUpdate();
+    public virtual void OwnerFixedUpdate()
+    {
+        if (!IsStunned)
+        {
+            UpdateRotation();
+        }   
+    }
 
     void UpdateTarget()
     {
@@ -128,9 +140,24 @@ public abstract class Fighter : MonoBehaviour
         stats[statId].ApplyChange(change);
     }
 
-    public void ChangeHP(int change)
+    public void ChangeHp(int change)
     {
-        state.hp = stats[StatisticManager.StatisticId.HP].CurrentValue;
+        State.hp = stats[StatisticManager.StatisticId.HP].CurrentValue;
+    }
+
+    void HpChanged()
+    {
+        ChangeStat(StatisticManager.StatisticId.HP, State.hp);
+
+        if (healthBar)
+        {
+            healthBar.value = stats[StatisticManager.StatisticId.HP].PercentageValue;
+        }
+
+        if (entity.IsOwner && stats[StatisticManager.StatisticId.HP].CurrentValue == 0)
+        {
+            Die();
+        }
     }
 
     void ChangeEnergy(float change)
@@ -155,7 +182,28 @@ public abstract class Fighter : MonoBehaviour
         }
     }
 
-    public void Die()
+    void UpdateRotation()
+    {
+        Quaternion rotation;
+        if (fighterStatus != Fighter.Status.Free &&
+            FighterStatus != Fighter.Status.Disconnecting)
+            rotation = LookAtTargetRotation();
+        else
+        {
+            Quaternion finalRotation = (target == null) ? DefaultRotation : LookAtTargetRotation();
+            rotation = Quaternion.Slerp(rb.rotation, finalRotation, RotationSpeed * Time.fixedDeltaTime);
+        }
+
+        rb.MoveRotation(rotation);
+    }
+
+    Quaternion LookAtTargetRotation()
+    {
+        return Quaternion.LookRotation(
+            Vector3.ProjectOnPlane(target.transform.position - rb.position, transform.up));
+    }
+
+    void Die()
     {
         BoltNetwork.Destroy(gameObject);
     }

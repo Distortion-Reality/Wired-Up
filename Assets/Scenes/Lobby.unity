@@ -417,10 +417,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 448663267}
+  - component: {fileID: 448663268}
   - component: {fileID: 448663266}
   - component: {fileID: 448663265}
   - component: {fileID: 448663264}
-  - component: {fileID: 448663268}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -526,6 +526,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   xSpawnPosOffset: 250
+  forceStart: 1
 --- !u!1 &586100993
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,7 +11,7 @@ public class Damage : Effect
 
     protected override void ApplySingleEffect(Fighter user, Fighter target)
     {
-        target.ChangeHP(- CalculateDamage(user, target));
+        target.ChangeHp(- CalculateDamage(user, target));
     }
 
     int CalculateDamage(Fighter user, Fighter target)

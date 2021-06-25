@@ -1,13 +1,16 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Bolt;
 
 [RequireComponent(typeof(TargetEnemyAbilityManager))]
 public class Enemy : Fighter
 {
-    protected override void OnFighterStart()
-    {
-        // Statistics initialization
+    new IFighterState State { get => entity.GetState<IEnemyState>(); }
 
+    protected override Quaternion DefaultRotation => transform.rotation;
+    
+    protected override void InitStats()
+    {
         FighterRangedStatistic hp = new FighterRangedStatistic(20);
         FighterStatistic armor = new FighterBuffableStatistic(10);
         FighterStatistic length = new FighterBuffableStatistic(10);
@@ -24,9 +27,13 @@ public class Enemy : Fighter
             { StatisticManager.StatisticId.Nrg, energy },
             { StatisticManager.StatisticId.Spd, speed }
         };
+    }
+
+    public override void EntityStart()
+    {
+        base.EntityStart();
 
         // Abilities initialization
-
         List<Effect> effects1 = new List<Effect>()
         {
             new Damage(10)
@@ -54,11 +61,6 @@ public class Enemy : Fighter
 
         // Assists initialization
         assists = new List<Ability>();
-    }
-
-    protected override void OnFighterUpdate()
-    {
-        
     }
 
     protected override void UseAbility(Ability ability)
