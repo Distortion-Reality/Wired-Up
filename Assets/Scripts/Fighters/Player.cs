@@ -7,8 +7,6 @@ using Photon.Bolt;
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
 public class Player : Fighter
 {
-    new IPlayerState State { get => entity.GetState<IPlayerState>(); }
-    
     Canvas gui;
     public GameObject allyInfoPrefab;
     static int alliesIndex = 0;
@@ -24,18 +22,19 @@ public class Player : Fighter
     Ability interaction;
     Wire wire;
 
+    protected new IPlayerState State => entity.GetState<IPlayerState>();
+
     protected override Quaternion DefaultRotation =>
         new Quaternion(transform.rotation.x, cam.rotation.y, transform.rotation.z, cam.rotation.w);
 
-    
     protected override void InitStats()
     {
         FighterRangedStatistic hp = new FighterRangedStatistic(10);
-        FighterStatistic armor = new FighterBuffableStatistic(10);
-        FighterStatistic length = new FighterBuffableStatistic(50);
-        FighterStatistic intensity = new FighterBuffableStatistic(10);
+        FighterBuffableStatistic armor = new FighterBuffableStatistic(10);
+        FighterBuffableStatistic length = new FighterBuffableStatistic(50);
+        FighterBuffableStatistic intensity = new FighterBuffableStatistic(10);
         FighterEnergy energy = new FighterEnergy(100);
-        FighterStatistic speed = new FighterBuffableStatistic(50);
+        FighterBuffableStatistic speed = new FighterBuffableStatistic(50);
 
         stats = new Dictionary<StatisticManager.StatisticId, FighterStatistic>()
         {
@@ -85,7 +84,6 @@ public class Player : Fighter
         List<Effect> interactionEffects = new List<Effect>();
         interaction = new Ability(interactionEffects, 5, "");
 
-
         wire = GetComponentInChildren<Wire>(true);
 
         cam = Camera.main.transform;
@@ -94,17 +92,14 @@ public class Player : Fighter
         gui = FindObjectOfType<Canvas>();
 
         if (entity.IsOwner)
-        {
             healthBar = GameObject.Find("PlayerHealthBar").GetComponent<Slider>();
-        }
-        else
-        // Ally
+        else // Ally
         {
             // Create ally UI
             Color allyColor = Color.green; // TODO: get actual color
             GameObject allyInfo = Instantiate(allyInfoPrefab, allyInfoPrefab.transform.position, allyInfoPrefab.transform.rotation);
             Vector3 pos = allyInfo.transform.position;
-            pos.Set(pos.x, pos.y + alliesIndex * 60 , pos.z);
+            pos.Set(pos.x, pos.y + alliesIndex * 60, pos.z);
             allyInfo.transform.SetParent(gui.transform, false);
 
             TMPro.TextMeshProUGUI allyName = allyInfo.GetComponentInChildren<TMPro.TextMeshProUGUI>();
@@ -123,13 +118,14 @@ public class Player : Fighter
     {
         base.OwnerUpdate();
 
-        if (!IsStunned)
+        if (fighterStatus != Status.Stunned)
         {
             CheckDashInput();
             
             if (fighterStatus != Status.Using)
             {
                 CheckTargetInput();
+
                 if (fighterStatus != Status.Disconnecting && target)
                     CheckAbilityInput();
             }
@@ -146,10 +142,8 @@ public class Player : Fighter
 
     public override void OwnerFixedUpdate()
     {
-        if (!IsStunned)
-        {
+        if (fighterStatus != Status.Stunned)
             UpdateMovement();
-        }
 
         base.OwnerFixedUpdate();
     }
@@ -232,7 +226,7 @@ public class Player : Fighter
                 ability = abilities[abilityIndex];
         }
 
-        if (ability)
+        if (ability != null)
             SelectAbility(ability);
     }
 

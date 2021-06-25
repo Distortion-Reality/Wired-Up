@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
 
-public class Ability : ScriptableObject
+public class Ability
 {
     readonly List<Effect> effects;
     readonly int energy;

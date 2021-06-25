@@ -20,16 +20,11 @@ public abstract class Fighter : MonoBehaviour
     }
 
     protected BoltEntity entity;
-    protected IFighterState State { get => entity.GetState<IFighterState>(); }
 
     protected Rigidbody rb;
     const float RotationSpeed = 10f;
 
     protected Slider healthBar;
-
-    protected float MoveSpeed => 1.3f * Mathf.Log(10 * stats[StatisticManager.StatisticId.Spd].CurrentValue);
-    protected abstract Quaternion DefaultRotation { get; }
-    protected bool IsStunned => fighterStatus == Fighter.Status.Stunned;
 
     protected Dictionary<StatisticManager.StatisticId, FighterStatistic> stats;
     protected List<Ability> attacks, assists;
@@ -45,6 +40,9 @@ public abstract class Fighter : MonoBehaviour
     public Fighter Target { get => target; }
     public Animator Animator { get => animator; }
 
+    protected IFighterState State => entity.GetState<IFighterState>();
+    protected float MoveSpeed => 1.3f * Mathf.Log(10 * stats[StatisticManager.StatisticId.Spd].CurrentValue);
+    protected abstract Quaternion DefaultRotation { get; }
     FighterEnergy Energy => (FighterEnergy) stats[StatisticManager.StatisticId.Nrg];
     public float AbilityRange => 2 * Mathf.Log(10 * stats[StatisticManager.StatisticId.Lng].CurrentValue);
     protected float TargetRange => 2 * AbilityRange;
@@ -53,7 +51,9 @@ public abstract class Fighter : MonoBehaviour
     public virtual void EntityStart()
     {
         entity = GetComponent<BoltEntity>();
+
         rb = GetComponent<Rigidbody>();
+
         targetAbilityManager = GetComponent<TargetAbilityManager>();
         animator = GetComponent<Animator>();
 
@@ -76,10 +76,8 @@ public abstract class Fighter : MonoBehaviour
 
     public virtual void OwnerFixedUpdate()
     {
-        if (!IsStunned)
-        {
+        if (fighterStatus != Status.Stunned)
             UpdateRotation();
-        }   
     }
 
     void UpdateTarget()
@@ -111,11 +109,6 @@ public abstract class Fighter : MonoBehaviour
 
     protected abstract void UseAbility(Ability ability);
 
-    public void ApplyAbilityEffects()
-    {
-        currentAbility.ApplyEffects(this);
-    }
-
     public virtual void EndAbility()
     {
         currentAbility = null;
@@ -142,22 +135,19 @@ public abstract class Fighter : MonoBehaviour
 
     public void ChangeHp(int change)
     {
-        State.hp = stats[StatisticManager.StatisticId.HP].CurrentValue;
+        State.hp = stats[StatisticManager.StatisticId.HP].ApplyChange(change);
     }
 
     void HpChanged()
     {
-        ChangeStat(StatisticManager.StatisticId.HP, State.hp);
+        if (!entity.IsOwner)
+            stats[StatisticManager.StatisticId.HP].CurrentValue = State.hp;
 
         if (healthBar)
-        {
             healthBar.value = stats[StatisticManager.StatisticId.HP].PercentageValue;
-        }
 
         if (entity.IsOwner && stats[StatisticManager.StatisticId.HP].CurrentValue == 0)
-        {
             Die();
-        }
     }
 
     void ChangeEnergy(float change)

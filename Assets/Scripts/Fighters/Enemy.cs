@@ -5,18 +5,17 @@ using Photon.Bolt;
 [RequireComponent(typeof(TargetEnemyAbilityManager))]
 public class Enemy : Fighter
 {
-    new IFighterState State { get => entity.GetState<IEnemyState>(); }
-
+    protected new IEnemyState State => entity.GetState<IEnemyState>();
     protected override Quaternion DefaultRotation => transform.rotation;
     
     protected override void InitStats()
     {
         FighterRangedStatistic hp = new FighterRangedStatistic(20);
-        FighterStatistic armor = new FighterBuffableStatistic(10);
-        FighterStatistic length = new FighterBuffableStatistic(10);
-        FighterStatistic intensity = new FighterBuffableStatistic(10);
+        FighterBuffableStatistic armor = new FighterBuffableStatistic(10);
+        FighterBuffableStatistic length = new FighterBuffableStatistic(10);
+        FighterBuffableStatistic intensity = new FighterBuffableStatistic(10);
         FighterEnergy energy = new FighterEnergy(20);
-        FighterStatistic speed = new FighterBuffableStatistic(50);
+        FighterBuffableStatistic speed = new FighterBuffableStatistic(50);
 
         stats = new Dictionary<StatisticManager.StatisticId, FighterStatistic>()
         {

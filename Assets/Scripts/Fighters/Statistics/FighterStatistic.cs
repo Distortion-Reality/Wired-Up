@@ -10,9 +10,9 @@ public abstract class FighterStatistic
     }
 
     public int BaseValue { get => baseValue; set => baseValue = value; }
-    public int CurrentValue { get => currentValue; }
+    public int CurrentValue { get => currentValue; set => currentValue = value; }
 
     public float PercentageValue => ((float) currentValue) / baseValue;
 
-    public abstract void ApplyChange(int change);
+    public abstract int ApplyChange(int change);
 }

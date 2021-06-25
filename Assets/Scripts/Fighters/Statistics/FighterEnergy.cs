@@ -11,14 +11,16 @@ public class FighterEnergy : FighterRangedStatistic
 
     public new float CurrentValue { get => currentValue; }
 
-    public override void ApplyChange(int change)
+    public override int ApplyChange(int change)
     {
         ApplyChange(change);
+        return base.currentValue;
     }
 
-    public void ApplyChange(float change)
+    public float ApplyChange(float change)
     {
         currentValue = Mathf.Clamp(currentValue + change, 0f, baseValue);
         base.currentValue = Mathf.FloorToInt(currentValue);
+        return currentValue;
     }
 }
