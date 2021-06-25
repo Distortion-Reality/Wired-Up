@@ -1,105 +1,206 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Bolt;
-using System;
 
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Animator))]
 public abstract class Fighter : MonoBehaviour
 {
-    public enum AbilityStatus
+    public enum Status
     {
-        FREE,
-        CONNECTING,
-        WAITING,
-        USING,
-        DISCONNECTING
+        Free,
+        Connecting,
+        Waiting,
+        Using,
+        Disconnecting,
+        Stunned
     }
 
-    Quaternion defaultRotation;
-    readonly float rotationSpeed = 10f;
+    protected BoltEntity entity;
+    protected IFighterState State { get => entity.GetState<IFighterState>(); }
+
+    protected Rigidbody rb;
+    const float RotationSpeed = 10f;
+
+    protected Slider healthBar;
+
+    protected float MoveSpeed => 1.3f * Mathf.Log(10 * stats[StatisticManager.StatisticId.Spd].CurrentValue);
+    protected abstract Quaternion DefaultRotation { get; }
+    protected bool IsStunned => fighterStatus == Fighter.Status.Stunned;
 
     protected Dictionary<StatisticManager.StatisticId, FighterStatistic> stats;
     protected List<Ability> attacks, assists;
-    protected AbilityStatus fighterAbilityStatus = AbilityStatus.FREE;
-    protected TargetAbilityManager targetAbilityManager;
+    protected Ability currentAbility = null;
+    protected Status fighterStatus = Status.Free;
+    TargetAbilityManager targetAbilityManager;
     protected Fighter target = null;
+    Animator animator;
 
     public Dictionary<StatisticManager.StatisticId, FighterStatistic> Stats { get => stats; }
-    public AbilityStatus FighterAbilityStatus { get => fighterAbilityStatus; set => fighterAbilityStatus = value; }
+    public Status FighterStatus { get => fighterStatus; set => fighterStatus = value; }
     public TargetAbilityManager TargetAbilityManager { get => targetAbilityManager; }
     public Fighter Target { get => target; }
+    public Animator Animator { get => animator; }
 
-    protected IFighterState state;
+    FighterEnergy Energy => (FighterEnergy) stats[StatisticManager.StatisticId.Nrg];
+    public float AbilityRange => 2 * Mathf.Log(10 * stats[StatisticManager.StatisticId.Lng].CurrentValue);
+    protected float TargetRange => 2 * AbilityRange;
+    public float TargetDistance => DistanceFrom(target.transform);
 
-    public virtual void Init()
+    public virtual void EntityStart()
     {
-        defaultRotation = transform.rotation;
+        entity = GetComponent<BoltEntity>();
+        rb = GetComponent<Rigidbody>();
+        targetAbilityManager = GetComponent<TargetAbilityManager>();
+        animator = GetComponent<Animator>();
 
-        state = GetComponent<BoltEntity>().GetState<IFighterState>();
+        InitStats();
+
+        // Setup Bolt states
+        State.SetTransforms(State.transform, transform);
+        State.hp = stats[StatisticManager.StatisticId.HP].CurrentValue;
+        State.AddCallback("hp", HpChanged);
     }
 
-    public virtual void UpdateFrame()
+    protected abstract void InitStats();
+
+    // Update is called once per frame
+    public virtual void OwnerUpdate()
     {
-        UpdateRotation();
+        UpdateTarget();
+        RegenEnergy();
+    }
+
+    public virtual void OwnerFixedUpdate()
+    {
+        if (!IsStunned)
+        {
+            UpdateRotation();
+        }   
+    }
+
+    void UpdateTarget()
+    {
+        if (target != null && TargetDistance > TargetRange && fighterStatus == Status.Free)
+            target = null;
+    }
+
+    protected float DistanceFrom(Transform other)
+    {
+        return Vector3.Magnitude(Vector3.ProjectOnPlane(other.position - transform.position, transform.up));
+    }
+
+    void RegenEnergy()
+    {
+        if (Energy.CurrentValue < Energy.BaseValue)
+        {
+            int spd = stats[StatisticManager.StatisticId.Spd].CurrentValue;
+            float energyRegen = 2.20738f * Mathf.Log(0.809275f * spd) * Time.deltaTime;
+            ChangeEnergy(energyRegen);
+        }
+    }
+
+    protected void SelectAbility(Ability ability)
+    {
+        if (CheckAndUseEnergy(ability.Energy))
+            UseAbility(ability);
+    }
+
+    protected abstract void UseAbility(Ability ability);
+
+    public void ApplyAbilityEffects()
+    {
+        currentAbility.ApplyEffects(this);
+    }
+
+    public virtual void EndAbility()
+    {
+        currentAbility = null;
+    }
+
+    public bool CheckAndUseEnergy(int abilityEnergy)
+    {
+        bool enoughEnergy = Energy.CurrentValue >= abilityEnergy;
+        if (enoughEnergy)
+            UseEnergy(abilityEnergy);
+
+        return enoughEnergy;
+    }
+
+    public void UseEnergy(int abilityEnergy)
+    {
+        ChangeEnergy(- abilityEnergy);
+    }
+
+    public void ChangeStat(StatisticManager.StatisticId statId, int change)
+    {
+        stats[statId].ApplyChange(change);
+    }
+
+    public void ChangeHp(int change)
+    {
+        State.hp = stats[StatisticManager.StatisticId.HP].CurrentValue;
+    }
+
+    void HpChanged()
+    {
+        ChangeStat(StatisticManager.StatisticId.HP, State.hp);
+
+        if (healthBar)
+        {
+            healthBar.value = stats[StatisticManager.StatisticId.HP].PercentageValue;
+        }
+
+        if (entity.IsOwner && stats[StatisticManager.StatisticId.HP].CurrentValue == 0)
+        {
+            Die();
+        }
+    }
+
+    void ChangeEnergy(float change)
+    {
+        Energy.ApplyChange(change);
+    }
+
+    public void ApplyStatus(Status status, float time)
+    {
+        StartCoroutine(ApplyStatusForTime(status, time));
+    }
+
+    IEnumerator ApplyStatusForTime(Status status, float time)
+    {
+        if (fighterStatus != status)
+        {
+            fighterStatus = status;
+
+            yield return new WaitForSeconds(time);
+
+            fighterStatus = Status.Free;
+        }
     }
 
     void UpdateRotation()
     {
-        if (fighterAbilityStatus != AbilityStatus.FREE &&
-            fighterAbilityStatus != AbilityStatus.DISCONNECTING)
-            transform.rotation = LookAtTargetRotation();
+        Quaternion rotation;
+        if (fighterStatus != Fighter.Status.Free &&
+            FighterStatus != Fighter.Status.Disconnecting)
+            rotation = LookAtTargetRotation();
         else
         {
-            Quaternion finalRotation;
-            if (target == null)
-                finalRotation = defaultRotation;
-            else
-                finalRotation = LookAtTargetRotation();
-
-            transform.rotation = Quaternion.Slerp(transform.rotation, finalRotation, rotationSpeed * Time.deltaTime);
+            Quaternion finalRotation = (target == null) ? DefaultRotation : LookAtTargetRotation();
+            rotation = Quaternion.Slerp(rb.rotation, finalRotation, RotationSpeed * Time.fixedDeltaTime);
         }
+
+        rb.MoveRotation(rotation);
     }
 
     Quaternion LookAtTargetRotation()
     {
         return Quaternion.LookRotation(
-            Vector3.ProjectOnPlane(target.transform.position - transform.position, Vector3.up));
-    }
-
-    protected abstract void UseAbility(Ability ability);
-
-    public abstract void EndAbility();
-
-    public bool CheckAndUseEnergy(int abilityEnergy)
-    {
-        if (stats[StatisticManager.StatisticId.Nrg].CurrentValue >= abilityEnergy)
-        {
-            UseEnergy(abilityEnergy);
-            return true;
-        }
-
-        return false;
-    }
-
-    public void UseEnergy(int abilityEnergy)
-    {
-        stats[StatisticManager.StatisticId.Nrg].CurrentValue -= abilityEnergy;
-    }
-
-    public void Damage(int amount)
-    {
-        int newHp = Math.Max(0, stats[StatisticManager.StatisticId.HP].CurrentValue - amount);
-        state.hp = newHp;
-        if (newHp == 0)
-            Die();
-    }
-
-    public void Heal(int amount)
-    {
-        int maxHp = stats[StatisticManager.StatisticId.HP].BaseValue;
-        int newHp = Math.Min(maxHp, stats[StatisticManager.StatisticId.HP].CurrentValue + amount);
-        state.hp = newHp;
+            Vector3.ProjectOnPlane(target.transform.position - rb.position, transform.up));
     }
 
     void Die()

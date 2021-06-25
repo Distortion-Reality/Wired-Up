@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class Damage : Effect
 {
     readonly int power;
@@ -7,8 +9,18 @@ public class Damage : Effect
         this.power = power;
     }
 
-    public override void ApplyEffect(Fighter user)
+    protected override void ApplySingleEffect(Fighter user, Fighter target)
     {
-        user.Target.Damage(power);
+        target.ChangeHp(- CalculateDamage(user, target));
+    }
+
+    int CalculateDamage(Fighter user, Fighter target)
+    {
+        int userInt = user.Stats[StatisticManager.StatisticId.Int].CurrentValue;
+        int targetArm = target.Stats[StatisticManager.StatisticId.Arm].CurrentValue;
+        float randomVal1 = Random.Range(0.8f, 1f);
+        float randomVal2 = Random.Range(0.8f, 1f);
+
+        return Mathf.RoundToInt(userInt * power * randomVal1 / (targetArm * randomVal2));
     }
 }

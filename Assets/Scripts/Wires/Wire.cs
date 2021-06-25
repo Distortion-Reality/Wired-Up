@@ -22,7 +22,7 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     public override void Attached()
     {
-        Init();
+        WireStart();
 
         if (entity.IsOwner)
             state.wireActive = gameObject.activeSelf;
@@ -36,7 +36,7 @@ public class Wire : EntityBehaviour<IPlayerState>
             gameObject.SetActive(state.wireActive);
     }
 
-    void Init()
+    void WireStart()
     {
         player = GetComponentInParent<Player>();
 
@@ -51,7 +51,7 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     public void Connect()
     {
-        if (player.FighterAbilityStatus == Fighter.AbilityStatus.DISCONNECTING)
+        if (player.FighterStatus == Fighter.Status.Disconnecting)
             StartCoroutine(ConnectWhenDisconnected());
         else
         {
@@ -67,38 +67,39 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     public void Disconnect()
     {
-        player.FighterAbilityStatus = Fighter.AbilityStatus.DISCONNECTING;
+        player.FighterStatus = Fighter.Status.Disconnecting;
         StartCoroutine(Retract());
     }
 
     void StartConnecting()
     {
-        player.FighterAbilityStatus = Fighter.AbilityStatus.CONNECTING;
+        player.FighterStatus = Fighter.Status.Connecting;
         StartCoroutine(Extend());
     }
 
-    float LocalExtension(float extendingSpeed)
+    float ExtensionThisFrame(float extendingSpeed)
     {
-        return ConvertToLocal(extendingSpeed * Time.deltaTime);
+        return extendingSpeed * Time.deltaTime;
     }
 
-    float ConvertToLocal(float value)
+    void ApplyExtension(float extension)
     {
-        return value / transform.localScale.y;
+        Vector3 localExtensionVector = Vector3.up * extension / transform.localScale.y;
+
+        wireHead.ApplyLocalTranslation(localExtensionVector);
+        wireBody.ApplyLocalScale(localExtensionVector);
     }
 
-    void ApplyLocalExtension(float extension)
+    void ResetExtension()
     {
-        Vector3 extensionVector = Vector3.up * extension;
-
-        wireHead.ApplyLocalTranslation(extensionVector);
-        wireBody.ApplyLocalScale(extensionVector);
+        wireHead.ResetLocalPosition();
+        wireBody.ResetLocalScale();
     }
 
     IEnumerator ConnectWhenDisconnected()
     {
         connectWhenDisconnected = true;
-        yield return new WaitUntil(() => player.FighterAbilityStatus != Fighter.AbilityStatus.DISCONNECTING);
+        yield return new WaitUntil(() => player.FighterStatus != Fighter.Status.Disconnecting);
 
         connectWhenDisconnected = false;
         StartConnecting();
@@ -106,14 +107,13 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     IEnumerator Extend()
     {
-        while (player.FighterAbilityStatus == Fighter.AbilityStatus.CONNECTING)
+        while (player.FighterStatus == Fighter.Status.Connecting)
         {
-            if (Length >= player.Stats[StatisticManager.StatisticId.Lng].CurrentValue)
+            if (Length >= player.AbilityRange)
                 player.EndAbility();
             else
             {
-                ApplyLocalExtension(LocalExtension(extendingSpeed));
-
+                ApplyExtension(ExtensionThisFrame(extendingSpeed));
                 yield return null;
             }
         }
@@ -121,13 +121,10 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     IEnumerator AdjustExtension()
     {
-        while (player.FighterAbilityStatus == Fighter.AbilityStatus.WAITING ||
-            player.FighterAbilityStatus == Fighter.AbilityStatus.USING)
+        while (player.FighterStatus == Fighter.Status.Waiting ||
+            player.FighterStatus == Fighter.Status.Using)
         {
-            float distance = Vector3.Magnitude(
-                Vector3.ProjectOnPlane(player.Target.transform.position - player.transform.position, Vector3.up));
-
-            ApplyLocalExtension(ConvertToLocal(distance - Length));
+            ApplyExtension(player.TargetDistance - Length);
 
             yield return null;
         }
@@ -136,21 +133,18 @@ public class Wire : EntityBehaviour<IPlayerState>
     IEnumerator Retract()
     {
         Quaternion disconnectingRotation = transform.rotation;
-        yield return null;
+        yield return new WaitForEndOfFrame();
         
         while (Extension > 0)
         {
             transform.rotation = disconnectingRotation;
-            float retraction = LocalExtension(retractingSpeed);
+            float retraction = ExtensionThisFrame(retractingSpeed);
 
             if (retraction >= Extension)
-            {
-                wireHead.ResetLocalPosition();
-                wireBody.ResetLocalScale();
-            }
+                ResetExtension();
             else
             {
-                ApplyLocalExtension(- retraction);
+                ApplyExtension(- retraction);
 
                 yield return null;
             }
@@ -158,7 +152,7 @@ public class Wire : EntityBehaviour<IPlayerState>
 
         transform.localRotation = defaultLocalRotation;
 
-        player.FighterAbilityStatus = Fighter.AbilityStatus.FREE;
+        player.FighterStatus = Fighter.Status.Free;
 
         if (!connectWhenDisconnected)
             gameObject.SetActive(false);

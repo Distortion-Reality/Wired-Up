@@ -1,24 +1,41 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using Photon.Bolt;
 
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
 public class Player : Fighter
 {
-    Ability currentAbility = null;
+    new IPlayerState State { get => entity.GetState<IPlayerState>(); }
+    
+    Canvas gui;
+    public GameObject allyInfoPrefab;
+    static int alliesIndex = 0;
+
+    Transform cam;
+    float moveSpeedMultiplier = 1f;
+    const int DashEnergy = 5;
+    const float DashMultiplier = 2f,
+        DashDuration = 0.25f,
+        DashCooldown = 5f;
+    float nextDashTime = 0f;
+
+    Ability interaction;
     Wire wire;
 
-    public override void Init()
+    protected override Quaternion DefaultRotation =>
+        new Quaternion(transform.rotation.x, cam.rotation.y, transform.rotation.z, cam.rotation.w);
+
+    
+    protected override void InitStats()
     {
-        base.Init();
-
-        // Statistics initialization
-
-        FighterStatistic hp = new FighterStatistic(10);
-        FighterStatistic armor = new FighterStatistic(10);
-        FighterStatistic length = new FighterStatistic(10);
-        FighterStatistic intensity = new FighterStatistic(10);
-        FighterStatistic energy = new FighterStatistic(1000000);
-        FighterStatistic speed = new FighterStatistic(10);
+        FighterRangedStatistic hp = new FighterRangedStatistic(10);
+        FighterStatistic armor = new FighterBuffableStatistic(10);
+        FighterStatistic length = new FighterBuffableStatistic(50);
+        FighterStatistic intensity = new FighterBuffableStatistic(10);
+        FighterEnergy energy = new FighterEnergy(100);
+        FighterStatistic speed = new FighterBuffableStatistic(50);
 
         stats = new Dictionary<StatisticManager.StatisticId, FighterStatistic>()
         {
@@ -29,26 +46,30 @@ public class Player : Fighter
             { StatisticManager.StatisticId.Nrg, energy },
             { StatisticManager.StatisticId.Spd, speed }
         };
+    }
+
+    public override void EntityStart()
+    {
+        base.EntityStart();
 
         // Abilities initialization
-
         List<Effect> effects1 = new List<Effect>()
         {
             new Damage(10)
         };
-        Ability ability1 = new Ability(effects1, 5);
+        Ability ability1 = new Ability(effects1, 5, "");
 
         List<Effect> effects2 = new List<Effect>()
         {
             new StatModifier(StatisticManager.StatisticId.Int, 10, 10)
         };
-        Ability ability2 = new Ability(effects2, 5);
+        Ability ability2 = new Ability(effects2, 5, "");
 
         List<Effect> effects3 = new List<Effect>()
         {
             new Healing(10)
         };
-        Ability ability3 = new Ability(effects3, 5);
+        Ability ability3 = new Ability(effects3, 5, "");
 
         attacks = new List<Ability>()
         {
@@ -60,42 +81,112 @@ public class Player : Fighter
         // Assists initialization
         assists = new List<Ability>();
 
-        // TargetAbilityManager initialization
-        targetAbilityManager = GetComponent<TargetPlayerAbilityManager>();
+        // Interaction ability initialization
+        List<Effect> interactionEffects = new List<Effect>();
+        interaction = new Ability(interactionEffects, 5, "");
 
-        // Wire initialization
+
         wire = GetComponentInChildren<Wire>(true);
+
+        cam = Camera.main.transform;
+
+        // UI initialization
+        gui = FindObjectOfType<Canvas>();
+
+        if (entity.IsOwner)
+        {
+            healthBar = GameObject.Find("PlayerHealthBar").GetComponent<Slider>();
+        }
+        else
+        // Ally
+        {
+            // Create ally UI
+            Color allyColor = Color.green; // TODO: get actual color
+            GameObject allyInfo = Instantiate(allyInfoPrefab, allyInfoPrefab.transform.position, allyInfoPrefab.transform.rotation);
+            Vector3 pos = allyInfo.transform.position;
+            pos.Set(pos.x, pos.y + alliesIndex * 60 , pos.z);
+            allyInfo.transform.SetParent(gui.transform, false);
+
+            TMPro.TextMeshProUGUI allyName = allyInfo.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            allyName.text = entity.Source.RemoteEndPoint.SteamId.Id.ToString(); // TODO: get actual name
+
+            allyInfo.transform.Find("AllyPortrait").GetComponent<Image>().color = allyColor;
+
+            healthBar = allyInfo.GetComponentInChildren<Slider>();
+            healthBar.transform.Find("Fill Area").Find("Fill").GetComponent<Image>().color = allyColor;
+
+            alliesIndex++;
+        }
     }
 
-    public override void UpdateFrame()
+    public override void OwnerUpdate()
     {
-        base.UpdateFrame();
+        base.OwnerUpdate();
 
-        if (Input.GetKeyDown(KeyCode.L))
-            Damage(1);
-        if (Input.GetKeyDown(KeyCode.M))
-            Heal(1);
-
-        if (fighterAbilityStatus != AbilityStatus.USING)
+        if (!IsStunned)
         {
-            CheckTargetInput();
-            if (fighterAbilityStatus != AbilityStatus.DISCONNECTING)
-                CheckAbilityInput();
+            CheckDashInput();
+            
+            if (fighterStatus != Status.Using)
+            {
+                CheckTargetInput();
+                if (fighterStatus != Status.Disconnecting && target)
+                    CheckAbilityInput();
+            }
         }
+    }
+
+    void CheckDashInput()
+    {
+        if (Input.GetButtonDown("Dash") && Time.time > nextDashTime &&
+            fighterStatus == Fighter.Status.Free &&
+            CheckAndUseEnergy(DashEnergy))
+            StartCoroutine(Dash());
+    }
+
+    public override void OwnerFixedUpdate()
+    {
+        if (!IsStunned)
+        {
+            UpdateMovement();
+        }
+
+        base.OwnerFixedUpdate();
+    }
+
+    void UpdateMovement()
+    {
+        float x = Input.GetAxisRaw("Horizontal");
+        float z = Input.GetAxisRaw("Vertical");
+
+        Vector3 dir = cam.right * x + cam.forward * z;
+        dir.Normalize();
+        dir *= moveSpeedMultiplier * MoveSpeed;
+        dir.y = rb.velocity.y;
+        rb.velocity = dir;
+    }
+
+    IEnumerator Dash()
+    {
+        moveSpeedMultiplier = DashMultiplier;
+        nextDashTime = Time.time + DashDuration + DashCooldown;
+        yield return new WaitForSeconds(DashDuration);
+
+        moveSpeedMultiplier = 1f;
     }
 
     void CheckTargetInput()
     {
         if (Input.GetButtonDown("Target"))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit))
-                if (hit.collider.CompareTag("Enemy") || hit.collider.CompareTag("Player"))
+            Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+            if (Physics.Raycast(ray, out RaycastHit hit, LayerMask.GetMask("Player", "Enemy", "Interactable")))
+                if (DistanceFrom(hit.transform) <= TargetRange)
                 {
                     Fighter hitFighter = hit.collider.GetComponent<Fighter>();
                     if (hitFighter != target)
                     {
-                        CheckAndUpdatePlayerAbilityStatus();
+                        CheckAndUpdatePlayerStatus();
                         target = hitFighter;
                     }
                 }
@@ -104,40 +195,57 @@ public class Player : Fighter
 
     void CheckAbilityInput()
     {
-        if (target == null)
+        int abilityIndex;
+        if (Input.GetButtonDown("Ability1"))
+            abilityIndex = 0;
+        else if (Input.GetButtonDown("Ability2"))
+            abilityIndex = 1;
+        else
             return;
 
-        if (!Input.GetButtonDown("Ability1") && !Input.GetButtonDown("Ability2"))
-            return;
+        int skillSet = 0;
+        if (Input.GetButton("SkillSet2"))
+            skillSet = 1;
+        else if (Input.GetButton("SkillSet3"))
+            skillSet = 2;
 
-        List<Ability> abilities = target is Player ? assists : attacks;
+        Ability ability = null;
+        if (target.CompareTag("Interactable") && abilityIndex == 1 && skillSet == 0)
+            ability = interaction;
+        else
+        {
+            List<Ability> abilities;
+            int offset;
+            if (target.CompareTag("Player"))
+            {
+                abilities = assists;
+                offset = 1;
+            }
+            else
+            {
+                abilities = attacks;
+                offset = 2;
+            }
 
-        int abilityToUse = 0;
-        if (Input.GetButton("AbilityModifier1"))
-            abilityToUse = 2;
-        else if (Input.GetButton("AbilityModifier2"))
-            abilityToUse = 4;
+            abilityIndex = offset * skillSet + abilityIndex;
+            if (abilityIndex < abilities.Count)
+                ability = abilities[abilityIndex];
+        }
 
-        if (Input.GetButtonDown("Ability2"))
-            abilityToUse++;
-
-        if (abilityToUse < abilities.Count)
-            UseAbility(abilities[abilityToUse]);
+        if (ability)
+            SelectAbility(ability);
     }
 
     protected override void UseAbility(Ability ability)
     {
-        if (CheckAndUseEnergy(ability.Energy))
-        {
-            CheckAndUpdatePlayerAbilityStatus();
-            currentAbility = ability;
-            wire.Connect();
-        }
+        CheckAndUpdatePlayerStatus();
+        currentAbility = ability;
+        wire.Connect();
     }
 
     public override void EndAbility()
     {
-        currentAbility = null;
+        base.EndAbility();
         wire.Disconnect();
     }
 
@@ -150,17 +258,17 @@ public class Player : Fighter
     public void EnqueueUserAbilityToTarget(Fighter actualTarget)
     {
         target = actualTarget;
-        fighterAbilityStatus = AbilityStatus.WAITING;
+        fighterStatus = Status.Waiting;
         target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
 
         wire.StayConnected();
     }
 
-    void CheckAndUpdatePlayerAbilityStatus()
+    void CheckAndUpdatePlayerStatus()
     {
-        if (fighterAbilityStatus == AbilityStatus.WAITING)
+        if (fighterStatus == Status.Waiting)
             InterruptWaiting();
-        else if (fighterAbilityStatus == AbilityStatus.CONNECTING)
+        else if (fighterStatus == Status.Connecting)
             EndAbility();
     }
 }

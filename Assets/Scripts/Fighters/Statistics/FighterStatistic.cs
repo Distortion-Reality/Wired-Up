@@ -1,9 +1,7 @@
-public class FighterStatistic
+public abstract class FighterStatistic
 {
-    readonly int baseValue;
-    int currentValue;
-
-    public FighterStatistic() : this(0) { }
+    protected int baseValue;
+    protected int currentValue;
 
     public FighterStatistic(int baseValue)
     {
@@ -11,14 +9,10 @@ public class FighterStatistic
         currentValue = baseValue;
     }
 
-    public int BaseValue { get => baseValue;}
+    public int BaseValue { get => baseValue; set => baseValue = value; }
+    public int CurrentValue { get => currentValue; }
 
-    public int CurrentValue { get => currentValue; set => currentValue = value; }
+    public float PercentageValue => ((float) currentValue) / baseValue;
 
-    public float PercentageValue { get => ((float) currentValue) / baseValue;}
-
-    public void ResetValue()
-    {
-        currentValue = baseValue;
-    }
+    public abstract void ApplyChange(int change);
 }

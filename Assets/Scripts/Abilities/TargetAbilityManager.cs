@@ -56,7 +56,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
             UserAbility userAbility = userAbilityQueue.Dequeue();
             userAbility.DoUserAbility();
 
-            yield return new WaitWhile(() => userAbility.User.FighterAbilityStatus == Fighter.AbilityStatus.USING);
+            yield return new WaitWhile(() => userAbility.User.FighterStatus == Fighter.Status.Using);
         }
 
         usersAreUsing = false;
@@ -65,7 +65,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
     void SetUsersAbilityStatusUsing()
     {
         foreach (UserAbility userAbility in userAbilityQueue)
-            userAbility.User.FighterAbilityStatus = Fighter.AbilityStatus.USING;
+            userAbility.User.FighterStatus = Fighter.Status.Using;
 
         usersAreUsing = true;
     }

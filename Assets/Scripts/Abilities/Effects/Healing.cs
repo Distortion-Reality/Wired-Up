@@ -1,14 +1,16 @@
+using UnityEngine;
+
 public class Healing : Effect
 {
-    readonly int amount;
+    readonly float percentage;
 
-    public Healing(int amount)
+    public Healing(float percentage)
     {
-        this.amount = amount;
+        this.percentage = percentage;
     }
 
-    public override void ApplyEffect(Fighter user)
+    protected override void ApplySingleEffect(Fighter user, Fighter target)
     {
-        user.Target.Heal(amount);
+        target.ChangeHp(Mathf.RoundToInt(target.Stats[StatisticManager.StatisticId.HP].BaseValue * percentage));
     }
 }

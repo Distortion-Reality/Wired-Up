@@ -10,6 +10,7 @@ public class LobbyManager : GlobalEventListener
     List<LobbyPlayer> allPlayers = new List<LobbyPlayer>(3);
 
     public float xSpawnPosOffset = 250.0f;
+    public bool forceStart = false;
 
     void Start()
     {
@@ -97,11 +98,7 @@ public class LobbyManager : GlobalEventListener
 
     public bool CanStart()
     {
-        return allPlayers.Count == 2 && allPlayers.TrueForAll(player => player.IsReady);
-    }
-
-    public override void OnEvent(LobbyStartEvent evnt)
-    {
-        SceneManager.LoadScene("Level2Scene", LoadSceneMode.Single);
+        if (forceStart) return true;
+        return allPlayers.Count == 3 && allPlayers.TrueForAll(player => player.IsReady);
     }
 }

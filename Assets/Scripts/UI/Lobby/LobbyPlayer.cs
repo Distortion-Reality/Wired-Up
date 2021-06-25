@@ -117,7 +117,6 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
         if (BoltNetwork.IsServer && lobbyManager.CanStart())
         {
             BoltNetwork.LoadScene("Level2Scene");
-            //LobbyStartEvent.Create().Send();
         }
     }
 }
