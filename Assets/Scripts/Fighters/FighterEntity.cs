@@ -1,7 +1,9 @@
 using Photon.Bolt;
+
 public class FighterEntity : EntityBehaviour<IFighterState>
 {
-    protected Fighter fighter;
+    Fighter fighter;
+
     public override void Attached()
     {
         fighter = GetComponent<Fighter>();
@@ -12,14 +14,12 @@ public class FighterEntity : EntityBehaviour<IFighterState>
     void Update()
     {
         if (entity.IsOwner)
-        {
             fighter.OwnerUpdate();
-        }
     }
 
     // SimulateOwner is a FixedUpdate run only if entity.IsOwner
     public override void SimulateOwner()
     {
-       fighter.OwnerFixedUpdate();
+        fighter.OwnerFixedUpdate();
     }
 }

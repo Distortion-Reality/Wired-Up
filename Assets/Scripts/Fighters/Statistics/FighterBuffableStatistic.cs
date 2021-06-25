@@ -8,9 +8,10 @@ public class FighterBuffableStatistic : FighterStatistic
 
     public FighterBuffableStatistic(int baseValue) : base(baseValue) { }
 
-    public override void ApplyChange(int change)
+    public override int ApplyChange(int change)
     {
         stage += change;
         currentValue += Mathf.RoundToInt(Mathf.Clamp(stage, - maxStage, maxStage) * stageBuff * baseValue);
+        return currentValue;
     }
 }
