@@ -34,7 +34,7 @@ public abstract class Fighter : MonoBehaviour
     protected Status fighterStatus = Status.Free;
     TargetAbilityManager targetAbilityManager;
     protected Fighter target = null;
-    Animator animator;
+    protected Animator animator;
 
     bool charging = false;
     Fighter charged = null;
@@ -65,15 +65,17 @@ public abstract class Fighter : MonoBehaviour
     public virtual void EntityStart()
     {
         entity = GetComponent<BoltEntity>();
-        entityId = ((FighterInfo) entity.AttachToken).guid;
+
+        UnwrapAttachedToken();
 
         pivotOffset = new Vector3(0, transform.position.y, 0);
         rb = GetComponent<Rigidbody>();
 
         targetAbilityManager = GetComponent<TargetAbilityManager>();
-        animator = GetComponentInChildren<Animator>();
 
         InitStats();
+        
+        InitAnimator();
 
         // Setup Bolt states
         State.SetTransforms(State.transform, transform);
@@ -81,7 +83,18 @@ public abstract class Fighter : MonoBehaviour
         State.AddCallback("hp", HpChanged);
     }
 
+    protected virtual void UnwrapAttachedToken()
+    {
+        FighterInfo info = (FighterInfo) entity.AttachToken;
+        entityId = info.guid;
+    }
+
     protected abstract void InitStats();
+
+    protected virtual void InitAnimator()
+    {
+        animator = GetComponent<Animator>();
+    }
 
     // Update is called once per frame
     public virtual void OwnerUpdate()
