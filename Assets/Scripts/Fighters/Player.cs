@@ -11,6 +11,7 @@ public class Player : Fighter
     CharacterColor character;
 
     Canvas gui;
+    Slider energyBar;
     public GameObject allyInfoPrefab;
     static int alliesIndex = 0;
 
@@ -96,13 +97,17 @@ public class Player : Fighter
 
         // UI initialization
         gui = FindObjectOfType<Canvas>();
+        Color color = character.UnityColor();
 
         if (entity.IsOwner)
+        {
             healthBar = GameObject.Find("PlayerHealthBar").GetComponent<Slider>();
+            energyBar = GameObject.Find("PlayerEnergyBar").GetComponent<Slider>();
+            energyBar.transform.Find("Fill Area").Find("Fill").GetComponent<Image>().color = color;
+        }
         else // Ally
         {
             // Create ally UI
-            Color color = character.UnityColor();
             GameObject allyInfo = Instantiate(allyInfoPrefab, allyInfoPrefab.transform.position, allyInfoPrefab.transform.rotation);
             Vector3 pos = allyInfo.transform.position += new Vector3(0, alliesIndex * 60, 0);
             allyInfo.transform.SetParent(gui.transform, false);
@@ -269,5 +274,10 @@ public class Player : Fighter
             InterruptWaiting();
         else if (fighterStatus == Status.Connecting)
             EndAbility();
+    }
+
+    protected override void EnergyChanged()
+    {
+        energyBar.value = Energy.PercentageValue;
     }
 }
