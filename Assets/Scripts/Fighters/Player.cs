@@ -25,8 +25,9 @@ public class Player : Fighter
     Ability interaction;
     Wire wire;
 
-    protected new IPlayerState State => entity.GetState<IPlayerState>();
+    public Wire Wire { get => wire; }
 
+    protected new IPlayerState State => entity.GetState<IPlayerState>();
     protected override Quaternion DefaultRotation =>
         new Quaternion(transform.rotation.x, cam.rotation.y, transform.rotation.z, cam.rotation.w);
 
@@ -35,7 +36,7 @@ public class Player : Fighter
         FighterRangedStatistic hp = new FighterRangedStatistic(10);
         FighterBuffableStatistic armor = new FighterBuffableStatistic(10);
         FighterBuffableStatistic length = new FighterBuffableStatistic(50);
-        FighterBuffableStatistic intensity = new FighterBuffableStatistic(10);
+        FighterBuffableStatistic intensity = new FighterBuffableStatistic(50);
         FighterEnergy energy = new FighterEnergy(100);
         FighterBuffableStatistic speed = new FighterBuffableStatistic(50);
 
@@ -74,37 +75,20 @@ public class Player : Fighter
         base.EntityStart();
 
         // Abilities initialization
-        List<Effect> effects1 = new List<Effect>()
-        {
-            new Damage(10)
-        };
-        Ability ability1 = new Ability(effects1, 5, "");
-
-        List<Effect> effects2 = new List<Effect>()
-        {
-            new StatModifier(StatisticManager.StatisticId.Int, 10, 10)
-        };
-        Ability ability2 = new Ability(effects2, 5, "");
-
-        List<Effect> effects3 = new List<Effect>()
-        {
-            new Healing(10)
-        };
-        Ability ability3 = new Ability(effects3, 5, "");
+        Ability ability1 = new RedAttack1();
+        Ability ability2 = new RedAttack2();
 
         attacks = new List<Ability>()
         {
             ability1,
             ability2,
-            ability3
         };
 
         // Assists initialization
         assists = new List<Ability>();
 
         // Interaction ability initialization
-        List<Effect> interactionEffects = new List<Effect>();
-        interaction = new Ability(interactionEffects, 5, "");
+        interaction = new RedAttack1();
 
         wire = GetComponentInChildren<Wire>(true);
 
@@ -156,14 +140,14 @@ public class Player : Fighter
     void CheckDashInput()
     {
         if (Input.GetButtonDown("Dash") && Time.time > nextDashTime &&
-            fighterStatus == Fighter.Status.Free &&
+            fighterStatus == Status.Free &&
             CheckAndUseEnergy(DashEnergy))
             StartCoroutine(Dash());
     }
 
     public override void OwnerFixedUpdate()
     {
-        if (fighterStatus != Status.Stunned)
+        if (fighterStatus != Status.Stunned && !movementsBlocked)
             UpdateMovement();
 
         base.OwnerFixedUpdate();
@@ -194,17 +178,17 @@ public class Player : Fighter
     {
         if (Input.GetButtonDown("Target"))
         {
-            Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+            //Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit, LayerMask.GetMask("Player", "Enemy", "Interactable")))
-                if (DistanceFrom(hit.transform) <= TargetRange)
+            {
+                Fighter hitFighter = hit.collider.GetComponent<Fighter>();
+                if (DistanceFrom(hitFighter) <= TargetRange && hitFighter != target)
                 {
-                    Fighter hitFighter = hit.collider.GetComponent<Fighter>();
-                    if (hitFighter != target)
-                    {
-                        CheckAndUpdatePlayerStatus();
-                        target = hitFighter;
-                    }
+                    CheckAndUpdatePlayerStatus();
+                    target = hitFighter;
                 }
+            }
         }
     }
 

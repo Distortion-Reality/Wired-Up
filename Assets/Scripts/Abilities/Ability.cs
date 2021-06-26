@@ -1,28 +1,11 @@
-using System.Collections.Generic;
-
-public class Ability
+public abstract class Ability
 {
-    readonly List<Effect> effects;
-    readonly int energy;
-    readonly string trigger;
+    public abstract int Energy { get; }
 
-    public Ability(List<Effect> effects, int energy, string trigger)
+    public abstract void DoAbility(Fighter user);
+
+    protected void EndAbility(Fighter user)
     {
-        this.effects = effects;
-        this.energy = energy;
-        this.trigger = trigger;
-    }
-
-    public int Energy => energy;
-
-    public void DoAbility(Fighter user)
-    {
-        user.Animator.SetTrigger(trigger);
-    }
-
-    public void ApplyEffects(Fighter user)
-    {
-        foreach (Effect effect in effects)
-            effect.ApplyEffect(user);
+        user.EndAbility();
     }
 }

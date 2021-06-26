@@ -20,9 +20,9 @@ public abstract class Fighter : MonoBehaviour
     }
 
     protected BoltEntity entity;
-
     protected Guid entityId;
 
+    Vector3 pivotOffset;
     protected Rigidbody rb;
     const float RotationSpeed = 10f;
 
@@ -36,19 +36,31 @@ public abstract class Fighter : MonoBehaviour
     protected Fighter target = null;
     protected Animator animator;
 
+    bool charging = false;
+    Fighter charged = null;
+
+    bool grounded = true;
+    protected bool movementsBlocked = false;
+
+    public Rigidbody Rb { get => rb; set => rb = value; }
     public Dictionary<StatisticManager.StatisticId, FighterStatistic> Stats { get => stats; }
     public Status FighterStatus { get => fighterStatus; set => fighterStatus = value; }
     public TargetAbilityManager TargetAbilityManager { get => targetAbilityManager; }
     public Fighter Target { get => target; }
     public Animator Animator { get => animator; }
+    public bool Charging { get => charging; set => charging = value; }
+    public Fighter Charged { get => charged; set => charged = value; }
+    public bool Grounded { get => grounded; set => grounded = value; }
+    public bool MovementsBlocked { set => movementsBlocked = value; }
 
     protected IFighterState State => entity.GetState<IFighterState>();
+    public Vector3 BasePosition => transform.position - pivotOffset;
     protected float MoveSpeed => 1.3f * Mathf.Log(10 * stats[StatisticManager.StatisticId.Spd].CurrentValue);
     protected abstract Quaternion DefaultRotation { get; }
     FighterEnergy Energy => (FighterEnergy) stats[StatisticManager.StatisticId.Nrg];
     public float AbilityRange => 2 * Mathf.Log(10 * stats[StatisticManager.StatisticId.Lng].CurrentValue);
     protected float TargetRange => 2 * AbilityRange;
-    public float TargetDistance => DistanceFrom(target.transform);
+    public float TargetDistance => DistanceFrom(target);
 
     public virtual void EntityStart()
     {
@@ -56,6 +68,7 @@ public abstract class Fighter : MonoBehaviour
 
         UnwrapAttachedToken();
 
+        pivotOffset = new Vector3(0, transform.position.y, 0);
         rb = GetComponent<Rigidbody>();
 
         targetAbilityManager = GetComponent<TargetAbilityManager>();
@@ -102,9 +115,9 @@ public abstract class Fighter : MonoBehaviour
             target = null;
     }
 
-    protected float DistanceFrom(Transform other)
+    protected float DistanceFrom(Fighter other)
     {
-        return Vector3.Magnitude(Vector3.ProjectOnPlane(other.position - transform.position, transform.up));
+        return Vector3.Distance(other.BasePosition, BasePosition);
     }
 
     void RegenEnergy()
@@ -161,7 +174,7 @@ public abstract class Fighter : MonoBehaviour
 
         if (healthBar)
             healthBar.value = stats[StatisticManager.StatisticId.HP].PercentageValue;
-
+        
         if (entity.IsOwner && stats[StatisticManager.StatisticId.HP].CurrentValue == 0)
             Die();
     }
@@ -171,7 +184,7 @@ public abstract class Fighter : MonoBehaviour
         Energy.ApplyChange(change);
     }
 
-    public void ApplyStatus(Status status, float time)
+    public void ApplyStatus(Status status, float time = 5f)
     {
         StartCoroutine(ApplyStatusForTime(status, time));
     }
@@ -191,8 +204,8 @@ public abstract class Fighter : MonoBehaviour
     void UpdateRotation()
     {
         Quaternion rotation;
-        if (fighterStatus != Fighter.Status.Free &&
-            FighterStatus != Fighter.Status.Disconnecting)
+        if (fighterStatus != Status.Free &&
+            FighterStatus != Status.Disconnecting)
             rotation = LookAtTargetRotation();
         else
         {
@@ -212,5 +225,18 @@ public abstract class Fighter : MonoBehaviour
     void Die()
     {
         BoltNetwork.Destroy(gameObject);
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (charging && !collision.gameObject.CompareTag("Terrain"))
+        {
+            charging = false;
+            if (collision.gameObject.CompareTag("Enemy"))
+                charged = collision.gameObject.GetComponent<Enemy>();
+        }
+
+        if (!grounded && collision.gameObject.CompareTag("Terrain"))
+            grounded = true;
     }
 }
