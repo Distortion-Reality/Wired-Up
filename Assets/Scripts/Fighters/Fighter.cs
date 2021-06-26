@@ -57,7 +57,7 @@ public abstract class Fighter : MonoBehaviour
     public Vector3 BasePosition => transform.position - pivotOffset;
     protected float MoveSpeed => 1.3f * Mathf.Log(10 * stats[StatisticManager.StatisticId.Spd].CurrentValue);
     protected abstract Quaternion DefaultRotation { get; }
-    FighterEnergy Energy => (FighterEnergy) stats[StatisticManager.StatisticId.Nrg];
+    protected FighterEnergy Energy => (FighterEnergy) stats[StatisticManager.StatisticId.Nrg];
     public float AbilityRange => 2 * Mathf.Log(10 * stats[StatisticManager.StatisticId.Lng].CurrentValue);
     protected float TargetRange => 2 * AbilityRange;
     public float TargetDistance => DistanceFrom(target);
@@ -182,7 +182,10 @@ public abstract class Fighter : MonoBehaviour
     void ChangeEnergy(float change)
     {
         Energy.ApplyChange(change);
+        EnergyChanged();
     }
+
+    protected virtual void EnergyChanged() {}
 
     public void ApplyStatus(Status status, float time = 5f)
     {

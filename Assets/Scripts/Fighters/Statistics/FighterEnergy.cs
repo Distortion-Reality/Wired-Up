@@ -11,6 +11,8 @@ public class FighterEnergy : FighterRangedStatistic
 
     public new float CurrentValue { get => currentValue; }
 
+    public new float PercentageValue => currentValue / baseValue;
+
     public override int ApplyChange(int change)
     {
         ApplyChange(change);
