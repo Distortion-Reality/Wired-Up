@@ -7,7 +7,6 @@ using Photon.Bolt;
 
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(Animator))]
 public abstract class Fighter : MonoBehaviour
 {
     public enum Status
