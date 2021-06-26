@@ -4,25 +4,24 @@ using UdpKit;
 using Photon.Bolt;
 using Photon.Bolt.Matchmaking;
 
-public class Menu : GlobalEventListener {
-
-    public static string PlayerNameKey = "playerName";
+public class Menu : GlobalEventListener
+{
     public TMPro.TMP_InputField playerName;
 
     void Start()
     {
-        PlayerPrefs.DeleteKey(PlayerNameKey);
-        if (!PlayerPrefs.HasKey(PlayerNameKey))
+        PlayerPrefs.DeleteKey(PlayerPrefKey.PlayerName);
+        if (!PlayerPrefs.HasKey(PlayerPrefKey.PlayerName))
         {
-            PlayerPrefs.SetString(PlayerNameKey, "Player #" 
+            PlayerPrefs.SetString(PlayerPrefKey.PlayerName, "Player #" 
             + (((uint) Guid.NewGuid().GetHashCode()).ToString().Substring(0, 4)));
         }
-        playerName.text = PlayerPrefs.GetString(PlayerNameKey);
+        playerName.text = PlayerPrefs.GetString(PlayerPrefKey.PlayerName);
     }
 
     public void PlayerNameEndEdit(string playerName)
     {
-        PlayerPrefs.SetString(PlayerNameKey, playerName);
+        PlayerPrefs.SetString(PlayerPrefKey.PlayerName, playerName);
     }
 
     public void Host()

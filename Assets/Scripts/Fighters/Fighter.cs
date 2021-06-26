@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,6 +21,8 @@ public abstract class Fighter : MonoBehaviour
     }
 
     protected BoltEntity entity;
+
+    protected Guid entityId;
 
     protected Rigidbody rb;
     const float RotationSpeed = 10f;
@@ -51,6 +54,7 @@ public abstract class Fighter : MonoBehaviour
     public virtual void EntityStart()
     {
         entity = GetComponent<BoltEntity>();
+        entityId = ((FighterInfo) entity.AttachToken).guid;
 
         rb = GetComponent<Rigidbody>();
 
@@ -69,7 +73,7 @@ public abstract class Fighter : MonoBehaviour
 
     // Update is called once per frame
     public virtual void OwnerUpdate()
-    {
+    {                                                                                                                                                                                   
         UpdateTarget();
         RegenEnergy();
     }

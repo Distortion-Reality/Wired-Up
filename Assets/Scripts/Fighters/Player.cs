@@ -51,6 +51,12 @@ public class Player : Fighter
     {
         base.EntityStart();
 
+        PlayerInfo info = (PlayerInfo) entity.AttachToken;
+        CharacterColor character = info.character;
+        Color color = character.UnityColor();
+
+        // Load character model
+
         // Abilities initialization
         List<Effect> effects1 = new List<Effect>()
         {
@@ -96,19 +102,18 @@ public class Player : Fighter
         else // Ally
         {
             // Create ally UI
-            Color allyColor = Color.green; // TODO: get actual color
             GameObject allyInfo = Instantiate(allyInfoPrefab, allyInfoPrefab.transform.position, allyInfoPrefab.transform.rotation);
             Vector3 pos = allyInfo.transform.position;
             pos.Set(pos.x, pos.y + alliesIndex * 60, pos.z);
             allyInfo.transform.SetParent(gui.transform, false);
 
             TMPro.TextMeshProUGUI allyName = allyInfo.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-            allyName.text = entity.Source.RemoteEndPoint.SteamId.Id.ToString(); // TODO: get actual name
+            allyName.text = info.name;
 
-            allyInfo.transform.Find("AllyPortrait").GetComponent<Image>().color = allyColor;
+            allyInfo.transform.Find("AllyPortrait").GetComponent<Image>().color = color;
 
             healthBar = allyInfo.GetComponentInChildren<Slider>();
-            healthBar.transform.Find("Fill Area").Find("Fill").GetComponent<Image>().color = allyColor;
+            healthBar.transform.Find("Fill Area").Find("Fill").GetComponent<Image>().color = color;
 
             alliesIndex++;
         }

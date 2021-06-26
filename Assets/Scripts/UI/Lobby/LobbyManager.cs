@@ -96,9 +96,13 @@ public class LobbyManager : GlobalEventListener
         owner.ReadyButton.interactable = available;
     }
 
+    public bool ForceStart(BoltEntity entity)
+    {
+        return entity.IsOwner && forceStart;
+    }
+
     public bool CanStart()
     {
-        if (forceStart) return true;
         return allPlayers.Count == 3 && allPlayers.TrueForAll(player => player.IsReady);
     }
 }

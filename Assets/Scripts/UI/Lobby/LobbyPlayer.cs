@@ -11,6 +11,7 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
     bool ready = false;
     public bool IsReady { get => ready; }
 
+    CharacterManager characterManager;
     LobbyManager lobbyManager;
     TMPro.TextMeshProUGUI playerName;
     Button nextCharacterButton;
@@ -20,10 +21,11 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
 
     public override void Attached()
     {
-        CreateCharactersModels();
-
+        characterManager = GameObject.FindObjectOfType<CharacterManager>();
         lobbyManager = GameObject.FindObjectOfType<LobbyManager>();
         playerName = GetComponentInChildren<TMPro.TextMeshProUGUI>();
+
+        CreateCharactersModels();
 
         if (entity.IsOwner)
         {
@@ -39,7 +41,7 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
             readyButton = GameObject.Find("ReadyButton").GetComponent<Button>();
             readyButton.onClick.AddListener(() => state.ready = !ready);
 
-            state.name = PlayerPrefs.GetString(Menu.PlayerNameKey);
+            state.name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName);
             state.character = 0;
             state.ready = false;
         }
@@ -55,9 +57,8 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
     void CreateCharactersModels()
     {
         Transform characterModel = gameObject.transform.Find("Character/CharacterModel");
-        CharacterManager characterManager = GameObject.FindObjectOfType<CharacterManager>();
 
-        foreach (var color in characterManager.GetCharacterColors())
+        foreach (var color in CharacterColorHelper.Values())
         {
             GameObject model = Instantiate(characterManager.GetPrefab(color), parent: characterModel);
             model.SetActive(false);
@@ -108,13 +109,16 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
         {
             nextCharacterButton.interactable = !ready;
             previousCharacterButton.interactable = !ready;
+
+            if (ready)
+                characterManager.CurrentCharacter = (CharacterColor) currentIndex;
         }
         else
         {
             lobbyManager.CheckOwnerCharacterAvailable();
         }
 
-        if (BoltNetwork.IsServer && lobbyManager.CanStart())
+        if ((BoltNetwork.IsServer && (lobbyManager.CanStart() || lobbyManager.ForceStart(entity))))
         {
             BoltNetwork.LoadScene("Level2Scene");
         }
