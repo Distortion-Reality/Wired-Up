@@ -21,13 +21,12 @@ public class RedAttack2 : Ability
         target.Grounded = false;
 
         if (user.CompareTag("Player"))
-            target.TargetAbilityManager.StartCoroutine(RotateWire(((Player) user).Wire, target));
+            target.TargetAbilityManager.StartCoroutine(WireLookAtTarget(((Player) user).Wire, target));
 
         float elapsedTime = 0f;
         while (elapsedTime < 1f)
         {
-            Vector3 translation = 0.2f * Time.fixedDeltaTime *
-                user.Stats[StatisticManager.StatisticId.Int].CurrentValue * Vector3.up;
+            Vector3 translation = 10 * Time.fixedDeltaTime * Vector3.up;
             target.Rb.MovePosition(target.Rb.position + translation);
 
             elapsedTime += Time.fixedDeltaTime;
@@ -37,7 +36,7 @@ public class RedAttack2 : Ability
 
         while (!target.Grounded)
         {
-            Vector3 force = user.Stats[StatisticManager.StatisticId.Int].CurrentValue * Vector3.down;
+            Vector3 force = 50 * Vector3.down;
             target.Rb.AddForce(force);
 
             yield return new WaitForFixedUpdate();
@@ -48,20 +47,18 @@ public class RedAttack2 : Ability
         target.Rb.constraints &= ~RigidbodyConstraints.FreezePosition;
         target.Rb.constraints |= RigidbodyConstraints.FreezePositionY;
 
-        int damage = Effects.Damage(user, target, power);
-        target.ChangeStat(StatisticManager.StatisticId.HP, -damage);
+        Effects.ApplyDamage(user, target, power);
 
         EndAbility(user);
     }
 
-    IEnumerator RotateWire(Wire wire, Fighter target)
+    IEnumerator WireLookAtTarget(Wire wire, Fighter target)
     {
         Quaternion defaultWireParentLocalRotation = wire.transform.parent.localRotation;
 
         while (!target.Grounded)
         {
             wire.transform.parent.LookAt(target.BasePosition);
-
             yield return null;
         }
 

@@ -1,10 +1,8 @@
 using UnityEngine;
 
-public class Template : Ability
+public class YellowAssist2 : Ability
 {
-    const int power = 20;
-
-    public override int Energy => 10;
+    public override int Energy => 20;
 
     public override void DoAbility(Fighter user)
     {

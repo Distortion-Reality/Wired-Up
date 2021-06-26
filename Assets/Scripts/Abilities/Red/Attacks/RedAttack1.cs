@@ -23,8 +23,8 @@ public class RedAttack1 : Ability
             yield return new WaitForFixedUpdate();
         }
 
-        int damage = Effects.Damage(user, user.Charged, power);
-        user.Charged.ChangeStat(StatisticManager.StatisticId.HP, -damage);
+        Effects.ApplyDamage(user, user.Charged, power);
+        user.Charged = null;
 
         EndAbility(user);
     }

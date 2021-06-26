@@ -33,29 +33,13 @@ public class Enemy : Fighter
         base.EntityStart();
 
         // Abilities initialization
-        List<Effect> effects1 = new List<Effect>()
-        {
-            new Damage(10)
-        };
         Ability ability1 = new RedAttack1();
-
-        List<Effect> effects2 = new List<Effect>()
-        {
-            new StatModifier(StatisticManager.StatisticId.Int, 10, 10)
-        };
         Ability ability2 = new RedAttack1();
-
-        List<Effect> effects3 = new List<Effect>()
-        {
-            new Healing(10)
-        };
-        Ability ability3 = new RedAttack1();
 
         attacks = new List<Ability>()
         {
             ability1,
             ability2,
-            ability3
         };
 
         // Assists initialization

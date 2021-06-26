@@ -6,7 +6,6 @@ using Photon.Bolt;
 
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(Animator))]
 public abstract class Fighter : MonoBehaviour
 {
     public enum Status
@@ -39,6 +38,7 @@ public abstract class Fighter : MonoBehaviour
     Fighter charged = null;
 
     bool grounded = true;
+    protected bool movementsBlocked = false;
 
     public Rigidbody Rb { get => rb; set => rb = value; }
     public Dictionary<StatisticManager.StatisticId, FighterStatistic> Stats { get => stats; }
@@ -49,6 +49,7 @@ public abstract class Fighter : MonoBehaviour
     public bool Charging { get => charging; set => charging = value; }
     public Fighter Charged { get => charged; set => charged = value; }
     public bool Grounded { get => grounded; set => grounded = value; }
+    public bool MovementsBlocked { set => movementsBlocked = value; }
 
     protected IFighterState State => entity.GetState<IFighterState>();
     public Vector3 BasePosition => transform.position - pivotOffset;
@@ -67,7 +68,7 @@ public abstract class Fighter : MonoBehaviour
         rb = GetComponent<Rigidbody>();
 
         targetAbilityManager = GetComponent<TargetAbilityManager>();
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
 
         InitStats();
 
@@ -167,7 +168,7 @@ public abstract class Fighter : MonoBehaviour
         Energy.ApplyChange(change);
     }
 
-    public void ApplyStatus(Status status, float time)
+    public void ApplyStatus(Status status, float time = 5f)
     {
         StartCoroutine(ApplyStatusForTime(status, time));
     }
@@ -214,13 +215,9 @@ public abstract class Fighter : MonoBehaviour
     {
         if (charging && !collision.gameObject.CompareTag("Terrain"))
         {
+            charging = false;
             if (collision.gameObject.CompareTag("Enemy"))
-            {
-                charging = false;
                 charged = collision.gameObject.GetComponent<Enemy>();
-            }
-            else
-                charging = false;
         }
 
         if (!grounded && collision.gameObject.CompareTag("Terrain"))
