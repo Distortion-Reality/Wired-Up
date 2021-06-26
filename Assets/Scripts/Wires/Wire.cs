@@ -166,7 +166,7 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     void OnDisable()
     {
-        if (entity.IsOwner)
+        if (entity.IsAttached && entity.IsOwner)
             state.wireActive = false;
     }
 }

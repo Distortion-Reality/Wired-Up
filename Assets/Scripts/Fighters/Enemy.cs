@@ -11,7 +11,7 @@ public class Enemy : Fighter
     protected override void InitStats()
     {
         FighterRangedStatistic hp = new FighterRangedStatistic(20);
-        FighterBuffableStatistic armor = new FighterBuffableStatistic(10);
+        FighterBuffableStatistic armor = new FighterBuffableStatistic(50);
         FighterBuffableStatistic length = new FighterBuffableStatistic(10);
         FighterBuffableStatistic intensity = new FighterBuffableStatistic(10);
         FighterEnergy energy = new FighterEnergy(20);
@@ -37,19 +37,19 @@ public class Enemy : Fighter
         {
             new Damage(10)
         };
-        Ability ability1 = new Ability(effects1, 5, "");
+        Ability ability1 = new RedAttack1();
 
         List<Effect> effects2 = new List<Effect>()
         {
             new StatModifier(StatisticManager.StatisticId.Int, 10, 10)
         };
-        Ability ability2 = new Ability(effects2, 5, "");
+        Ability ability2 = new RedAttack1();
 
         List<Effect> effects3 = new List<Effect>()
         {
             new Healing(10)
         };
-        Ability ability3 = new Ability(effects3, 5, "");
+        Ability ability3 = new RedAttack1();
 
         attacks = new List<Ability>()
         {
