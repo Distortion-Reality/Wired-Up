@@ -7,6 +7,9 @@ using Photon.Bolt;
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
 public class Player : Fighter
 {
+    string playerName;
+    CharacterColor character;
+
     Canvas gui;
     public GameObject allyInfoPrefab;
     static int alliesIndex = 0;
@@ -47,15 +50,28 @@ public class Player : Fighter
         };
     }
 
+    protected override void UnwrapAttachedToken()
+    {
+        base.UnwrapAttachedToken();
+
+        PlayerInfo info = (PlayerInfo) entity.AttachToken;
+        playerName = info.name;
+        character = info.character;
+    }
+
+    protected override void InitAnimator()
+    {
+        // Load character model
+        CharacterManager characterManager = GameObject.FindObjectOfType<CharacterManager>();
+        GameObject modelPrefab = characterManager.GetPrefab(character);
+        GameObject model = Instantiate(modelPrefab, parent: transform);
+
+        animator = model.GetComponent<Animator>();
+    }
+
     public override void EntityStart()
     {
         base.EntityStart();
-
-        PlayerInfo info = (PlayerInfo) entity.AttachToken;
-        CharacterColor character = info.character;
-        Color color = character.UnityColor();
-
-        // Load character model
 
         // Abilities initialization
         List<Effect> effects1 = new List<Effect>()
@@ -102,13 +118,13 @@ public class Player : Fighter
         else // Ally
         {
             // Create ally UI
+            Color color = character.UnityColor();
             GameObject allyInfo = Instantiate(allyInfoPrefab, allyInfoPrefab.transform.position, allyInfoPrefab.transform.rotation);
-            Vector3 pos = allyInfo.transform.position;
-            pos.Set(pos.x, pos.y + alliesIndex * 60, pos.z);
+            Vector3 pos = allyInfo.transform.position += new Vector3(0, alliesIndex * 60, 0);
             allyInfo.transform.SetParent(gui.transform, false);
 
             TMPro.TextMeshProUGUI allyName = allyInfo.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-            allyName.text = info.name;
+            allyName.text = playerName;
 
             allyInfo.transform.Find("AllyPortrait").GetComponent<Image>().color = color;
 
