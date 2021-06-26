@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +20,7 @@ public abstract class Fighter : MonoBehaviour
     }
 
     protected BoltEntity entity;
+    protected Guid entityId;
 
     Vector3 pivotOffset;
     protected Rigidbody rb;
@@ -63,6 +65,7 @@ public abstract class Fighter : MonoBehaviour
     public virtual void EntityStart()
     {
         entity = GetComponent<BoltEntity>();
+        entityId = ((FighterInfo) entity.AttachToken).guid;
 
         pivotOffset = new Vector3(0, transform.position.y, 0);
         rb = GetComponent<Rigidbody>();
@@ -82,7 +85,7 @@ public abstract class Fighter : MonoBehaviour
 
     // Update is called once per frame
     public virtual void OwnerUpdate()
-    {
+    {                                                                                                                                                                                   
         UpdateTarget();
         RegenEnergy();
     }

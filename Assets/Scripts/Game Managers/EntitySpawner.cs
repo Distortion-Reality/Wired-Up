@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Photon.Bolt;
 
@@ -8,7 +9,11 @@ public class EntitySpawner : MonoBehaviour {
     void Start()
     {
         if (BoltNetwork.IsServer)
-            BoltNetwork.Instantiate(prefab, transform.position, transform.rotation);
+        {
+            FighterInfo info = new FighterInfo();
+            info.guid = Guid.NewGuid();
+            BoltNetwork.Instantiate(prefab, info, transform.position, transform.rotation);
+        }
 
         Destroy(gameObject);
     }

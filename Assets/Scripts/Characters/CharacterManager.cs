@@ -1,23 +1,15 @@
-using System;
 using UnityEngine;
 
 public class CharacterManager : MonoBehaviour
 {
-    public enum CharacterColor
-    {
-        Red, Blue, Green, Purple, Yellow
-    }
-
     public GameObject redPrefab, bluePrefab, greenPrefab, purplePrefab, yellowPrefab;
+    
+    CharacterColor currentCharacter;
+    public CharacterColor CurrentCharacter { get => currentCharacter; set => currentCharacter = value; }
 
-    public CharacterColor[] GetCharacterColors()
+    public GameObject GetPrefab(CharacterColor id)
     {
-        return (CharacterColor[]) Enum.GetValues(typeof(CharacterColor));
-    }
-
-    public GameObject GetPrefab(CharacterColor type)
-    {
-        switch (type)
+        switch (id)
         {
             case CharacterColor.Red:
                 return redPrefab;
