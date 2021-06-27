@@ -11,7 +11,7 @@ public class TargetEnemyAbilityManager : TargetAbilityManager
         if (usersAreUsing)
         {
             userAbility.UseEnergy();
-            userAbility.User.FighterStatus = Fighter.Status.Using;
+            userAbility.User.FighterStatus = Fighter.Status.Using; // TODO: send event to change state
         }
         else if (userAbilityQueue.Count == 1)
             StartCoroutine(WaitForOtherAbilities());
@@ -37,7 +37,7 @@ public class TargetEnemyAbilityManager : TargetAbilityManager
     void EndAbilities()
     {
         foreach (UserAbility userAbility in userAbilityQueue)
-            userAbility.User.EndAbility();
+            userAbility.User.EndAbility(); // TODO: send EndAbility as event
         userAbilityQueue.Clear();
     }
 }

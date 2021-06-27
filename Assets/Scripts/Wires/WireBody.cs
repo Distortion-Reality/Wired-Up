@@ -24,7 +24,6 @@ public class WireBody : EntityBehaviour<IPlayerState>
         if (entity.IsOwner)
             state.wireBodyScale = transform.parent.localScale;
 
-        state.SetTransforms(state.wireBodyTransform, transform.parent);
         state.AddCallback("wireBodyScale", ScaleChanged);
 
         defaultLocalScale = LocalScale;

@@ -265,7 +265,7 @@ public class Player : Fighter
 
     public void InterruptWaiting()
     {
-        target.TargetAbilityManager.RemoveUserAbility(this);
+        target.TargetAbilityManager.RemoveUserAbility(this); // TODO: send event
         EndAbility();
     }
 
@@ -273,7 +273,7 @@ public class Player : Fighter
     {
         target = actualTarget;
         fighterStatus = Status.Waiting;
-        target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
+        target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility); // TODO: send event
 
         wire.StayConnected();
     }
