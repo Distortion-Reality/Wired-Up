@@ -10,10 +10,10 @@ public class GreenAttack1 : Ability
     public override void DoAbility(Fighter user)
     {
         user.Target.TargetAbilityManager.StartCoroutine(BlockMovements(user.Target));
-        EndAbility(user);
+        user.EndAbility();
     }
 
-    IEnumerator BlockMovements(Fighter target)
+    static IEnumerator BlockMovements(Fighter target)
     {
         target.MovementsBlocked = true;
         yield return new WaitForSeconds(time);

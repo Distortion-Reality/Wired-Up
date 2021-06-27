@@ -29,8 +29,8 @@ public abstract class TargetAbilityManager : MonoBehaviour
         }
     }
 
-    protected Queue<UserAbility> userAbilityQueue = new Queue<UserAbility>();
-    protected bool usersAreUsing = false;
+    protected Queue<UserAbility> userAbilityQueue = new Queue<UserAbility>(); // TODO: sync count
+    protected bool usersAreUsing = false; // TODO: sync
 
     public void EnqueueUserAbility(Fighter user, Ability ability)
     {

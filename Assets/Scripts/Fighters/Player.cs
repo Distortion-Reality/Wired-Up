@@ -17,7 +17,7 @@ public class Player : Fighter
 
     Transform cam;
     float moveSpeedMultiplier = 1f;
-    const int DashEnergy = 5;
+    const int DashEnergy = 10;
     const float DashMultiplier = 2f,
         DashDuration = 0.25f,
         DashCooldown = 5f;
@@ -142,6 +142,13 @@ public class Player : Fighter
         }
     }
 
+    public override void OwnerFixedUpdate()
+    {
+        UpdateMovement();
+
+        base.OwnerFixedUpdate();
+    }
+
     void CheckDashInput()
     {
         if (Input.GetButtonDown("Dash") && Time.time > nextDashTime &&
@@ -150,22 +157,23 @@ public class Player : Fighter
             StartCoroutine(Dash());
     }
 
-    public override void OwnerFixedUpdate()
-    {
-        if (fighterStatus != Status.Stunned && !movementsBlocked)
-            UpdateMovement();
-
-        base.OwnerFixedUpdate();
-    }
-
     void UpdateMovement()
     {
-        float x = Input.GetAxisRaw("Horizontal");
-        float z = Input.GetAxisRaw("Vertical");
+        Vector3 dir;
 
-        Vector3 dir = cam.right * x + cam.forward * z;
-        dir.Normalize();
-        dir *= moveSpeedMultiplier * MoveSpeed;
+        if (fighterStatus == Status.Waiting || fighterStatus == Status.Using ||
+            fighterStatus == Status.Stunned || movementsBlocked)
+            dir = Vector3.zero;
+        else
+        {
+            float x = Input.GetAxisRaw("Horizontal");
+            float z = Input.GetAxisRaw("Vertical");
+
+            dir = cam.right * x + cam.forward * z;
+            dir.Normalize();
+            dir *= moveSpeedMultiplier * MoveSpeed;
+        }
+
         dir.y = rb.velocity.y;
         rb.velocity = dir;
     }
@@ -188,7 +196,7 @@ public class Player : Fighter
             if (Physics.Raycast(ray, out RaycastHit hit, LayerMask.GetMask("Player", "Enemy", "Interactable")))
             {
                 Fighter hitFighter = hit.collider.GetComponent<Fighter>();
-                if (DistanceFrom(hitFighter) <= TargetRange && hitFighter != target)
+                if (hitFighter && DistanceFrom(hitFighter) <= TargetRange && hitFighter != target)
                 {
                     CheckAndUpdatePlayerStatus();
                     target = hitFighter;

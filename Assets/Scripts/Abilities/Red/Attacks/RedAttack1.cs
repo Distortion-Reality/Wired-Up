@@ -19,13 +19,16 @@ public class RedAttack1 : Ability
         {
             Vector3 force = 20 * user.Stats[StatisticManager.StatisticId.Spd].CurrentValue * Vector3.forward;
             user.Rb.AddRelativeForce(force);
-
+            
             yield return new WaitForFixedUpdate();
         }
 
-        Effects.ApplyDamage(user, user.Charged, power);
-        user.Charged = null;
+        if (user.Charged)
+        {
+            Effects.ApplyDamage(user, user.Charged, power);
+            user.Charged = null;
+        }
 
-        EndAbility(user);
+        user.EndAbility();
     }
 }

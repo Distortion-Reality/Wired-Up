@@ -9,19 +9,18 @@ public class RedAttack2 : Ability
 
     public override void DoAbility(Fighter user)
     {
-        user.Target.TargetAbilityManager.StartCoroutine(LiftAndSlam(user));
+        user.Target.TargetAbilityManager.StartCoroutine(LiftAndSlam(user, user.Target));
+
+        if (user.CompareTag("Player"))
+            user.Target.TargetAbilityManager.StartCoroutine(WiresLookAtTarget(((Player)user).Wire, user.Target));
     }
 
-    IEnumerator LiftAndSlam(Fighter user)
+    static IEnumerator LiftAndSlam(Fighter user, Fighter target)
     {
-        Fighter target = user.Target;
         float targetStartingPositionY = target.transform.position.y;
         target.Rb.constraints |= RigidbodyConstraints.FreezePosition;
         target.Rb.constraints &= ~RigidbodyConstraints.FreezePositionY;
         target.Grounded = false;
-
-        if (user.CompareTag("Player"))
-            target.TargetAbilityManager.StartCoroutine(WireLookAtTarget(((Player) user).Wire, target));
 
         float elapsedTime = 0f;
         while (elapsedTime < 1f)
@@ -49,10 +48,10 @@ public class RedAttack2 : Ability
 
         Effects.ApplyDamage(user, target, power);
 
-        EndAbility(user);
+        user.EndAbility();
     }
 
-    IEnumerator WireLookAtTarget(Wire wire, Fighter target)
+    IEnumerator WiresLookAtTarget(Wire wire, Fighter target)
     {
         Quaternion defaultWireParentLocalRotation = wire.transform.parent.localRotation;
 
