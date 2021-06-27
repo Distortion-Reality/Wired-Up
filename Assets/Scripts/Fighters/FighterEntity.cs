@@ -1,5 +1,5 @@
 using Photon.Bolt;
-
+ 
 public class FighterEntity : EntityBehaviour<IFighterState>
 {
     Fighter fighter;
@@ -10,11 +10,18 @@ public class FighterEntity : EntityBehaviour<IFighterState>
         fighter.EntityStart();
     }
 
+    public override void Detached()
+    {
+        fighter.EntityDestroyed();
+    }
+
     // Update is called once per frame
     void Update()
     {
         if (entity.IsOwner)
             fighter.OwnerUpdate();
+        
+        fighter.EntityUpdate();
     }
 
     // SimulateOwner is a FixedUpdate run only if entity.IsOwner

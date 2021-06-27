@@ -190,6 +190,7 @@
             "$type": "Photon.Bolt.Compiler.PropertyTypeTransform, bolt.compiler",
             "PositionSelection": 14,
             "RotationSelection": 14,
+            "ExtrapolationVelocityMode": 1,
             "PositionCompression": [
               {
                 "MinValue": -1024,
@@ -254,6 +255,7 @@
           },
           "AssetSettings": {
             "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",
+            "SmoothingAlgorithm": 2,
             "ExtrapolationErrorTolerance": 0.25,
             "_ExtrapolationCorrectionFrames": 6,
             "ExtrapolationMaxFrames": 9,
@@ -511,14 +513,18 @@
           }
         },
         {
-          "Name": "hp",
+          "Name": "statistics",
           "Enabled": true,
           "Expanded": true,
           "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
-            "$type": "Photon.Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
-            "MaxValue": 255
+            "$type": "Photon.Bolt.Compiler.PropertyTypeArray, bolt.compiler",
+            "ElementCount": 5,
+            "ElementType": {
+              "$type": "Photon.Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
+              "MaxValue": 255
+            }
           },
           "AssetSettings": {
             "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",
@@ -607,6 +613,19 @@
       "$type": "Photon.Bolt.Compiler.EventDefinition, bolt.compiler",
       "Properties": [
         {
+          "Name": "entityId",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Photon.Bolt.Compiler.PropertyTypeGuid, bolt.compiler"
+          },
+          "AssetSettings": {
+            "$type": "Photon.Bolt.Compiler.PropertyEventSettings, bolt.compiler"
+          }
+        },
+        {
           "Name": "statisticId",
           "Enabled": true,
           "Expanded": true,
@@ -635,8 +654,15 @@
           }
         }
       ],
-      "Name": "FighterChangeStatisticEvent",
+      "Name": "ChangeStatisticEvent",
       "Guid": "77e36854-cdf1-4d96-96a2-8e6fdd462209",
+      "Groups": []
+    },
+    {
+      "$type": "Photon.Bolt.Compiler.EventDefinition, bolt.compiler",
+      "Properties": [],
+      "Name": "DoAbilityEvent",
+      "Guid": "0d1e23f0-092b-4b19-b1bc-19cf59631b1a",
       "Groups": []
     }
   ],

@@ -1,10 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Bolt;
 
 [RequireComponent(typeof(TargetEnemyAbilityManager))]
 public class Enemy : Fighter
 {
+    public GameObject enemyHealthBarPrefab;
+    const float HealthBarMinDistance = 10f;
+    const float HealthBarMaxDistance = 60f;
+
     protected new IEnemyState State => entity.GetState<IEnemyState>();
     
     protected override void InitStats()
@@ -44,8 +49,29 @@ public class Enemy : Fighter
         // Assists initialization
         assists = new List<Ability>();
 
+        healthBar = Instantiate(enemyHealthBarPrefab, parent: gui.transform).GetComponent<Slider>();
     }
 
+    public override void EntityUpdate()
+    {
+        base.EntityUpdate();
+
+        UpdateHealthBarTransform();
+    }
+
+    protected virtual void UpdateHealthBarTransform()
+    {
+        float cameraDistance = Vector3.Distance(Camera.main.transform.position, transform.position);
+        if (cameraDistance > HealthBarMaxDistance)
+            healthBar.gameObject.SetActive(false);
+        else
+        {
+            healthBar.transform.position  = Camera.main.WorldToScreenPoint(transform.position + new Vector3(0f, 2f, 0f));
+            Vector3 scale = Vector3.one * (HealthBarMinDistance / cameraDistance);
+            healthBar.transform.localScale = scale;
+            healthBar.gameObject.SetActive(true);
+        }
+    }
     protected override void UseAbility(Ability ability)
     {
         fighterStatus = Status.Using;

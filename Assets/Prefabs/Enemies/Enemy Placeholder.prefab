@@ -190,6 +190,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc829031d16801547be8a5a01d140f75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyHealthBarPrefab: {fileID: 4677544950231653370, guid: 4207759deac519ad4a623769fa629c87, type: 3}
 --- !u!114 &4926753982981743751
 MonoBehaviour:
   m_ObjectHideFlags: 0
