@@ -145,7 +145,6 @@
           "PropertyType": {
             "$type": "Photon.Bolt.Compiler.PropertyTypeVector, bolt.compiler",
             "Selection": 14,
-            "StrictEquality": true,
             "Compression": [
               {
                 "MaxValue": 255,
@@ -246,7 +245,6 @@
                 "BitsRequired": 16
               }
             ],
-            "PositionStrictCompare": true,
             "RotationCompressionQuaternion": {
               "MinValue": -1,
               "MaxValue": 1,
@@ -665,9 +663,60 @@
     },
     {
       "$type": "Photon.Bolt.Compiler.EventDefinition, bolt.compiler",
-      "Properties": [],
-      "Name": "DoAbilityEvent",
+      "Properties": [
+        {
+          "Name": "senderId",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Photon.Bolt.Compiler.PropertyTypeGuid, bolt.compiler"
+          },
+          "AssetSettings": {
+            "$type": "Photon.Bolt.Compiler.PropertyEventSettings, bolt.compiler"
+          }
+        },
+        {
+          "Name": "targetId",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Photon.Bolt.Compiler.PropertyTypeGuid, bolt.compiler"
+          },
+          "AssetSettings": {
+            "$type": "Photon.Bolt.Compiler.PropertyEventSettings, bolt.compiler"
+          }
+        },
+        {
+          "Name": "abilityId",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Photon.Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
+            "MaxValue": 7,
+            "CompressionEnabled": true
+          },
+          "AssetSettings": {
+            "$type": "Photon.Bolt.Compiler.PropertyEventSettings, bolt.compiler"
+          }
+        }
+      ],
+      "Name": "RemoteAbilityEvent",
       "Guid": "0d1e23f0-092b-4b19-b1bc-19cf59631b1a",
+      "Groups": []
+    },
+    {
+      "$type": "Photon.Bolt.Compiler.CommandDefinition, bolt.compiler",
+      "Input": [],
+      "Result": [],
+      "Properties": [],
+      "Name": "NewCommand",
+      "Guid": "b703b3d1-96e4-4d28-a839-b7bd0f762dff",
       "Groups": []
     }
   ],

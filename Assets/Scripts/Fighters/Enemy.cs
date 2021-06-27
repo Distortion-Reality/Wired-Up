@@ -20,7 +20,7 @@ public class Enemy : Fighter
 
     protected override void InitStats()
     {
-        FighterRangedStatistic hp = new FighterRangedStatistic(20);
+        FighterRangedStatistic hp = new FighterRangedStatistic(100);
         FighterBuffableStatistic armor = new FighterBuffableStatistic(50);
         FighterBuffableStatistic length = new FighterBuffableStatistic(50);
         FighterBuffableStatistic intensity = new FighterBuffableStatistic(10);

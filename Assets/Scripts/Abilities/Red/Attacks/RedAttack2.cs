@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using Photon.Bolt;
 
 public class RedAttack2 : Ability
 {
@@ -9,10 +10,25 @@ public class RedAttack2 : Ability
 
     public override void DoAbility(Fighter user)
     {
-        user.Target.TargetAbilityManager.StartCoroutine(LiftAndSlam(user, user.Target));
+        if (user.Target.Entity.IsOwner)
+            DoAbility(user, user.Target);
+        else
+        {
+            RemoteAbilityEvent evnt = RemoteAbilityEvent.Create(user.Target.Entity.Source, ReliabilityModes.ReliableOrdered);
+            evnt.senderId = user.EntityId;
+            evnt.targetId = user.Target.EntityId;
+            evnt.abilityId = (int) RemoteAbility.RedAttack2;
+            evnt.Send();
+            Debug.Log("sent event RedAttack2");
+        }
 
         if (user.CompareTag("Player"))
             user.Target.TargetAbilityManager.StartCoroutine(WiresLookAtTarget(((Player)user).Wire, user.Target));
+    }
+
+    public static void DoAbility(Fighter sender, Fighter target)
+    {
+        target.TargetAbilityManager.StartCoroutine(LiftAndSlam(sender, target));
     }
 
     static IEnumerator LiftAndSlam(Fighter user, Fighter target)
@@ -31,7 +47,8 @@ public class RedAttack2 : Ability
         while (elapsedTime < 1f)
         {
             Vector3 translation = 7 * Time.fixedDeltaTime * Vector3.up;
-            target.Rb.MovePosition(target.Rb.position + translation);
+            //target.Rb.MovePosition(target.Rb.position + translation);
+            target.transform.position += translation;
 
             elapsedTime += Time.fixedDeltaTime;
 
@@ -56,7 +73,17 @@ public class RedAttack2 : Ability
 
         Effects.ApplyDamage(user, target, power);
 
-        user.EndAbility();
+        if (user.Entity.IsOwner)
+            user.EndAbility();
+        else
+        {
+            RemoteAbilityEvent evnt = RemoteAbilityEvent.Create(user.Entity.Source, ReliabilityModes.ReliableOrdered);
+            evnt.senderId = target.EntityId;
+            evnt.targetId = user.EntityId;
+            evnt.abilityId = (int) RemoteAbility.EndAbility;
+            evnt.Send();
+            Debug.Log("sent event EndAbility");
+        }
     }
 
     IEnumerator WiresLookAtTarget(Wire wire, Fighter target)
