@@ -43,6 +43,7 @@ public class Enemy : Fighter
 
         // Assists initialization
         assists = new List<Ability>();
+
     }
 
     protected override void UseAbility(Ability ability)
