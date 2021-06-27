@@ -1,5 +1,7 @@
+using UnityEngine;
 using Photon.Bolt;
 
+[RequireComponent(typeof(BoltEntity))]
 public class FighterEntity : EntityBehaviour<IFighterState>
 {
     Fighter fighter;

@@ -16,7 +16,7 @@ public class Player : Fighter
     static int alliesIndex = 0;
 
     Transform cam;
-    float moveSpeedMultiplier = 1f;
+    float movementSpeedMultiplier = 1f;
     const int DashEnergy = 10;
     const float DashMultiplier = 2f,
         DashDuration = 0.25f,
@@ -38,7 +38,7 @@ public class Player : Fighter
         FighterBuffableStatistic armor = new FighterBuffableStatistic(10);
         FighterBuffableStatistic length = new FighterBuffableStatistic(50);
         FighterBuffableStatistic intensity = new FighterBuffableStatistic(50);
-        FighterEnergy energy = new FighterEnergy(100);
+        FighterEnergy energy = new FighterEnergy(50);
         FighterBuffableStatistic speed = new FighterBuffableStatistic(50);
 
         stats = new Dictionary<StatisticManager.StatisticId, FighterStatistic>()
@@ -76,17 +76,22 @@ public class Player : Fighter
         base.EntityStart();
 
         // Abilities initialization
-        Ability ability1 = new RedAttack1();
-        Ability ability2 = new RedAttack2();
+        Ability attack1 = new GreenAttack1();
+        Ability attack2 = new RedAttack2();
 
         attacks = new List<Ability>()
         {
-            ability1,
-            ability2,
+            attack1,
+            attack2,
         };
 
         // Assists initialization
-        assists = new List<Ability>();
+        Ability assist1 = new BlueAssist2();
+
+        assists = new List<Ability>()
+        {
+            assist1
+        };
 
         // Interaction ability initialization
         interaction = new RedAttack1();
@@ -157,7 +162,7 @@ public class Player : Fighter
             StartCoroutine(Dash());
     }
 
-    void UpdateMovement()
+    protected override void UpdateMovement()
     {
         Vector3 dir;
 
@@ -171,7 +176,7 @@ public class Player : Fighter
 
             dir = cam.right * x + cam.forward * z;
             dir.Normalize();
-            dir *= moveSpeedMultiplier * MoveSpeed;
+            dir *= movementSpeedMultiplier * MovementSpeed;
         }
 
         dir.y = rb.velocity.y;
@@ -180,11 +185,11 @@ public class Player : Fighter
 
     IEnumerator Dash()
     {
-        moveSpeedMultiplier = DashMultiplier;
+        movementSpeedMultiplier = DashMultiplier;
         nextDashTime = Time.time + DashDuration + DashCooldown;
         yield return new WaitForSeconds(DashDuration);
 
-        moveSpeedMultiplier = 1f;
+        movementSpeedMultiplier = 1f;
     }
 
     void CheckTargetInput()

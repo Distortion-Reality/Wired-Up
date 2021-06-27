@@ -18,6 +18,11 @@ public class RedAttack2 : Ability
     static IEnumerator LiftAndSlam(Fighter user, Fighter target)
     {
         float targetStartingPositionY = target.transform.position.y;
+
+        bool targetIsEnemy = target.CompareTag("Enemy");
+        if (targetIsEnemy)
+            ((Enemy)target).SetAgentUpdatePosition(false);
+
         target.Rb.constraints |= RigidbodyConstraints.FreezePosition;
         target.Rb.constraints &= ~RigidbodyConstraints.FreezePositionY;
         target.Grounded = false;
@@ -25,7 +30,7 @@ public class RedAttack2 : Ability
         float elapsedTime = 0f;
         while (elapsedTime < 1f)
         {
-            Vector3 translation = 10 * Time.fixedDeltaTime * Vector3.up;
+            Vector3 translation = 7 * Time.fixedDeltaTime * Vector3.up;
             target.Rb.MovePosition(target.Rb.position + translation);
 
             elapsedTime += Time.fixedDeltaTime;
@@ -35,7 +40,7 @@ public class RedAttack2 : Ability
 
         while (!target.Grounded)
         {
-            Vector3 force = 50 * Vector3.down;
+            Vector3 force = 100 * Vector3.down;
             target.Rb.AddForce(force);
 
             yield return new WaitForFixedUpdate();
@@ -45,6 +50,9 @@ public class RedAttack2 : Ability
             new Vector3(target.transform.position.x, targetStartingPositionY, target.transform.position.z);
         target.Rb.constraints &= ~RigidbodyConstraints.FreezePosition;
         target.Rb.constraints |= RigidbodyConstraints.FreezePositionY;
+
+        if (targetIsEnemy)
+            ((Enemy)target).SetAgentUpdatePosition(true);
 
         Effects.ApplyDamage(user, target, power);
 
