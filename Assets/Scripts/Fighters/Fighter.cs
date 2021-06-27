@@ -57,7 +57,15 @@ public abstract class Fighter : MonoBehaviour
 
     protected IFighterState State => entity.GetState<IFighterState>();
     public Vector3 BasePosition => transform.position - pivotOffset;
-    protected virtual float MovementSpeed => 1.3f * Mathf.Log(10 * stats[StatisticManager.StatisticId.Spd].CurrentValue);
+    protected virtual float MovementSpeed
+    {
+        get
+        {
+            float movementSpeed = 1.3f * Mathf.Log(10 * stats[StatisticManager.StatisticId.Spd].CurrentValue);
+            float multiplier = (targetAbilityManager.UserAbilityQueueCount > 0) ? 0.5f : 1f;
+            return multiplier * movementSpeed;
+        }
+    }
     protected virtual Quaternion DefaultRotation => transform.rotation;
     protected FighterEnergy Energy => (FighterEnergy) stats[StatisticManager.StatisticId.Nrg];
     public virtual float AbilityRange => 2 * Mathf.Log(10 * stats[StatisticManager.StatisticId.Lng].CurrentValue);
