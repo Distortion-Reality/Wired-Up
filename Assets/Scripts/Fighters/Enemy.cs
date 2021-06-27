@@ -11,7 +11,7 @@ public class Enemy : Fighter
     {
         FighterRangedStatistic hp = new FighterRangedStatistic(20);
         FighterBuffableStatistic armor = new FighterBuffableStatistic(50);
-        FighterBuffableStatistic length = new FighterBuffableStatistic(10);
+        FighterBuffableStatistic length = new FighterBuffableStatistic(70);
         FighterBuffableStatistic intensity = new FighterBuffableStatistic(10);
         FighterEnergy energy = new FighterEnergy(20);
         FighterBuffableStatistic speed = new FighterBuffableStatistic(50);

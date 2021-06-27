@@ -24,6 +24,9 @@ public class EnemyMovement : MonoBehaviour
     {
         if (enemy.Target)
         {
+            agent.destination = enemy.Target.BasePosition;
+            agent.stoppingDistance = enemy.Target.AbilityRange + 3;
+            /*
             destination = Vector3.ProjectOnPlane(enemy.Target.transform.position, Vector3.up);
                 //Debug.Log(enemy.Target.transform.position);
                 agent.destination = destination;
@@ -45,7 +48,7 @@ public class EnemyMovement : MonoBehaviour
                     }
                 }
 
-            /*
+            
             Vector3 playerDirection = Vector3.ProjectOnPlane(enemy.Target.transform.position-transform.position, Vector3.up).normalized;
             Vector3 direction = playerDirection;
             enemies = FindObjectsOfType<Enemy>();
