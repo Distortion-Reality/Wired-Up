@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Template : Ability
+public class BlueAssist2 : Ability
 {
     const int stages = 1;
 

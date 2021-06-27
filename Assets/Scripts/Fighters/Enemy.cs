@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Bolt;
+using UnityEngine.AI;
 
+[RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(TargetEnemyAbilityManager))]
 public class Enemy : Fighter
 {
@@ -10,13 +12,17 @@ public class Enemy : Fighter
     const float HealthBarMinDistance = 10f;
     const float HealthBarMaxDistance = 60f;
 
+    NavMeshAgent agent;
+
     protected new IEnemyState State => entity.GetState<IEnemyState>();
-    
+    protected override float MovementSpeed => 1.5f * base.MovementSpeed;
+    public override float AbilityRange => 1.5f * base.AbilityRange;
+
     protected override void InitStats()
     {
         FighterRangedStatistic hp = new FighterRangedStatistic(20);
         FighterBuffableStatistic armor = new FighterBuffableStatistic(50);
-        FighterBuffableStatistic length = new FighterBuffableStatistic(70);
+        FighterBuffableStatistic length = new FighterBuffableStatistic(50);
         FighterBuffableStatistic intensity = new FighterBuffableStatistic(10);
         FighterEnergy energy = new FighterEnergy(20);
         FighterBuffableStatistic speed = new FighterBuffableStatistic(50);
@@ -37,19 +43,45 @@ public class Enemy : Fighter
         base.EntityStart();
 
         // Abilities initialization
-        Ability ability1 = new RedAttack1();
-        Ability ability2 = new RedAttack1();
+        Ability attack1 = new RedAttack1();
+        Ability attack2 = new RedAttack2();
 
         attacks = new List<Ability>()
         {
-            ability1,
-            ability2,
+            attack1,
+            attack2,
         };
 
         // Assists initialization
-        assists = new List<Ability>();
+        Ability assist1 = new BlueAssist2();
+
+        assists = new List<Ability>()
+        {
+            assist1
+        };
+
+        agent = GetComponent<NavMeshAgent>();
 
         healthBar = Instantiate(enemyHealthBarPrefab, parent: gui.transform).GetComponent<Slider>();
+    }
+
+    public override void OwnerUpdate()
+    {
+        base.OwnerUpdate();
+
+        UpdateMovement();
+    }
+
+    protected override void UpdateMovement()
+    {
+        if (target &&
+            fighterStatus != Status.Waiting && fighterStatus != Status.Using &&
+            fighterStatus != Status.Stunned && !movementsBlocked)
+        {
+            agent.destination = target.BasePosition;
+            agent.stoppingDistance = target.AbilityRange + 3;
+            agent.speed = MovementSpeed;
+        }
     }
 
     public override void EntityUpdate()
@@ -72,6 +104,12 @@ public class Enemy : Fighter
             healthBar.gameObject.SetActive(true);
         }
     }
+
+    public void SetAgentUpdatePosition(bool agentUpdatePosition)
+    {
+        agent.updatePosition = agentUpdatePosition;
+    }
+
     protected override void UseAbility(Ability ability)
     {
         fighterStatus = Status.Using;

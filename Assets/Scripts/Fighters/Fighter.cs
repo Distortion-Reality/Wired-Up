@@ -57,10 +57,10 @@ public abstract class Fighter : MonoBehaviour
 
     protected IFighterState State => entity.GetState<IFighterState>();
     public Vector3 BasePosition => transform.position - pivotOffset;
-    protected float MoveSpeed => 1.3f * Mathf.Log(10 * stats[StatisticManager.StatisticId.Spd].CurrentValue);
+    protected virtual float MovementSpeed => 1.3f * Mathf.Log(10 * stats[StatisticManager.StatisticId.Spd].CurrentValue);
     protected virtual Quaternion DefaultRotation => transform.rotation;
     protected FighterEnergy Energy => (FighterEnergy) stats[StatisticManager.StatisticId.Nrg];
-    public float AbilityRange => 2 * Mathf.Log(10 * stats[StatisticManager.StatisticId.Lng].CurrentValue);
+    public virtual float AbilityRange => 2 * Mathf.Log(10 * stats[StatisticManager.StatisticId.Lng].CurrentValue);
     protected float TargetRange => 2 * AbilityRange;
     public float TargetDistance => DistanceFrom(target);
 
@@ -121,6 +121,8 @@ public abstract class Fighter : MonoBehaviour
             UpdateRotation();
     }
 
+    protected abstract void UpdateMovement();
+
     void UpdateTarget()
     {
         if (target != null && TargetDistance > TargetRange && fighterStatus == Status.Free)
@@ -137,7 +139,7 @@ public abstract class Fighter : MonoBehaviour
         if (Energy.CurrentValue < Energy.BaseValue)
         {
             int spd = stats[StatisticManager.StatisticId.Spd].CurrentValue;
-            float energyRegen = 2.20738f * Mathf.Log(0.809275f * spd) * Time.deltaTime;
+            float energyRegen = 2 * Mathf.Log(spd) * Time.deltaTime;
             ChangeEnergy(energyRegen);
         }
     }
