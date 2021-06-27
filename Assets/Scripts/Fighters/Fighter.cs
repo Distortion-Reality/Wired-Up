@@ -46,7 +46,7 @@ public abstract class Fighter : MonoBehaviour
     public Dictionary<StatisticManager.StatisticId, FighterStatistic> Stats { get => stats; }
     public Status FighterStatus { get => fighterStatus; set => fighterStatus = value; }
     public TargetAbilityManager TargetAbilityManager { get => targetAbilityManager; }
-    public Fighter Target { get => target; }
+    public Fighter Target { get => target; set => target = value; }
     public Animator Animator { get => animator; }
     public bool Charging { get => charging; set => charging = value; }
     public Fighter Charged { get => charged; set => charged = value; }
