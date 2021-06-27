@@ -10,7 +10,6 @@ public class Player : Fighter
     string playerName;
     CharacterColor character;
 
-    Canvas gui;
     Slider energyBar;
     public GameObject allyInfoPrefab;
     static int alliesIndex = 0;
@@ -96,7 +95,6 @@ public class Player : Fighter
         cam = Camera.main.transform;
 
         // UI initialization
-        gui = FindObjectOfType<Canvas>();
         Color color = character.UnityColor();
 
         if (entity.IsOwner)
@@ -108,9 +106,8 @@ public class Player : Fighter
         else // Ally
         {
             // Create ally UI
-            GameObject allyInfo = Instantiate(allyInfoPrefab, allyInfoPrefab.transform.position, allyInfoPrefab.transform.rotation);
-            Vector3 pos = allyInfo.transform.position += new Vector3(0, alliesIndex * 60, 0);
-            allyInfo.transform.SetParent(gui.transform, false);
+            GameObject allyInfo = Instantiate(allyInfoPrefab, parent: gui.transform);
+            allyInfo.transform.position += new Vector3(0, alliesIndex * 60, 0);
 
             TMPro.TextMeshProUGUI allyName = allyInfo.GetComponentInChildren<TMPro.TextMeshProUGUI>();
             allyName.text = playerName;

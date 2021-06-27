@@ -26,6 +26,7 @@ public abstract class Fighter : MonoBehaviour
     protected Rigidbody rb;
     const float RotationSpeed = 10f;
 
+    protected Canvas gui;
     protected Slider healthBar;
 
     protected Dictionary<StatisticManager.StatisticId, FighterStatistic> stats;
@@ -74,6 +75,8 @@ public abstract class Fighter : MonoBehaviour
 
         targetAbilityManager = GetComponent<TargetAbilityManager>();
 
+        gui = FindObjectOfType<Canvas>();
+
         InitStats();
         
         InitAnimator();
@@ -101,7 +104,11 @@ public abstract class Fighter : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
+    public virtual void EntityUpdate()
+    {
+        
+    }
+
     public virtual void OwnerUpdate()
     {                                                                                                                                                                                   
         UpdateTarget();
@@ -249,6 +256,11 @@ public abstract class Fighter : MonoBehaviour
     void Die()
     {
         BoltNetwork.Destroy(gameObject);
+    }
+
+    public void EntityDestroyed()
+    {
+        Destroy(healthBar.gameObject);
     }
 
     void OnCollisionEnter(Collision collision)
