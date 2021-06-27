@@ -9,24 +9,28 @@ public class RedAttack2 : Ability
 
     public override void DoAbility(Fighter user)
     {
-        user.Target.TargetAbilityManager.StartCoroutine(LiftAndSlam(user));
+        user.Target.TargetAbilityManager.StartCoroutine(LiftAndSlam(user, user.Target));
+
+        if (user.CompareTag("Player"))
+            user.Target.TargetAbilityManager.StartCoroutine(WiresLookAtTarget(((Player)user).Wire, user.Target));
     }
 
-    IEnumerator LiftAndSlam(Fighter user)
+    static IEnumerator LiftAndSlam(Fighter user, Fighter target)
     {
-        Fighter target = user.Target;
         float targetStartingPositionY = target.transform.position.y;
+
+        bool targetIsEnemy = target.CompareTag("Enemy");
+        if (targetIsEnemy)
+            ((Enemy)target).SetAgentUpdatePosition(false);
+
         target.Rb.constraints |= RigidbodyConstraints.FreezePosition;
         target.Rb.constraints &= ~RigidbodyConstraints.FreezePositionY;
         target.Grounded = false;
 
-        if (user.CompareTag("Player"))
-            target.TargetAbilityManager.StartCoroutine(WireLookAtTarget(((Player) user).Wire, target));
-
         float elapsedTime = 0f;
         while (elapsedTime < 1f)
         {
-            Vector3 translation = 10 * Time.fixedDeltaTime * Vector3.up;
+            Vector3 translation = 7 * Time.fixedDeltaTime * Vector3.up;
             target.Rb.MovePosition(target.Rb.position + translation);
 
             elapsedTime += Time.fixedDeltaTime;
@@ -36,7 +40,7 @@ public class RedAttack2 : Ability
 
         while (!target.Grounded)
         {
-            Vector3 force = 50 * Vector3.down;
+            Vector3 force = 100 * Vector3.down;
             target.Rb.AddForce(force);
 
             yield return new WaitForFixedUpdate();
@@ -47,12 +51,15 @@ public class RedAttack2 : Ability
         target.Rb.constraints &= ~RigidbodyConstraints.FreezePosition;
         target.Rb.constraints |= RigidbodyConstraints.FreezePositionY;
 
+        if (targetIsEnemy)
+            ((Enemy)target).SetAgentUpdatePosition(true);
+
         Effects.ApplyDamage(user, target, power);
 
-        EndAbility(user);
+        user.EndAbility();
     }
 
-    IEnumerator WireLookAtTarget(Wire wire, Fighter target)
+    IEnumerator WiresLookAtTarget(Wire wire, Fighter target)
     {
         Quaternion defaultWireParentLocalRotation = wire.transform.parent.localRotation;
 

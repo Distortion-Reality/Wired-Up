@@ -6,7 +6,9 @@ using Photon.Bolt;
 
 public class NetworkManager : GlobalEventListener {
 
-    Dictionary<Guid, Fighter> fighters = new Dictionary<Guid, Fighter>();
+    readonly Dictionary<Guid, Fighter> fighters = new Dictionary<Guid, Fighter>();
+
+    public GameObject levelManagerPrefab;
 
     public override void SceneLoadLocalDone(string scene, IProtocolToken token)
     {
@@ -24,6 +26,9 @@ public class NetworkManager : GlobalEventListener {
         Cinemachine.CinemachineFreeLook cinemachine = playerCamera.GetComponent<Cinemachine.CinemachineFreeLook>();
         cinemachine.Follow = entity.transform;
         cinemachine.LookAt = entity.transform.Find("CameraLookTarget");
+
+        if (BoltNetwork.IsServer)
+            Instantiate(levelManagerPrefab);
     }
 
     public override void Disconnected(BoltConnection connection)

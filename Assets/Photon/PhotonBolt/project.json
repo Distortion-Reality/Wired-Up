@@ -13,7 +13,8 @@
           "Priority": 1,
           "PropertyType": {
             "$type": "Photon.Bolt.Compiler.PropertyTypeString, bolt.compiler",
-            "MaxLength": 20
+            "MaxLength": 20,
+            "Encoding": 1
           },
           "AssetSettings": {
             "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",
@@ -31,7 +32,8 @@
           "Priority": 1,
           "PropertyType": {
             "$type": "Photon.Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
-            "MaxValue": 255
+            "MaxValue": 4,
+            "CompressionEnabled": true
           },
           "AssetSettings": {
             "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",
@@ -143,33 +145,31 @@
           "PropertyType": {
             "$type": "Photon.Bolt.Compiler.PropertyTypeVector, bolt.compiler",
             "Selection": 14,
+            "StrictEquality": true,
             "Compression": [
               {
-                "MinValue": -1024,
-                "MaxValue": 1024,
+                "MaxValue": 255,
                 "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
-                "Shift": 1024.0,
-                "BitsRequired": 18
+                "BitsRequired": 15
               },
               {
-                "MinValue": -1024,
-                "MaxValue": 1024,
+                "MaxValue": 255,
                 "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
-                "Shift": 1024.0,
-                "BitsRequired": 18
+                "BitsRequired": 15
               },
               {
-                "MinValue": -1024,
-                "MaxValue": 1024,
+                "MaxValue": 255,
                 "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
-                "Shift": 1024.0,
-                "BitsRequired": 18
+                "BitsRequired": 15
               }
             ]
           },
@@ -193,9 +193,20 @@
             "ExtrapolationVelocityMode": 1,
             "PositionCompression": [
               {
+                "MinValue": -64,
+                "MaxValue": 64,
+                "Accuracy": 0.01,
+                "Enabled": true,
+                "Pack": 100.0,
+                "Read": 0.01,
+                "Shift": 64.0,
+                "BitsRequired": 14
+              },
+              {
                 "MinValue": -1024,
                 "MaxValue": 1024,
                 "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
                 "Shift": 1024.0,
@@ -205,15 +216,7 @@
                 "MinValue": -1024,
                 "MaxValue": 1024,
                 "Accuracy": 0.01,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "Shift": 1024.0,
-                "BitsRequired": 18
-              },
-              {
-                "MinValue": -1024,
-                "MaxValue": 1024,
-                "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
                 "Shift": 1024.0,
@@ -243,6 +246,7 @@
                 "BitsRequired": 16
               }
             ],
+            "PositionStrictCompare": true,
             "RotationCompressionQuaternion": {
               "MinValue": -1,
               "MaxValue": 1,
@@ -255,7 +259,6 @@
           },
           "AssetSettings": {
             "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",
-            "SmoothingAlgorithm": 2,
             "ExtrapolationErrorTolerance": 0.25,
             "_ExtrapolationCorrectionFrames": 6,
             "ExtrapolationMaxFrames": 9,
@@ -442,33 +445,31 @@
             "$type": "Photon.Bolt.Compiler.PropertyTypeTransform, bolt.compiler",
             "PositionSelection": 14,
             "RotationSelection": 14,
+            "Space": 1,
             "PositionCompression": [
               {
-                "MinValue": -1024,
                 "MaxValue": 1024,
                 "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
-                "Shift": 1024.0,
-                "BitsRequired": 18
+                "BitsRequired": 17
               },
               {
-                "MinValue": -1024,
-                "MaxValue": 1024,
+                "MaxValue": 64,
                 "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
-                "Shift": 1024.0,
-                "BitsRequired": 18
+                "BitsRequired": 13
               },
               {
-                "MinValue": -1024,
                 "MaxValue": 1024,
                 "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
-                "Shift": 1024.0,
-                "BitsRequired": 18
+                "BitsRequired": 17
               }
             ],
             "RotationCompression": [
@@ -523,7 +524,8 @@
             "ElementCount": 5,
             "ElementType": {
               "$type": "Photon.Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
-              "MaxValue": 255
+              "MaxValue": 255,
+              "CompressionEnabled": true
             }
           },
           "AssetSettings": {
@@ -633,7 +635,8 @@
           "Priority": 1,
           "PropertyType": {
             "$type": "Photon.Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
-            "MaxValue": 255
+            "MaxValue": 7,
+            "CompressionEnabled": true
           },
           "AssetSettings": {
             "$type": "Photon.Bolt.Compiler.PropertyEventSettings, bolt.compiler"
@@ -647,7 +650,9 @@
           "Priority": 1,
           "PropertyType": {
             "$type": "Photon.Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
-            "MaxValue": 255
+            "MinValue": -255,
+            "MaxValue": 256,
+            "CompressionEnabled": true
           },
           "AssetSettings": {
             "$type": "Photon.Bolt.Compiler.PropertyEventSettings, bolt.compiler"

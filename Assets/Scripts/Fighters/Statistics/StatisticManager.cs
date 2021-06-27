@@ -12,7 +12,15 @@ public static class StatisticManager
         Nrg
     }
 
-    public static List<Statistic> stats = new List<Statistic>()
+    public static List<StatisticId> BuffableStats = new List<StatisticId>()
+    {
+        StatisticId.Arm,
+        StatisticId.Lng,
+        StatisticId.Int,
+        StatisticId.Spd
+    };
+
+    public static List<Statistic> Stats = new List<Statistic>()
     {
         new Statistic(StatisticId.HP, "Hit Points", StatisticId.HP.ToString(),
             "The remaining life value of the character and how many damages he can sustain."),

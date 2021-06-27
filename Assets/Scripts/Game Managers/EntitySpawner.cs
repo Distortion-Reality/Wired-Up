@@ -10,8 +10,10 @@ public class EntitySpawner : MonoBehaviour {
     {
         if (BoltNetwork.IsServer)
         {
-            FighterInfo info = new FighterInfo();
-            info.guid = Guid.NewGuid();
+            FighterInfo info = new FighterInfo
+            {
+                guid = Guid.NewGuid()
+            };
             BoltNetwork.Instantiate(prefab, info, transform.position, transform.rotation);
         }
 

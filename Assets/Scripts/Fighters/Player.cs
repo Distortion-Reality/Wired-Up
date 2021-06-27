@@ -15,8 +15,8 @@ public class Player : Fighter
     static int alliesIndex = 0;
 
     Transform cam;
-    float moveSpeedMultiplier = 1f;
-    const int DashEnergy = 5;
+    float movementSpeedMultiplier = 1f;
+    const int DashEnergy = 10;
     const float DashMultiplier = 2f,
         DashDuration = 0.25f,
         DashCooldown = 5f;
@@ -37,7 +37,7 @@ public class Player : Fighter
         FighterBuffableStatistic armor = new FighterBuffableStatistic(10);
         FighterBuffableStatistic length = new FighterBuffableStatistic(50);
         FighterBuffableStatistic intensity = new FighterBuffableStatistic(50);
-        FighterEnergy energy = new FighterEnergy(100);
+        FighterEnergy energy = new FighterEnergy(50);
         FighterBuffableStatistic speed = new FighterBuffableStatistic(50);
 
         stats = new Dictionary<StatisticManager.StatisticId, FighterStatistic>()
@@ -75,17 +75,22 @@ public class Player : Fighter
         base.EntityStart();
 
         // Abilities initialization
-        Ability ability1 = new RedAttack1();
-        Ability ability2 = new RedAttack2();
+        Ability attack1 = new GreenAttack1();
+        Ability attack2 = new RedAttack2();
 
         attacks = new List<Ability>()
         {
-            ability1,
-            ability2,
+            attack1,
+            attack2,
         };
 
         // Assists initialization
-        assists = new List<Ability>();
+        Ability assist1 = new BlueAssist2();
+
+        assists = new List<Ability>()
+        {
+            assist1
+        };
 
         // Interaction ability initialization
         interaction = new RedAttack1();
@@ -139,6 +144,13 @@ public class Player : Fighter
         }
     }
 
+    public override void OwnerFixedUpdate()
+    {
+        UpdateMovement();
+
+        base.OwnerFixedUpdate();
+    }
+
     void CheckDashInput()
     {
         if (Input.GetButtonDown("Dash") && Time.time > nextDashTime &&
@@ -147,33 +159,34 @@ public class Player : Fighter
             StartCoroutine(Dash());
     }
 
-    public override void OwnerFixedUpdate()
+    protected override void UpdateMovement()
     {
-        if (fighterStatus != Status.Stunned && !movementsBlocked)
-            UpdateMovement();
+        Vector3 dir;
 
-        base.OwnerFixedUpdate();
-    }
+        if (fighterStatus == Status.Waiting || fighterStatus == Status.Using ||
+            fighterStatus == Status.Stunned || movementsBlocked)
+            dir = Vector3.zero;
+        else
+        {
+            float x = Input.GetAxisRaw("Horizontal");
+            float z = Input.GetAxisRaw("Vertical");
 
-    void UpdateMovement()
-    {
-        float x = Input.GetAxisRaw("Horizontal");
-        float z = Input.GetAxisRaw("Vertical");
+            dir = cam.right * x + cam.forward * z;
+            dir.Normalize();
+            dir *= movementSpeedMultiplier * MovementSpeed;
+        }
 
-        Vector3 dir = cam.right * x + cam.forward * z;
-        dir.Normalize();
-        dir *= moveSpeedMultiplier * MoveSpeed;
         dir.y = rb.velocity.y;
         rb.velocity = dir;
     }
 
     IEnumerator Dash()
     {
-        moveSpeedMultiplier = DashMultiplier;
+        movementSpeedMultiplier = DashMultiplier;
         nextDashTime = Time.time + DashDuration + DashCooldown;
         yield return new WaitForSeconds(DashDuration);
 
-        moveSpeedMultiplier = 1f;
+        movementSpeedMultiplier = 1f;
     }
 
     void CheckTargetInput()
@@ -185,7 +198,7 @@ public class Player : Fighter
             if (Physics.Raycast(ray, out RaycastHit hit, LayerMask.GetMask("Player", "Enemy", "Interactable")))
             {
                 Fighter hitFighter = hit.collider.GetComponent<Fighter>();
-                if (DistanceFrom(hitFighter) <= TargetRange && hitFighter != target)
+                if (hitFighter && DistanceFrom(hitFighter) <= TargetRange && hitFighter != target)
                 {
                     CheckAndUpdatePlayerStatus();
                     target = hitFighter;

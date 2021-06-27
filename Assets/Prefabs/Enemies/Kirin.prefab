@@ -11486,11 +11486,11 @@ GameObject:
   - component: {fileID: 8675912992726391281}
   - component: {fileID: 8675912992726391279}
   - component: {fileID: 8675912992536992478}
-  - component: {fileID: 8675912992726391278}
   - component: {fileID: -7587929950226072440}
   - component: {fileID: -5094576705429482036}
   - component: {fileID: 6049302253457917196}
   - component: {fileID: -5276833803730709588}
+  - component: {fileID: 1197858421013658795}
   m_Layer: 0
   m_Name: Kirin
   m_TagString: Player
@@ -11577,24 +11577,6 @@ CapsuleCollider:
   m_Height: 2.2
   m_Direction: 1
   m_Center: {x: 0, y: 1.1, z: 0.1}
---- !u!114 &8675912992726391278
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8675912992726391280}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 479ab7e502a85e3469b4023661553a14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useCharacterForward: 0
-  turnSpeed: 10
-  runKey: 304
-  jumpKey: 32
-  slashKey: 101
-  fireWeapon: 324
 --- !u!114 &-7587929950226072440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11663,6 +11645,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6ee45fcc9aa19214aca6b37a13ff6a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!195 &1197858421013658795
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8675912992726391280}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &8681554135728776912
 GameObject:
   m_ObjectHideFlags: 0
