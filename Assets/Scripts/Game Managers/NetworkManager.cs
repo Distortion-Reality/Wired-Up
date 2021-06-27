@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Photon.Bolt;
 
-[BoltGlobalBehaviour("Level2Scene")]
-public class NetworkCallbacks : GlobalEventListener {
+public class NetworkManager : GlobalEventListener {
+
+    Dictionary<Guid, Fighter> fighters = new Dictionary<Guid, Fighter>();
 
     public override void SceneLoadLocalDone(string scene, IProtocolToken token)
     {
@@ -28,5 +30,29 @@ public class NetworkCallbacks : GlobalEventListener {
     {
         BoltLauncher.Shutdown();
         SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+    }
+
+    public override void EntityAttached(BoltEntity entity)
+    {
+        if (entity.StateIs<IFighterState>())
+        {
+            Fighter fighter = entity.GetComponent<Fighter>();
+            fighters[fighter.EntityId] = fighter;
+        }
+    }
+
+    public override void EntityDetached(BoltEntity entity)
+    {
+        if (entity.StateIs<IFighterState>())
+        {
+            Fighter fighter = entity.GetComponent<Fighter>();
+            fighters.Remove(fighter.EntityId);
+        }
+    }
+
+    public override void OnEvent(ChangeStatisticEvent evnt)
+    {
+        Fighter fighter = fighters[evnt.entityId];
+        fighter.ChangeStat((StatisticManager.StatisticId) evnt.statisticId, evnt.change);
     }
 }

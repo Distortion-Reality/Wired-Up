@@ -42,6 +42,7 @@ public abstract class Fighter : MonoBehaviour
     bool grounded = true;
     protected bool movementsBlocked = false;
 
+    public Guid EntityId { get => entityId; }
     public Rigidbody Rb { get => rb; set => rb = value; }
     public Dictionary<StatisticManager.StatisticId, FighterStatistic> Stats { get => stats; }
     public Status FighterStatus { get => fighterStatus; set => fighterStatus = value; }
@@ -79,7 +80,11 @@ public abstract class Fighter : MonoBehaviour
 
         // Setup Bolt states
         State.SetTransforms(State.transform, transform);
-        State.hp = stats[StatisticManager.StatisticId.HP].CurrentValue;
+        for (int i = 0; i < 5; i++)
+        {
+            State.statistics[i] = stats[(StatisticManager.StatisticId) i].CurrentValue;
+        }
+        State.AddCallback("statistics[]", StatisticChanged); 
         State.AddCallback("hp", HpChanged);
     }
 
@@ -159,19 +164,35 @@ public abstract class Fighter : MonoBehaviour
 
     public void ChangeStat(StatisticManager.StatisticId statId, int change)
     {
-        stats[statId].ApplyChange(change);
+        if (!entity.IsOwner)
+        {
+            ChangeStatisticEvent evnt = ChangeStatisticEvent.Create(entity.Source, ReliabilityModes.ReliableOrdered);
+            evnt.entityId = entityId;
+            evnt.statisticId = (int) statId;
+            evnt.change = change;
+            evnt.Send();
+        }
+        else
+        {
+            State.statistics[(int) statId] = stats[statId].ApplyChange(change);
+        }
     }
 
-    public void ChangeHp(int change)
+    void StatisticChanged(IState state, string propertyPath, ArrayIndices arrayIndices)
     {
-        State.hp = stats[StatisticManager.StatisticId.HP].ApplyChange(change);
+        int index = arrayIndices[0];
+        IFighterState localState = (IFighterState) state;
+        int value = localState.statistics[index];
+
+        StatisticManager.StatisticId statId = (StatisticManager.StatisticId) index;
+        stats[statId].CurrentValue = value;
+
+        if (statId == StatisticManager.StatisticId.HP)
+            HpChanged();
     }
 
     void HpChanged()
     {
-        if (!entity.IsOwner)
-            stats[StatisticManager.StatisticId.HP].CurrentValue = State.hp;
-
         if (healthBar)
             healthBar.value = stats[StatisticManager.StatisticId.HP].PercentageValue;
         
