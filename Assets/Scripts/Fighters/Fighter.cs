@@ -260,7 +260,8 @@ public abstract class Fighter : MonoBehaviour
 
     public void EntityDestroyed()
     {
-        Destroy(healthBar.gameObject);
+        if (healthBar)
+            Destroy(healthBar.gameObject);
     }
 
     void OnCollisionEnter(Collision collision)
