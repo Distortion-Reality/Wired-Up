@@ -54,7 +54,7 @@ public abstract class Fighter : MonoBehaviour
     protected IFighterState State => entity.GetState<IFighterState>();
     public Vector3 BasePosition => transform.position - pivotOffset;
     protected float MoveSpeed => 1.3f * Mathf.Log(10 * stats[StatisticManager.StatisticId.Spd].CurrentValue);
-    protected abstract Quaternion DefaultRotation { get; }
+    protected virtual Quaternion DefaultRotation => transform.rotation;
     FighterEnergy Energy => (FighterEnergy) stats[StatisticManager.StatisticId.Nrg];
     public float AbilityRange => 2 * Mathf.Log(10 * stats[StatisticManager.StatisticId.Lng].CurrentValue);
     protected float TargetRange => 2 * AbilityRange;
@@ -213,14 +213,25 @@ public abstract class Fighter : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (charging && !collision.gameObject.CompareTag("Terrain"))
-        {
-            charging = false;
-            if (collision.gameObject.CompareTag("Enemy"))
-                charged = collision.gameObject.GetComponent<Enemy>();
-        }
+        OnChargingCollision(collision);
 
         if (!grounded && collision.gameObject.CompareTag("Terrain"))
             grounded = true;
+    }
+
+    void OnCollisionStay(Collision collision)
+    {
+        OnChargingCollision(collision);
+    }
+
+    void OnChargingCollision(Collision collision)
+    {
+        if (charging && !collision.gameObject.CompareTag("Terrain"))
+        {
+            charging = false;
+            if (!collision.gameObject.CompareTag(tag) &&
+                collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Player"))
+                charged = collision.gameObject.GetComponent<Fighter>();
+        }
     }
 }

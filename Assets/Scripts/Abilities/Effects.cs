@@ -3,11 +3,9 @@ using UnityEngine;
 
 public static class Effects
 {
-    public static int ApplyDamage(Fighter user, Fighter target, int power)
+    public static void ApplyDamage(Fighter user, Fighter target, int power)
     {
-        int damage = Damage(user, target, power);
-        ChangeHP(target, -damage);
-        return damage;
+        ChangeHP(target, -Damage(user, target, power));
     }
 
     public static int Damage(Fighter user, Fighter target, int power)

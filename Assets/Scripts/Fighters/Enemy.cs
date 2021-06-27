@@ -6,7 +6,6 @@ using Photon.Bolt;
 public class Enemy : Fighter
 {
     protected new IEnemyState State => entity.GetState<IEnemyState>();
-    protected override Quaternion DefaultRotation => transform.rotation;
     
     protected override void InitStats()
     {
