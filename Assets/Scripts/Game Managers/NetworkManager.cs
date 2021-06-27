@@ -61,6 +61,12 @@ public class NetworkManager : GlobalEventListener {
         fighter.ChangeStat((StatisticManager.StatisticId) evnt.statisticId, evnt.change);
     }
 
+    public override void OnEvent(ChangeStatusEvent evnt)
+    {
+        Fighter fighter = fighters[evnt.entityId];
+        fighter.FighterStatus = (Fighter.Status) evnt.statusId;
+    }
+
     public override void OnEvent(RemoteAbilityEvent evnt)
     {
         RemoteAbility ability = (RemoteAbility) evnt.abilityId;
@@ -69,11 +75,9 @@ public class NetworkManager : GlobalEventListener {
         switch (ability)
         {
             case RemoteAbility.RedAttack2:
-                Debug.Log("received event RedAttack2");
                 RedAttack2.DoAbility(sender, target);
                 break;
             case RemoteAbility.EndAbility:
-                Debug.Log("received event EndAbility");
                 target.EndAbility();
                 break;
         }

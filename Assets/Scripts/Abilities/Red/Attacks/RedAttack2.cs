@@ -19,7 +19,6 @@ public class RedAttack2 : Ability
             evnt.targetId = user.Target.EntityId;
             evnt.abilityId = (int) RemoteAbility.RedAttack2;
             evnt.Send();
-            Debug.Log("sent event RedAttack2");
         }
 
         if (user.CompareTag("Player"))
@@ -47,8 +46,7 @@ public class RedAttack2 : Ability
         while (elapsedTime < 1f)
         {
             Vector3 translation = 7 * Time.fixedDeltaTime * Vector3.up;
-            //target.Rb.MovePosition(target.Rb.position + translation);
-            target.transform.position += translation;
+            target.Rb.MovePosition(target.Rb.position + translation);
 
             elapsedTime += Time.fixedDeltaTime;
 
@@ -82,7 +80,6 @@ public class RedAttack2 : Ability
             evnt.targetId = user.EntityId;
             evnt.abilityId = (int) RemoteAbility.EndAbility;
             evnt.Send();
-            Debug.Log("sent event EndAbility");
         }
     }
 
