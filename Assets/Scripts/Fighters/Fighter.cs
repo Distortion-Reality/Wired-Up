@@ -185,6 +185,7 @@ public abstract class Fighter : MonoBehaviour
     protected virtual void OnEndAbility()
     {
         currentAbility = null;
+        charging = false;
     }
 
     public bool CheckAndUseEnergy(int abilityEnergy)
@@ -272,7 +273,7 @@ public abstract class Fighter : MonoBehaviour
         }
     }
 
-    void UpdateRotation()
+    protected virtual void UpdateRotation()
     {
         Quaternion rotation;
         if (FighterStatus != Status.Free &&
