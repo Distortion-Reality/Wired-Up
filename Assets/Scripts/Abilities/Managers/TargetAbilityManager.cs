@@ -32,6 +32,13 @@ public abstract class TargetAbilityManager : MonoBehaviour
     protected Queue<UserAbility> userAbilityQueue = new Queue<UserAbility>();
     protected bool usersAreUsing = false;
 
+    public int UserAbilityQueueCount => userAbilityQueue.Count;
+
+    public Fighter DequeueUserAbilityQueue()
+    {
+        return userAbilityQueue.Dequeue().User;
+    }
+
     public void EnqueueUserAbility(Fighter user, Ability ability)
     {
         UserAbility userAbility = new UserAbility(user, ability);
@@ -49,7 +56,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
 
     protected IEnumerator DoAbilities()
     {
-        SetUsersAbilityStatusUsing();
+        SetUsersStatusUsing();
 
         while (userAbilityQueue.Count > 0)
         {
@@ -63,7 +70,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
         usersAreUsing = false;
     }
 
-    void SetUsersAbilityStatusUsing()
+    void SetUsersStatusUsing()
     {
         foreach (UserAbility userAbility in userAbilityQueue)
             userAbility.User.FighterStatus = Fighter.Status.Using; // TODO: send event

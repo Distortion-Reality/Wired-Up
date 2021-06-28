@@ -12,10 +12,12 @@ public class NetworkManager : GlobalEventListener {
     {
         // Spawn player
         CharacterManager characterManager = GameObject.FindObjectOfType<CharacterManager>();
-        PlayerInfo info = new PlayerInfo();
-        info.guid = Guid.NewGuid();
-        info.name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName);
-        info.character = characterManager.CurrentCharacter;
+        PlayerInfo info = new PlayerInfo
+        {
+            guid = Guid.NewGuid(),
+            name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName),
+            character = characterManager.CurrentCharacter
+        };
         Transform players = GameObject.Find("Players").transform;
         BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Player, info, players.position, players.rotation);
 
