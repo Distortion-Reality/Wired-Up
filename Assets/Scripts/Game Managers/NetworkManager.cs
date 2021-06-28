@@ -64,19 +64,33 @@ public class NetworkManager : GlobalEventListener {
         fighter.FighterStatus = (Fighter.Status) evnt.statusId;
     }
 
-    public override void OnEvent(RemoteAbilityEvent evnt)
+    public override void OnEvent(UseEnergyEvent evnt)
     {
-        RemoteAbility ability = (RemoteAbility) evnt.abilityId;
-        Fighter sender = fighters[evnt.senderId];
+        Fighter fighter = fighters[evnt.entityId];
+        fighter.UseEnergy(evnt.amount);
+    }
+
+    public override void OnEvent(EnqueueAbilityEvent evnt)
+    {
+        Ability ability = AbilityRegistry.Get((AbilityId) evnt.abilityId);
         Fighter target = fighters[evnt.targetId];
-        switch (ability)
-        {
-            case RemoteAbility.RedAttack2:
-                RedAttack2.DoAbility(sender, target);
-                break;
-            case RemoteAbility.EndAbility:
-                target.EndAbility();
-                break;
-        }
+        Fighter user = fighters[evnt.senderId];
+        user.Target = target;
+        target.TargetAbilityManager.EnqueueUserAbility(user, ability);
+    }
+
+    public override void OnEvent(RemoveAbilityEvent evnt)
+    {
+        fighters[evnt.targetId].TargetAbilityManager.RemoveUserAbility(fighters[evnt.senderId]);
+    }
+
+    public override void OnEvent(EndAbilityEvent evnt)
+    {
+        fighters[evnt.entityId].EndAbility();
+    }
+
+    public override void OnEvent(ChangeWireRotationEvent evnt)
+    {
+        ((Player) fighters[evnt.entityId]).Wire.transform.parent.localRotation = evnt.rotation;
     }
 }

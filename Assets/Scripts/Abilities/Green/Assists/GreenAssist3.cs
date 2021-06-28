@@ -9,13 +9,14 @@ public class GreenAssist3 : Ability
     const float radius = 4f;
 
     public override int Energy => 40;
+    public override AbilityId Id => AbilityId.GreenAssist3;
 
-    public override void DoAbility(Fighter user)
+    public override void DoAbility(Fighter user, Fighter target)
     {
         int selfDamage = user.Stats[StatisticManager.StatisticId.HP].CurrentValue / 4;
         Effects.ChangeHP(user, selfDamage);
 
-        user.Target.TargetAbilityManager.StartCoroutine(HealingOverTimeAOE(user.Target));
+        target.TargetAbilityManager.StartCoroutine(HealingOverTimeAOE(target));
 
         user.EndAbility();
     }

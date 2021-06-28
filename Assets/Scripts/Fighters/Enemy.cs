@@ -75,8 +75,8 @@ public class Enemy : Fighter
     protected override void UpdateMovement()
     {
         if (target &&
-            fighterStatus != Status.Waiting && fighterStatus != Status.Using &&
-            fighterStatus != Status.Stunned && !movementsBlocked)
+            FighterStatus != Status.Waiting && FighterStatus != Status.Using &&
+            FighterStatus != Status.Stunned && !movementsBlocked)
         {
             agent.destination = target.BasePosition;
             agent.stoppingDistance = target.AbilityRange + 3;
@@ -112,13 +112,13 @@ public class Enemy : Fighter
 
     protected override void UseAbility(Ability ability)
     {
-        fighterStatus = Status.Using;
-        ability.DoAbility(this);
+        FighterStatus = Status.Using;
+        ability.DoAbility(this, target);
     }
 
-    public override void EndAbility()
+    protected override void OnEndAbility()
     {
-        base.EndAbility();
-        fighterStatus = Status.Free;
+        base.OnEndAbility();
+        FighterStatus = Status.Free;
     }
 }
