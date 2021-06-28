@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Photon.Bolt;
 
-public class NetworkManager : GlobalEventListener {
-
+public class NetworkManager : GlobalEventListener
+{
     readonly Dictionary<Guid, Fighter> fighters = new Dictionary<Guid, Fighter>();
 
     public GameObject levelManagerPrefab;
@@ -13,11 +13,13 @@ public class NetworkManager : GlobalEventListener {
     public override void SceneLoadLocalDone(string scene, IProtocolToken token)
     {
         // Spawn player
-        CharacterManager characterManager = GameObject.FindObjectOfType<CharacterManager>();
-        PlayerInfo info = new PlayerInfo();
-        info.guid = Guid.NewGuid();
-        info.name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName);
-        info.character = characterManager.CurrentCharacter;
+        CharacterManager characterManager = FindObjectOfType<CharacterManager>();
+        PlayerInfo info = new PlayerInfo
+        {
+            guid = Guid.NewGuid(),
+            name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName),
+            character = characterManager.CurrentCharacter
+        };
         Transform players = GameObject.Find("Players").transform;
         BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Player, info, players.position, players.rotation);
 
@@ -26,9 +28,6 @@ public class NetworkManager : GlobalEventListener {
         Cinemachine.CinemachineFreeLook cinemachine = playerCamera.GetComponent<Cinemachine.CinemachineFreeLook>();
         cinemachine.Follow = entity.transform;
         cinemachine.LookAt = entity.transform.Find("CameraLookTarget");
-
-        if (BoltNetwork.IsServer)
-            Instantiate(levelManagerPrefab);
     }
 
     public override void Disconnected(BoltConnection connection)
