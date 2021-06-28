@@ -29,6 +29,6 @@ public class RedAttack1 : Ability
             user.Charged = null;
         }
 
-        user.EndAbility();
+        EndAbility(user);
     }
 }

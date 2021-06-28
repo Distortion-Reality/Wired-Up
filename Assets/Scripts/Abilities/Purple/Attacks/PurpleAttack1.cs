@@ -13,6 +13,6 @@ public class PurpleAttack1 : Ability
         Effects.ChangeHP(user.Target, damage);
         Effects.ChangeHP(user, Mathf.Min(targetHP, damage));
 
-        user.EndAbility();
+        EndAbility(user);
     }
 }

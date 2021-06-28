@@ -10,7 +10,7 @@ public class GreenAttack1 : Ability
     public override void DoAbility(Fighter user)
     {
         user.Target.TargetAbilityManager.StartCoroutine(BlockMovements(user.Target));
-        user.EndAbility();
+        EndAbility(user);
     }
 
     static IEnumerator BlockMovements(Fighter target)

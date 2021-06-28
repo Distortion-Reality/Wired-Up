@@ -17,7 +17,7 @@ public class GreenAssist3 : Ability
 
         user.Target.TargetAbilityManager.StartCoroutine(HealingOverTimeAOE(user.Target));
 
-        user.EndAbility();
+        EndAbility(user);
     }
 
     IEnumerator HealingOverTimeAOE(Fighter target)

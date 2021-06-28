@@ -10,27 +10,13 @@ public class RedAttack2 : Ability
 
     public override void DoAbility(Fighter user)
     {
-        if (user.Target.Entity.IsOwner)
-            DoAbility(user, user.Target);
-        else
-        {
-            RemoteAbilityEvent evnt = RemoteAbilityEvent.Create(user.Target.Entity.Source, ReliabilityModes.ReliableOrdered);
-            evnt.senderId = user.EntityId;
-            evnt.targetId = user.Target.EntityId;
-            evnt.abilityId = (int) RemoteAbility.RedAttack2;
-            evnt.Send();
-        }
+        user.Target.TargetAbilityManager.StartCoroutine(LiftAndSlam(user, user.Target));
 
         if (user.CompareTag("Player"))
             user.Target.TargetAbilityManager.StartCoroutine(WiresLookAtTarget(((Player)user).Wire, user.Target));
     }
 
-    public static void DoAbility(Fighter sender, Fighter target)
-    {
-        target.TargetAbilityManager.StartCoroutine(LiftAndSlam(sender, target));
-    }
-
-    static IEnumerator LiftAndSlam(Fighter user, Fighter target)
+    IEnumerator LiftAndSlam(Fighter user, Fighter target)
     {
         float targetStartingPositionY = target.transform.position.y;
 
@@ -71,16 +57,7 @@ public class RedAttack2 : Ability
 
         Effects.ApplyDamage(user, target, power);
 
-        if (user.Entity.IsOwner)
-            user.EndAbility();
-        else
-        {
-            RemoteAbilityEvent evnt = RemoteAbilityEvent.Create(user.Entity.Source, ReliabilityModes.ReliableOrdered);
-            evnt.senderId = target.EntityId;
-            evnt.targetId = user.EntityId;
-            evnt.abilityId = (int) RemoteAbility.EndAbility;
-            evnt.Send();
-        }
+        EndAbility(user);
     }
 
     IEnumerator WiresLookAtTarget(Wire wire, Fighter target)

@@ -12,7 +12,7 @@ public class PurpleAttack2 : Ability
     public override void DoAbility(Fighter user)
     {
         user.Target.TargetAbilityManager.StartCoroutine(DamageOverTime(user, user.Target));
-        user.EndAbility();
+        EndAbility(user);
     }
 
     static IEnumerator DamageOverTime(Fighter user, Fighter target)

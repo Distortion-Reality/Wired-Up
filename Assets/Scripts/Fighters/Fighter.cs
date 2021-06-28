@@ -97,7 +97,6 @@ public abstract class Fighter : MonoBehaviour
             State.statistics[i] = stats[(StatisticManager.StatisticId) i].CurrentValue;
         }
         State.AddCallback("statistics[]", StatisticChanged); 
-        State.AddCallback("hp", HpChanged);
     }
 
     protected virtual void UnwrapAttachedToken()
@@ -269,7 +268,10 @@ public abstract class Fighter : MonoBehaviour
         while (targetAbilityManager.UserAbilityQueueCount > 0)
         {
             Fighter user = targetAbilityManager.DequeueUserAbilityQueue();
-            user.EndAbility(); // TODO: send event
+            if (user.Entity.IsOwner)
+                user.EndAbility();
+            else
+                EndAbilityEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered, user.EntityId);
         }
 
         BoltNetwork.Destroy(gameObject);

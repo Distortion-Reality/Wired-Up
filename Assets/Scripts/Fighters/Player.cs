@@ -265,7 +265,10 @@ public class Player : Fighter
 
     public void InterruptWaiting()
     {
-        target.TargetAbilityManager.RemoveUserAbility(this); // TODO: send event
+        if (target.Entity.IsOwner)
+            target.TargetAbilityManager.RemoveUserAbility(this);
+        else
+            RemoveAbilityEvent.Post(target.Entity.Source, ReliabilityModes.ReliableOrdered, entityId, target.EntityId);
         EndAbility();
     }
 
@@ -273,7 +276,11 @@ public class Player : Fighter
     {
         target = actualTarget;
         fighterStatus = Status.Waiting;
-        target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility); // TODO: send event
+        if (target.Entity.IsOwner)
+            target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
+        else
+            EnqueueAbilityEvent.Post(target.Entity.Source, ReliabilityModes.ReliableOrdered, entityId, 
+            target.EntityId, 0);
 
         wire.StayConnected();
     }

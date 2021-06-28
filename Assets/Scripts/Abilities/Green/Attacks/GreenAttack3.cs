@@ -9,6 +9,6 @@ public class GreenAttack3 : Ability
         Effects.ApplyDamage(user, user.Target, power);
         user.Target.ApplyStatus(Fighter.Status.Stunned);
 
-        user.EndAbility();
+        EndAbility(user);
     }
 }

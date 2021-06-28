@@ -12,6 +12,6 @@ public class PurpleAssist3 : Ability
         Effects.ChangeHP(user, -hp);
         Effects.ChangeHP(user.Target, hp);
 
-        user.EndAbility();
+        EndAbility(user);
     }
 }
