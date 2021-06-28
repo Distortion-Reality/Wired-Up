@@ -9,6 +9,7 @@ public class GreenAssist3 : Ability
     const float radius = 4f;
 
     public override int Energy => 40;
+    public override AbilityId Id => AbilityId.GreenAssist3;
 
     public override void DoAbility(Fighter user)
     {

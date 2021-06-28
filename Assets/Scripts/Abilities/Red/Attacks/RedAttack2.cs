@@ -7,6 +7,7 @@ public class RedAttack2 : Ability
     const int power = 30;
 
     public override int Energy => 20;
+    public override AbilityId Id => AbilityId.RedAttack2;
 
     public override void DoAbility(Fighter user)
     {

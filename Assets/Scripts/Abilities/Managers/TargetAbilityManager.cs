@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Photon.Bolt;
 
 public abstract class TargetAbilityManager : MonoBehaviour
 {
@@ -25,7 +26,11 @@ public abstract class TargetAbilityManager : MonoBehaviour
 
         public void UseEnergy()
         {
-            user.UseEnergy(ability.Energy); // TODO: send event to user
+            if (user.Entity.IsOwner)
+                user.UseEnergy(ability.Energy);
+            else
+                UseEnergyEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered, 
+                user.EntityId, ability.Energy);
         }
     }
 
@@ -64,7 +69,6 @@ public abstract class TargetAbilityManager : MonoBehaviour
             userAbility.DoUserAbility();
 
             yield return new WaitWhile(() => userAbility.User.FighterStatus == Fighter.Status.Using);
-            // TODO: get fighter status state
         }
 
         usersAreUsing = false;
@@ -73,7 +77,14 @@ public abstract class TargetAbilityManager : MonoBehaviour
     void SetUsersStatusUsing()
     {
         foreach (UserAbility userAbility in userAbilityQueue)
-            userAbility.User.FighterStatus = Fighter.Status.Using; // TODO: send event
+        {
+            Fighter user = userAbility.User;
+            if (user.Entity.IsOwner)
+                userAbility.User.FighterStatus = Fighter.Status.Using; // TODO: change state
+            else
+                ChangeStatusEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
+                user.EntityId, (int) Fighter.Status.Using);
+        }
 
         usersAreUsing = true;
     }

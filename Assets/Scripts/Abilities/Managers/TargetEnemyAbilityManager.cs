@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using Photon.Bolt;
 
 public class TargetEnemyAbilityManager : TargetAbilityManager
 {
@@ -37,7 +38,14 @@ public class TargetEnemyAbilityManager : TargetAbilityManager
     void EndAbilities()
     {
         foreach (UserAbility userAbility in userAbilityQueue)
-            userAbility.User.EndAbility(); // TODO: send EndAbility as event
+        {
+            Fighter user = userAbility.User;
+            if (user.Entity.IsOwner)
+                user.EndAbility();
+            else
+                EndAbilityEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered, user.EntityId);
+        }
+            
         userAbilityQueue.Clear();
     }
 }

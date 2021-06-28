@@ -8,6 +8,7 @@ public class PurpleAttack2 : Ability
     const int times = 5;
 
     public override int Energy => 20;
+    public override AbilityId Id => AbilityId.PurpleAttack2;
 
     public override void DoAbility(Fighter user)
     {

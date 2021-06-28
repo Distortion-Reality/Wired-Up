@@ -75,8 +75,8 @@ public class Player : Fighter
         base.EntityStart();
 
         // Abilities initialization
-        Ability attack1 = new GreenAttack1();
-        Ability attack2 = new RedAttack2();
+        Ability attack1 = AbilityRegistry.Get(AbilityId.GreenAttack1);
+        Ability attack2 = AbilityRegistry.Get(AbilityId.RedAttack2);
 
         attacks = new List<Ability>()
         {
@@ -85,7 +85,7 @@ public class Player : Fighter
         };
 
         // Assists initialization
-        Ability assist1 = new BlueAssist2();
+        Ability assist1 = AbilityRegistry.Get(AbilityId.BlueAssist2);
 
         assists = new List<Ability>()
         {
@@ -280,7 +280,7 @@ public class Player : Fighter
             target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
         else
             EnqueueAbilityEvent.Post(target.Entity.Source, ReliabilityModes.ReliableOrdered, entityId, 
-            target.EntityId, 0);
+            target.EntityId, (int) currentAbility.Id);
 
         wire.StayConnected();
     }

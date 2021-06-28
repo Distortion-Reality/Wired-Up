@@ -64,10 +64,19 @@ public class NetworkManager : GlobalEventListener {
         fighter.FighterStatus = (Fighter.Status) evnt.statusId;
     }
 
+    public override void OnEvent(UseEnergyEvent evnt)
+    {
+        Fighter fighter = fighters[evnt.entityId];
+        fighter.UseEnergy(evnt.amount);
+    }
+
     public override void OnEvent(EnqueueAbilityEvent evnt)
     {
-        Ability ability = null;
-        fighters[evnt.targetId].TargetAbilityManager.EnqueueUserAbility(fighters[evnt.senderId], ability);
+        Ability ability = AbilityRegistry.Get((AbilityId) evnt.abilityId);
+        Fighter target = fighters[evnt.targetId];
+        Fighter user = fighters[evnt.senderId];
+        user.Target = target;
+        target.TargetAbilityManager.EnqueueUserAbility(user, ability);
     }
 
     public override void OnEvent(RemoveAbilityEvent evnt)

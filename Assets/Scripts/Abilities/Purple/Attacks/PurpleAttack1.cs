@@ -5,6 +5,7 @@ public class PurpleAttack1 : Ability
     const int power = 10;
 
     public override int Energy => 10;
+    public override AbilityId Id => AbilityId.PurpleAttack1;
 
     public override void DoAbility(Fighter user)
     {

@@ -5,6 +5,7 @@ public class BlueAssist2 : Ability
     const int stages = 1;
 
     public override int Energy => 25;
+    public override AbilityId Id => AbilityId.BlueAssist2;
 
     public override void DoAbility(Fighter user)
     {
