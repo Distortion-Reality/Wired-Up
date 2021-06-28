@@ -11,7 +11,7 @@ public class BlueAssist2 : Ability
     {
         int statIndex = Random.Range(0, StatisticManager.BuffableStats.Count);
         StatisticManager.StatisticId statId = StatisticManager.BuffableStats[statIndex];
-        Effects.BuffStat(target, statId, stages);
+        Effects.BuffStat(user, target, statId, stages);
 
         user.EndAbility();
     }

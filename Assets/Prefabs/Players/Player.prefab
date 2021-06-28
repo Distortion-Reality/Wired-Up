@@ -121,6 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e854b9e9122ca9c498651815329af277, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerName: 
   allyInfoPrefab: {fileID: 803556834540358605, guid: 8262d8c9ec16b66dc9912b47fa8393b3, type: 3}
 --- !u!114 &2237140014869720875
 MonoBehaviour:

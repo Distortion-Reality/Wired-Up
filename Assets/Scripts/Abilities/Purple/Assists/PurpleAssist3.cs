@@ -10,8 +10,8 @@ public class PurpleAssist3 : Ability
     public override void DoAbility(Fighter user, Fighter target)
     {
         int hp = Mathf.RoundToInt(percentage * user.Stats[StatisticManager.StatisticId.HP].CurrentValue);
-        Effects.ChangeHP(user, -hp);
-        Effects.ChangeHP(target, hp);
+        Effects.ChangeHP(user, user, -hp);
+        Effects.ChangeHP(user, target, hp);
 
         user.EndAbility();
     }

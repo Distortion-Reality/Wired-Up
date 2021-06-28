@@ -30,7 +30,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
         }
     }
 
-    Fighter target;
+    protected Fighter target;
 
     protected Queue<UserAbility> userAbilityQueue = new Queue<UserAbility>();
     protected bool usersAreUsing = false;
@@ -47,7 +47,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
         return userAbilityQueue.Dequeue().User;
     }
 
-    public void EnqueueUserAbility(Fighter user, Ability ability)
+    public virtual void EnqueueUserAbility(Fighter user, Ability ability)
     {
         if (target.Entity.IsOwner)
         {

@@ -7,7 +7,7 @@ using Photon.Bolt;
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
 public class Player : Fighter
 {
-    public string playerName;
+    string playerName;
     CharacterColor character;
 
     Slider energyBar;
@@ -24,6 +24,9 @@ public class Player : Fighter
 
     Ability interaction;
     Wire wire;
+
+    public string PlayerName { get => playerName; }
+    public CharacterColor Character { get => character; }
 
     public Wire Wire { get => wire; }
 
