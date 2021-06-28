@@ -79,7 +79,12 @@ public abstract class Fighter : MonoBehaviour
 
         UnwrapAttachedToken();
 
-        pivotOffset = new Vector3(0, transform.position.y, 0);
+        Collider collider = GetComponent<Collider>();
+        float halfHeight = GetComponent<Collider>().bounds.size.y / 2;
+        Vector3 colliderCentrePosition = Vector3.up * collider.bounds.center.y;
+        Vector3 baseColliderPosition = colliderCentrePosition + (Vector3.down * halfHeight);
+        pivotOffset = Vector3.up * transform.position.y - baseColliderPosition;
+
         rb = GetComponent<Rigidbody>();
 
         targetAbilityManager = GetComponent<TargetAbilityManager>();
