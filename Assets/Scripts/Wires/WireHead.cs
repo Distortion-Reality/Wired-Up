@@ -15,7 +15,7 @@ public class WireHead : EntityBehaviour<IPlayerState>
 
     public override void Attached()
     {
-        state.SetTransforms(state.wireHeadTransform, transform);
+        state.SetTransforms(state.wireHeadTransform, transform, transform);
     }
 
     public void Init(Wire wire, WireBody wireBody)
@@ -48,7 +48,7 @@ public class WireHead : EntityBehaviour<IPlayerState>
         switch (player.FighterStatus)
         {
             case Fighter.Status.Waiting:
-                if (other.gameObject != player.Target.gameObject)
+                if (other.gameObject != player.Target.gameObject && !other.GetComponent<WireHead>())
                     player.InterruptWaiting();
                 break;
 

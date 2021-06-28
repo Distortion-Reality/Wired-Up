@@ -7,7 +7,7 @@ using Photon.Bolt;
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
 public class Player : Fighter
 {
-    string playerName;
+    public string playerName;
     CharacterColor character;
 
     Slider energyBar;
@@ -63,7 +63,7 @@ public class Player : Fighter
     protected override void InitAnimator()
     {
         // Load character model
-        CharacterManager characterManager = GameObject.FindObjectOfType<CharacterManager>();
+        CharacterManager characterManager = FindObjectOfType<CharacterManager>();
         GameObject modelPrefab = characterManager.GetPrefab(character);
         GameObject model = Instantiate(modelPrefab, parent: transform);
 
