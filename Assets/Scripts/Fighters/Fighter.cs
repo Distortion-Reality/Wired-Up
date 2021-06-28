@@ -32,7 +32,7 @@ public abstract class Fighter : MonoBehaviour
     protected Dictionary<StatisticManager.StatisticId, FighterStatistic> stats;
     protected List<Ability> attacks, assists;
     protected Ability currentAbility = null;
-    protected Status fighterStatus = Status.Free;
+    Status fighterStatus = Status.Free;
     TargetAbilityManager targetAbilityManager;
     protected Fighter target = null;
     protected Animator animator;
@@ -47,7 +47,18 @@ public abstract class Fighter : MonoBehaviour
     public Guid EntityId { get => entityId; }
     public Rigidbody Rb { get => rb; set => rb = value; }
     public Dictionary<StatisticManager.StatisticId, FighterStatistic> Stats { get => stats; }
-    public Status FighterStatus { get => fighterStatus; set => fighterStatus = value; }
+    public Status FighterStatus
+    {
+        get => (Status) State.status;
+        set
+        {
+            if (entity.IsOwner)
+                State.status = (int) value;
+            else
+                ChangeStatusEvent.Post(entity.Source, ReliabilityModes.ReliableOrdered, entityId, 
+                    (int) Fighter.Status.Using);
+        }
+    }
     public TargetAbilityManager TargetAbilityManager { get => targetAbilityManager; }
     public Fighter Target { get => target; set => target = value; }
     public Animator Animator { get => animator; }
@@ -91,12 +102,15 @@ public abstract class Fighter : MonoBehaviour
         InitAnimator();
 
         // Setup Bolt states
-        State.SetTransforms(State.transform, transform);
+        State.SetTransforms(State.transform, transform, transform);
         for (int i = 0; i < 5; i++)
         {
             State.statistics[i] = stats[(StatisticManager.StatisticId) i].CurrentValue;
         }
-        State.AddCallback("statistics[]", StatisticChanged); 
+        State.status = (int) fighterStatus;
+
+        State.AddCallback("statistics[]", StatisticChanged);
+        State.AddCallback("status", StatusChanged);
     }
 
     protected virtual void UnwrapAttachedToken()
@@ -125,7 +139,7 @@ public abstract class Fighter : MonoBehaviour
 
     public virtual void OwnerFixedUpdate()
     {
-        if (fighterStatus != Status.Stunned)
+        if (FighterStatus != Status.Stunned)
             UpdateRotation();
     }
 
@@ -133,7 +147,7 @@ public abstract class Fighter : MonoBehaviour
 
     void UpdateTarget()
     {
-        if (target != null && TargetDistance > TargetRange && fighterStatus == Status.Free)
+        if (target != null && TargetDistance > TargetRange && FighterStatus == Status.Free)
             target = null;
     }
 
@@ -160,7 +174,15 @@ public abstract class Fighter : MonoBehaviour
 
     protected abstract void UseAbility(Ability ability);
 
-    public virtual void EndAbility()
+    public void EndAbility()
+    {
+        if (entity.IsOwner)
+            OnEndAbility();
+        else
+            EndAbilityEvent.Post(entity.Source, ReliabilityModes.ReliableOrdered, entityId);
+    }
+
+    protected virtual void OnEndAbility()
     {
         currentAbility = null;
     }
@@ -176,7 +198,10 @@ public abstract class Fighter : MonoBehaviour
 
     public void UseEnergy(int abilityEnergy)
     {
-        ChangeEnergy(- abilityEnergy);
+        if (entity.IsOwner)
+            ChangeEnergy(- abilityEnergy);
+        else
+            UseEnergyEvent.Post(entity.Source, ReliabilityModes.ReliableOrdered, entityId, abilityEnergy);
     }
 
     public void ChangeStat(StatisticManager.StatisticId statId, int change)
@@ -230,22 +255,27 @@ public abstract class Fighter : MonoBehaviour
         StartCoroutine(ApplyStatusForTime(status, time));
     }
 
+    void StatusChanged()
+    {
+        fighterStatus = (Status) State.status;
+    }
+
     IEnumerator ApplyStatusForTime(Status status, float time)
     {
-        if (fighterStatus != status)
+        if (FighterStatus != status)
         {
-            fighterStatus = status;
+            FighterStatus = status;
 
             yield return new WaitForSeconds(time);
 
-            fighterStatus = Status.Free;
+            FighterStatus = Status.Free;
         }
     }
 
     void UpdateRotation()
     {
         Quaternion rotation;
-        if (fighterStatus != Status.Free &&
+        if (FighterStatus != Status.Free &&
             FighterStatus != Status.Disconnecting)
             rotation = LookAtTargetRotation();
         else
@@ -268,10 +298,7 @@ public abstract class Fighter : MonoBehaviour
         while (targetAbilityManager.UserAbilityQueueCount > 0)
         {
             Fighter user = targetAbilityManager.DequeueUserAbilityQueue();
-            if (user.Entity.IsOwner)
-                user.EndAbility();
-            else
-                EndAbilityEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered, user.EntityId);
+            user.EndAbility();
         }
 
         BoltNetwork.Destroy(gameObject);

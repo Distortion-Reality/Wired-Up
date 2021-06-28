@@ -88,4 +88,9 @@ public class NetworkManager : GlobalEventListener {
     {
         fighters[evnt.entityId].EndAbility();
     }
+
+    public override void OnEvent(ChangeWireRotationEvent evnt)
+    {
+        ((Player) fighters[evnt.entityId]).Wire.transform.parent.localRotation = evnt.rotation;
+    }
 }

@@ -20,6 +20,9 @@ public class FighterEntity : EntityBehaviour<IFighterState>
     // Update is called once per frame
     void Update()
     {
+        if (!entity.IsAttached)
+            return;
+        
         if (entity.IsOwner)
             fighter.OwnerUpdate();
         

@@ -19,25 +19,28 @@ public abstract class TargetAbilityManager : MonoBehaviour
 
         public Fighter User => user;
 
-        public void DoUserAbility()
+        public void DoUserAbility(Fighter target)
         {
-            ability.DoAbility(user);
+            ability.DoAbility(user, target);
         }
 
         public void UseEnergy()
         {
-            if (user.Entity.IsOwner)
-                user.UseEnergy(ability.Energy);
-            else
-                UseEnergyEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered, 
-                user.EntityId, ability.Energy);
+            user.UseEnergy(ability.Energy);
         }
     }
+
+    Fighter target;
 
     protected Queue<UserAbility> userAbilityQueue = new Queue<UserAbility>();
     protected bool usersAreUsing = false;
 
     public int UserAbilityQueueCount => userAbilityQueue.Count;
+
+    void Start()
+    {
+        target = GetComponent<Fighter>();
+    }
 
     public Fighter DequeueUserAbilityQueue()
     {
@@ -46,15 +49,24 @@ public abstract class TargetAbilityManager : MonoBehaviour
 
     public void EnqueueUserAbility(Fighter user, Ability ability)
     {
-        UserAbility userAbility = new UserAbility(user, ability);
-        userAbilityQueue.Enqueue(userAbility);
-        CheckUserAbilityQueue(userAbility);
+        if (target.Entity.IsOwner)
+        {
+            UserAbility userAbility = new UserAbility(user, ability);
+            userAbilityQueue.Enqueue(userAbility);
+            CheckUserAbilityQueue(userAbility);
+        }
+        else
+            EnqueueAbilityEvent.Post(target.Entity.Source, ReliabilityModes.ReliableOrdered, user.EntityId,
+            target.EntityId, (int) ability.Id);
     }
 
     public void RemoveUserAbility(Fighter user)
     {
-        userAbilityQueue = new Queue<UserAbility>(userAbilityQueue.Where(
-            userAbility => userAbility.User != user));
+        if (target.Entity.IsOwner)
+            userAbilityQueue = new Queue<UserAbility>(userAbilityQueue.Where(
+                userAbility => userAbility.User != user));
+        else
+            RemoveAbilityEvent.Post(target.Entity.Source, ReliabilityModes.ReliableOrdered, user.EntityId, target.EntityId);
     }
 
     protected abstract void CheckUserAbilityQueue(UserAbility userAbility);
@@ -66,7 +78,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
         while (userAbilityQueue.Count > 0)
         {
             UserAbility userAbility = userAbilityQueue.Dequeue();
-            userAbility.DoUserAbility();
+            userAbility.DoUserAbility(target);
 
             yield return new WaitWhile(() => userAbility.User.FighterStatus == Fighter.Status.Using);
         }
@@ -79,11 +91,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
         foreach (UserAbility userAbility in userAbilityQueue)
         {
             Fighter user = userAbility.User;
-            if (user.Entity.IsOwner)
-                userAbility.User.FighterStatus = Fighter.Status.Using; // TODO: change state
-            else
-                ChangeStatusEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
-                user.EntityId, (int) Fighter.Status.Using);
+            userAbility.User.FighterStatus = Fighter.Status.Using;
         }
 
         usersAreUsing = true;

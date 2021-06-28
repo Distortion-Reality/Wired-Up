@@ -6,13 +6,5 @@ public abstract class Ability
 
     public abstract AbilityId Id { get; }
 
-    public abstract void DoAbility(Fighter user);
-
-    protected void EndAbility(Fighter user)
-    {
-        if (user.Entity.IsOwner)
-            user.EndAbility();
-        else
-            EndAbilityEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered, user.EntityId);
-    }
+    public abstract void DoAbility(Fighter user, Fighter target);
 }

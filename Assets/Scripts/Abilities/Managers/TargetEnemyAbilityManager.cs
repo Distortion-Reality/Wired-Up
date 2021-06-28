@@ -38,14 +38,7 @@ public class TargetEnemyAbilityManager : TargetAbilityManager
     void EndAbilities()
     {
         foreach (UserAbility userAbility in userAbilityQueue)
-        {
-            Fighter user = userAbility.User;
-            if (user.Entity.IsOwner)
-                user.EndAbility();
-            else
-                EndAbilityEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered, user.EntityId);
-        }
-            
+            userAbility.User.EndAbility();
         userAbilityQueue.Clear();
     }
 }

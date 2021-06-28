@@ -26,6 +26,7 @@ public class Wire : EntityBehaviour<IPlayerState>
 
         if (entity.IsOwner)
             state.wireActive = gameObject.activeSelf;
+        state.SetTransforms(state.wireTransform, transform.parent, transform.parent);
 
         state.AddCallback("wireActive", ActiveChanged);
     }

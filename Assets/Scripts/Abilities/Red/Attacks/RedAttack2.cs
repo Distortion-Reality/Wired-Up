@@ -9,12 +9,12 @@ public class RedAttack2 : Ability
     public override int Energy => 20;
     public override AbilityId Id => AbilityId.RedAttack2;
 
-    public override void DoAbility(Fighter user)
+    public override void DoAbility(Fighter user, Fighter target)
     {
-        user.Target.TargetAbilityManager.StartCoroutine(LiftAndSlam(user, user.Target));
+        target.TargetAbilityManager.StartCoroutine(LiftAndSlam(user, target));
 
         if (user.CompareTag("Player"))
-            user.Target.TargetAbilityManager.StartCoroutine(WiresLookAtTarget(((Player)user).Wire, user.Target));
+            target.TargetAbilityManager.StartCoroutine(WiresLookAtTarget((Player)user, target));
     }
 
     IEnumerator LiftAndSlam(Fighter user, Fighter target)
@@ -58,19 +58,29 @@ public class RedAttack2 : Ability
 
         Effects.ApplyDamage(user, target, power);
 
-        EndAbility(user);
+        user.EndAbility();
     }
 
-    IEnumerator WiresLookAtTarget(Wire wire, Fighter target)
+    IEnumerator WiresLookAtTarget(Player user, Fighter target)
     {
+        Wire wire = user.Wire;
         Quaternion defaultWireParentLocalRotation = wire.transform.parent.localRotation;
 
         while (!target.Grounded)
         {
             wire.transform.parent.LookAt(target.BasePosition);
+
+            if (!user.Entity.IsOwner)
+                ChangeWireRotationEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
+                    user.EntityId, wire.transform.parent.localRotation);
+                
             yield return null;
         }
 
-        wire.transform.parent.localRotation = defaultWireParentLocalRotation;
+        if (user.Entity.IsOwner)
+            wire.transform.parent.localRotation = defaultWireParentLocalRotation;
+        else
+            ChangeWireRotationEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
+                    user.EntityId, defaultWireParentLocalRotation);
     }
 }

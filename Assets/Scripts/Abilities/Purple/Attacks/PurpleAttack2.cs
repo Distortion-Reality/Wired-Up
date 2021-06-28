@@ -10,10 +10,10 @@ public class PurpleAttack2 : Ability
     public override int Energy => 20;
     public override AbilityId Id => AbilityId.PurpleAttack2;
 
-    public override void DoAbility(Fighter user)
+    public override void DoAbility(Fighter user, Fighter target)
     {
-        user.Target.TargetAbilityManager.StartCoroutine(DamageOverTime(user, user.Target));
-        EndAbility(user);
+        target.TargetAbilityManager.StartCoroutine(DamageOverTime(user, target));
+        user.EndAbility();
     }
 
     static IEnumerator DamageOverTime(Fighter user, Fighter target)

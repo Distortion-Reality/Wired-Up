@@ -104,9 +104,9 @@ public class Player : Fighter
 
         if (entity.IsOwner)
         {
-            healthBar = GameObject.Find("PlayerHealthBar").GetComponent<Slider>();
-            energyBar = GameObject.Find("PlayerEnergyBar").GetComponent<Slider>();
-            energyBar.transform.Find("Fill Area").Find("Fill").GetComponent<Image>().color = color;
+            healthBar = GameObject.Find("PlayerEnergyBar").GetComponent<Slider>();
+            energyBar = GameObject.Find("PlayerHealthBar").GetComponent<Slider>();
+            healthBar.transform.Find("Fill Area").Find("Fill").GetComponent<Image>().color = color;
         }
         else // Ally
         {
@@ -130,15 +130,15 @@ public class Player : Fighter
     {
         base.OwnerUpdate();
 
-        if (fighterStatus != Status.Stunned)
+        if (FighterStatus != Status.Stunned)
         {
             CheckDashInput();
             
-            if (fighterStatus != Status.Using)
+            if (FighterStatus != Status.Using)
             {
                 CheckTargetInput();
 
-                if (fighterStatus != Status.Disconnecting && target)
+                if (FighterStatus != Status.Disconnecting && target)
                     CheckAbilityInput();
             }
         }
@@ -154,7 +154,7 @@ public class Player : Fighter
     void CheckDashInput()
     {
         if (Input.GetButtonDown("Dash") && Time.time > nextDashTime &&
-            fighterStatus == Status.Free &&
+            FighterStatus == Status.Free &&
             CheckAndUseEnergy(DashEnergy))
             StartCoroutine(Dash());
     }
@@ -163,8 +163,8 @@ public class Player : Fighter
     {
         Vector3 dir;
 
-        if (fighterStatus == Status.Waiting || fighterStatus == Status.Using ||
-            fighterStatus == Status.Stunned || movementsBlocked)
+        if (FighterStatus == Status.Waiting || FighterStatus == Status.Using ||
+            FighterStatus == Status.Stunned || movementsBlocked)
             dir = Vector3.zero;
         else
         {
@@ -257,39 +257,32 @@ public class Player : Fighter
         wire.Connect();
     }
 
-    public override void EndAbility()
+    protected override void OnEndAbility()
     {
-        base.EndAbility();
+        base.OnEndAbility();
         wire.Disconnect();
     }
 
     public void InterruptWaiting()
     {
-        if (target.Entity.IsOwner)
-            target.TargetAbilityManager.RemoveUserAbility(this);
-        else
-            RemoveAbilityEvent.Post(target.Entity.Source, ReliabilityModes.ReliableOrdered, entityId, target.EntityId);
+        target.TargetAbilityManager.RemoveUserAbility(this);
         EndAbility();
     }
 
     public void EnqueueUserAbilityToTarget(Fighter actualTarget)
     {
         target = actualTarget;
-        fighterStatus = Status.Waiting;
-        if (target.Entity.IsOwner)
-            target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
-        else
-            EnqueueAbilityEvent.Post(target.Entity.Source, ReliabilityModes.ReliableOrdered, entityId, 
-            target.EntityId, (int) currentAbility.Id);
-
+        FighterStatus = Status.Waiting;
+        target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
+        
         wire.StayConnected();
     }
 
     void CheckAndUpdatePlayerStatus()
     {
-        if (fighterStatus == Status.Waiting)
+        if (FighterStatus == Status.Waiting)
             InterruptWaiting();
-        else if (fighterStatus == Status.Connecting)
+        else if (FighterStatus == Status.Connecting)
             EndAbility();
     }
 

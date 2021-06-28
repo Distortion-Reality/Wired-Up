@@ -7,12 +7,12 @@ public class PurpleAssist3 : Ability
     public override int Energy => 30;
     public override AbilityId Id => AbilityId.PurpleAssist3;
 
-    public override void DoAbility(Fighter user)
+    public override void DoAbility(Fighter user, Fighter target)
     {
         int hp = Mathf.RoundToInt(percentage * user.Stats[StatisticManager.StatisticId.HP].CurrentValue);
         Effects.ChangeHP(user, -hp);
-        Effects.ChangeHP(user.Target, hp);
+        Effects.ChangeHP(target, hp);
 
-        EndAbility(user);
+        user.EndAbility();
     }
 }

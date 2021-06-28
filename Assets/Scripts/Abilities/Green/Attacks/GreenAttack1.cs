@@ -8,10 +8,10 @@ public class GreenAttack1 : Ability
     public override int Energy => 10;
     public override AbilityId Id => AbilityId.GreenAttack1;
 
-    public override void DoAbility(Fighter user)
+    public override void DoAbility(Fighter user, Fighter target)
     {
-        user.Target.TargetAbilityManager.StartCoroutine(BlockMovements(user.Target));
-        EndAbility(user);
+        target.TargetAbilityManager.StartCoroutine(BlockMovements(target));
+        user.EndAbility();
     }
 
     static IEnumerator BlockMovements(Fighter target)

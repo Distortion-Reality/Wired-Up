@@ -8,9 +8,9 @@ public class RedAttack1 : Ability
     public override int Energy => 10;
     public override AbilityId Id => AbilityId.RedAttack1;
 
-    public override void DoAbility(Fighter user)
+    public override void DoAbility(Fighter user, Fighter target)
     {
-        user.Target.TargetAbilityManager.StartCoroutine(Charge(user));
+        target.TargetAbilityManager.StartCoroutine(Charge(user));
     }
 
     IEnumerator Charge(Fighter user)
@@ -30,6 +30,6 @@ public class RedAttack1 : Ability
             user.Charged = null;
         }
 
-        EndAbility(user);
+        user.EndAbility();
     }
 }

@@ -7,13 +7,13 @@ public class PurpleAttack1 : Ability
     public override int Energy => 10;
     public override AbilityId Id => AbilityId.PurpleAttack1;
 
-    public override void DoAbility(Fighter user)
+    public override void DoAbility(Fighter user, Fighter target)
     {
-        int targetHP = user.Target.Stats[StatisticManager.StatisticId.HP].CurrentValue;
-        int damage = Effects.Damage(user, user.Target, power);
-        Effects.ChangeHP(user.Target, damage);
+        int targetHP = target.Stats[StatisticManager.StatisticId.HP].CurrentValue;
+        int damage = Effects.Damage(user, target, power);
+        Effects.ChangeHP(target, damage);
         Effects.ChangeHP(user, Mathf.Min(targetHP, damage));
 
-        EndAbility(user);
+        user.EndAbility();
     }
 }
