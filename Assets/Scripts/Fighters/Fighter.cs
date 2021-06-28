@@ -43,6 +43,7 @@ public abstract class Fighter : MonoBehaviour
     bool grounded = true;
     protected bool movementsBlocked = false;
 
+    public BoltEntity Entity { get => entity; }
     public Guid EntityId { get => entityId; }
     public Rigidbody Rb { get => rb; set => rb = value; }
     public Dictionary<StatisticManager.StatisticId, FighterStatistic> Stats { get => stats; }

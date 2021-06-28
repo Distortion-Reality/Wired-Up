@@ -17,7 +17,6 @@ public class EnemyManager : GlobalEventListener
 
     public override void EntityAttached(BoltEntity entity)
     {
-        Debug.Log(entity);
         if (entity.StateIs<IPlayerState>())
             players.Add(entity.GetComponent<Player>());
         else if (entity.StateIs<IEnemyState>())

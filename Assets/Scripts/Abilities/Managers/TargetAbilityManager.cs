@@ -25,7 +25,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
 
         public void UseEnergy()
         {
-            user.UseEnergy(ability.Energy);
+            user.UseEnergy(ability.Energy); // TODO: send event to user
         }
     }
 
@@ -64,6 +64,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
             userAbility.DoUserAbility();
 
             yield return new WaitWhile(() => userAbility.User.FighterStatus == Fighter.Status.Using);
+            // TODO: get fighter status state
         }
 
         usersAreUsing = false;
@@ -72,7 +73,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
     void SetUsersStatusUsing()
     {
         foreach (UserAbility userAbility in userAbilityQueue)
-            userAbility.User.FighterStatus = Fighter.Status.Using;
+            userAbility.User.FighterStatus = Fighter.Status.Using; // TODO: send event
 
         usersAreUsing = true;
     }

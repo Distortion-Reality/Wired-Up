@@ -4,16 +4,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Photon.Bolt;
 
-public class NetworkManager : GlobalEventListener
-{
-    readonly Dictionary<Guid, Fighter> fighters = new Dictionary<Guid, Fighter>();
+public class NetworkManager : GlobalEventListener {
 
-    public GameObject levelManagerPrefab;
+    readonly Dictionary<Guid, Fighter> fighters = new Dictionary<Guid, Fighter>();
 
     public override void SceneLoadLocalDone(string scene, IProtocolToken token)
     {
         // Spawn player
-        CharacterManager characterManager = FindObjectOfType<CharacterManager>();
+        CharacterManager characterManager = GameObject.FindObjectOfType<CharacterManager>();
         PlayerInfo info = new PlayerInfo
         {
             guid = Guid.NewGuid(),
@@ -58,5 +56,27 @@ public class NetworkManager : GlobalEventListener
     {
         Fighter fighter = fighters[evnt.entityId];
         fighter.ChangeStat((StatisticManager.StatisticId) evnt.statisticId, evnt.change);
+    }
+
+    public override void OnEvent(ChangeStatusEvent evnt)
+    {
+        Fighter fighter = fighters[evnt.entityId];
+        fighter.FighterStatus = (Fighter.Status) evnt.statusId;
+    }
+
+    public override void OnEvent(RemoteAbilityEvent evnt)
+    {
+        RemoteAbility ability = (RemoteAbility) evnt.abilityId;
+        Fighter sender = fighters[evnt.senderId];
+        Fighter target = fighters[evnt.targetId];
+        switch (ability)
+        {
+            case RemoteAbility.RedAttack2:
+                RedAttack2.DoAbility(sender, target);
+                break;
+            case RemoteAbility.EndAbility:
+                target.EndAbility();
+                break;
+        }
     }
 }
