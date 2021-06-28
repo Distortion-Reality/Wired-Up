@@ -14,14 +14,14 @@ public class GreenAssist3 : Ability
     public override void DoAbility(Fighter user, Fighter target)
     {
         int selfDamage = user.Stats[StatisticManager.StatisticId.HP].CurrentValue / 4;
-        Effects.ChangeHP(user, selfDamage);
+        Effects.ChangeHP(user, user, selfDamage);
 
-        target.TargetAbilityManager.StartCoroutine(HealingOverTimeAOE(target));
+        target.TargetAbilityManager.StartCoroutine(HealingOverTimeAOE(user, target));
 
         user.EndAbility();
     }
 
-    IEnumerator HealingOverTimeAOE(Fighter target)
+    IEnumerator HealingOverTimeAOE(Fighter user, Fighter target)
     {
         for (int i = 0; i < times; i++)
         {
@@ -29,7 +29,7 @@ public class GreenAssist3 : Ability
             foreach (Collider collider in colliders)
             {
                 Fighter fighter = collider.GetComponent<Fighter>();
-                Effects.ApplyHealing(fighter, percentage);
+                Effects.ApplyHealing(user, fighter, percentage);
             }
 
             yield return new WaitForSeconds(rate);

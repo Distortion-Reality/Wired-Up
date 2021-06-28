@@ -6,7 +6,14 @@ using Photon.Bolt;
 
 public class NetworkManager : GlobalEventListener {
 
+    ParticlesManager particlesManager;
+
     readonly Dictionary<Guid, Fighter> fighters = new Dictionary<Guid, Fighter>();
+
+    void Start()
+    {
+        particlesManager = GetComponent<ParticlesManager>();
+    }
 
     public override void SceneLoadLocalDone(string scene, IProtocolToken token)
     {
@@ -92,5 +99,13 @@ public class NetworkManager : GlobalEventListener {
     public override void OnEvent(ChangeWireRotationEvent evnt)
     {
         ((Player) fighters[evnt.entityId]).Wire.transform.parent.localRotation = evnt.rotation;
+    }
+
+    public override void OnEvent(SpawnParticleEvent evnt)
+    {
+        GameObject prefab = particlesManager.GetParticlePrefab((ParticlesId) evnt.particleId);
+        GameObject particle = Instantiate(prefab, evnt.position, Quaternion.identity);
+        ParticleSystem.MainModule main = particle.GetComponent<ParticleSystem>().main;
+        main.startColor = new ParticleSystem.MinMaxGradient(evnt.color);
     }
 }

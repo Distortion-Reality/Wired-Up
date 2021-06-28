@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Photon.Bolt;
 
 [RequireComponent(typeof(BoltEntity))]
@@ -20,6 +21,12 @@ public class FighterEntity : EntityBehaviour<IFighterState>
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            BoltLauncher.Shutdown();
+            SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+        }
+
         if (!entity.IsAttached)
             return;
         

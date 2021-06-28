@@ -7,6 +7,15 @@ public class TargetEnemyAbilityManager : TargetAbilityManager
     public int minAbilities = 2;
     public float waitingTime = 1.5f;
 
+    public override void EnqueueUserAbility(Fighter user, Ability ability)
+    {
+        base.EnqueueUserAbility(user, ability);
+
+        if (userAbilityQueue.Count < minAbilities && user is Player)
+            SpawnParticleEvent.Post(ReliabilityModes.ReliableOrdered, (int) ParticlesId.Target, 
+                ((Player)user).Character.UnityColor(), target.transform.position);
+    }
+
     protected override void CheckUserAbilityQueue(UserAbility userAbility)
     {
         if (usersAreUsing)

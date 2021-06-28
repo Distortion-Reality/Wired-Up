@@ -11,8 +11,8 @@ public class PurpleAttack1 : Ability
     {
         int targetHP = target.Stats[StatisticManager.StatisticId.HP].CurrentValue;
         int damage = Effects.Damage(user, target, power);
-        Effects.ChangeHP(target, damage);
-        Effects.ChangeHP(user, Mathf.Min(targetHP, damage));
+        Effects.ChangeHP(user, target, damage);
+        Effects.ChangeHP(user, user, Mathf.Min(targetHP, damage));
 
         user.EndAbility();
     }
