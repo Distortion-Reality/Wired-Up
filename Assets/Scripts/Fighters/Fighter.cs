@@ -96,7 +96,7 @@ public abstract class Fighter : MonoBehaviour
         {
             State.statistics[i] = stats[(StatisticManager.StatisticId) i].CurrentValue;
         }
-        State.AddCallback("statistics[]", StatisticChanged); 
+        State.AddCallback("statistics[]", StatisticChanged);
         State.AddCallback("hp", HpChanged);
     }
 
@@ -164,6 +164,7 @@ public abstract class Fighter : MonoBehaviour
     public virtual void EndAbility()
     {
         currentAbility = null;
+        charging = false;
     }
 
     public bool CheckAndUseEnergy(int abilityEnergy)
@@ -243,7 +244,7 @@ public abstract class Fighter : MonoBehaviour
         }
     }
 
-    void UpdateRotation()
+    protected virtual void UpdateRotation()
     {
         Quaternion rotation;
         if (fighterStatus != Status.Free &&
