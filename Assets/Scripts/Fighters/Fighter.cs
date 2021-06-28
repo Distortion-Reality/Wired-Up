@@ -265,6 +265,12 @@ public abstract class Fighter : MonoBehaviour
 
     void Die()
     {
+        while (targetAbilityManager.UserAbilityQueueCount > 0)
+        {
+            Fighter user = targetAbilityManager.DequeueUserAbilityQueue();
+            user.EndAbility(); // TODO: send event
+        }
+
         BoltNetwork.Destroy(gameObject);
     }
 

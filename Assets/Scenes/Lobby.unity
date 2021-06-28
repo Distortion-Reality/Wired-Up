@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44658822, g: 0.49642307, b: 0.5748253, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -152,11 +152,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c55de54ce61e8efeb0a3d21afc74cd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  redPrefab: {fileID: 7384382340359815668, guid: ffa87237d16c50349aa55ef557f1658e, type: 3}
-  bluePrefab: {fileID: 7384382340359815668, guid: ffa87237d16c50349aa55ef557f1658e, type: 3}
-  greenPrefab: {fileID: 7384382340359815668, guid: ffa87237d16c50349aa55ef557f1658e, type: 3}
-  purplePrefab: {fileID: 7384382340359815668, guid: ffa87237d16c50349aa55ef557f1658e, type: 3}
-  yellowPrefab: {fileID: 7384382340359815668, guid: ffa87237d16c50349aa55ef557f1658e, type: 3}
+  redPrefab: {fileID: 3278723925132932006, guid: b4624f7e1da804046973134c4bfc626c, type: 3}
+  bluePrefab: {fileID: 7401197748145023452, guid: 98645aadc9e2aa94f947fae87b71aa67, type: 3}
+  greenPrefab: {fileID: 3278723925132932006, guid: b4624f7e1da804046973134c4bfc626c, type: 3}
+  purplePrefab: {fileID: 3278723925132932006, guid: b4624f7e1da804046973134c4bfc626c, type: 3}
+  yellowPrefab: {fileID: 3278723925132932006, guid: b4624f7e1da804046973134c4bfc626c, type: 3}
 --- !u!4 &29759829
 Transform:
   m_ObjectHideFlags: 0

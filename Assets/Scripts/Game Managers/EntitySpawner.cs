@@ -14,9 +14,14 @@ public class EntitySpawner : MonoBehaviour {
             {
                 guid = Guid.NewGuid()
             };
-            BoltNetwork.Instantiate(prefab, info, transform.position, transform.rotation);
+            InstantiatePrefab(info);
         }
 
         Destroy(gameObject);
+    }
+
+    protected virtual BoltEntity InstantiatePrefab(FighterInfo info)
+    {
+        return BoltNetwork.Instantiate(prefab, info, transform.position, transform.rotation);
     }
 }
