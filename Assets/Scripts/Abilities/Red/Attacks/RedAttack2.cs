@@ -68,11 +68,14 @@ public class RedAttack2 : Ability
 
         while (!target.Grounded)
         {
-            wire.transform.parent.LookAt(target.BasePosition);
+            Quaternion rotation = Quaternion.LookRotation(target.BasePosition - wire.transform.position);
 
-            if (!user.Entity.IsOwner)
+            if (user.Entity.IsOwner)
+                wire.transform.parent.rotation = rotation;
+            else
                 ChangeWireRotationEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
-                    user.EntityId, wire.transform.parent.localRotation);
+                    user.EntityId, rotation);
+                
                 
             yield return null;
         }
