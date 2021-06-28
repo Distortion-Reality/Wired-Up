@@ -99,6 +99,9 @@ public class Player : Fighter
         interaction = new RedAttack1();
 
         wire = GetComponentInChildren<Wire>(true);
+        CharacterManager characterManager = FindObjectOfType<CharacterManager>();
+        foreach (Renderer renderer in wire.GetComponentsInChildren<Renderer>())
+            renderer.material = characterManager.GetWireMaterial(character);
 
         cam = Camera.main.transform;
 

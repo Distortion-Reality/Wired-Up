@@ -3,6 +3,8 @@ using UnityEngine;
 public class CharacterManager : MonoBehaviour
 {
     public GameObject redPrefab, bluePrefab, greenPrefab, purplePrefab, yellowPrefab;
+
+    public Material redWireMaterial, blueWireMaterial, greenWireMaterial, purpleWireMaterial, yellowWireMaterial;
     
     CharacterColor currentCharacter;
     public CharacterColor CurrentCharacter { get => currentCharacter; set => currentCharacter = value; }
@@ -23,6 +25,25 @@ public class CharacterManager : MonoBehaviour
                 return yellowPrefab;
             default:
                 return redPrefab;
+        }
+    }
+
+    public Material GetWireMaterial(CharacterColor id)
+    {
+        switch (id)
+        {
+            case CharacterColor.Red:
+                return redWireMaterial;
+            case CharacterColor.Blue:
+                return blueWireMaterial;
+            case CharacterColor.Green:
+                return greenWireMaterial;
+            case CharacterColor.Purple:
+                return purpleWireMaterial;
+            case CharacterColor.Yellow:
+                return yellowWireMaterial;
+            default:
+                return redWireMaterial;
         }
     }
 
