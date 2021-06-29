@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minAbilities: 2
-  waitingTime: 1.5
+  waitingTime: 5
 --- !u!114 &1160451499801872718
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -36,6 +36,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
     protected bool usersAreUsing = false;
 
     public int UserAbilityQueueCount => userAbilityQueue.Count;
+    public IEnumerable<Fighter> UsersInQueue => userAbilityQueue.Select(userAbility => userAbility.User);
 
     void Start()
     {
@@ -80,7 +81,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
             UserAbility userAbility = userAbilityQueue.Dequeue();
             userAbility.DoUserAbility(target);
 
-            yield return new WaitWhile(() => userAbility.User.FighterStatus == Fighter.Status.Using);
+            yield return new WaitUntil(() => userAbility.User.FighterStatus == Fighter.Status.Disconnecting);
         }
 
         usersAreUsing = false;
@@ -89,10 +90,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
     void SetUsersStatusUsing()
     {
         foreach (UserAbility userAbility in userAbilityQueue)
-        {
-            Fighter user = userAbility.User;
             userAbility.User.FighterStatus = Fighter.Status.Using;
-        }
 
         usersAreUsing = true;
     }

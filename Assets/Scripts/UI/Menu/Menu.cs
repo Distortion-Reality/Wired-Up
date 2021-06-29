@@ -53,4 +53,9 @@ public class Menu : GlobalEventListener
                 BoltMatchmaking.JoinSession(photonSession);
         }
     }
+
+    public void Quit()
+    {
+        Application.Quit();
+    }
 }

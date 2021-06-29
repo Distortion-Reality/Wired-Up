@@ -9,6 +9,9 @@ public class NetworkManager : GlobalEventListener {
     ParticlesManager particlesManager;
 
     readonly Dictionary<Guid, Fighter> fighters = new Dictionary<Guid, Fighter>();
+    int allyCount = -1;
+
+    public int AllyCount { get => allyCount; }
 
     void Start()
     {
@@ -25,8 +28,19 @@ public class NetworkManager : GlobalEventListener {
             name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName),
             character = characterManager.CurrentCharacter
         };
-        Transform players = GameObject.Find("Players").transform;
-        BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Player, info, players.position, players.rotation);
+
+        LevelSpawnInfo spawnInfo = (LevelSpawnInfo) token;
+        Transform spawnPoint = GameObject.Find("PlayersSpawnPoint").transform;
+        Vector3 spawnPosition = spawnPoint.position;
+        if (!BoltNetwork.IsServer)
+        {
+            if (characterManager.CurrentCharacter == spawnInfo.left)
+            spawnPosition += Vector3.left * 5;
+            else if (characterManager.CurrentCharacter == spawnInfo.right)
+            spawnPosition += Vector3.right * 5;
+        }
+
+        BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Player, info, spawnPosition, spawnPoint.rotation);
 
         // Setup player camera
         GameObject playerCamera = GameObject.Find("PlayerCamera");
@@ -47,6 +61,9 @@ public class NetworkManager : GlobalEventListener {
         {
             Fighter fighter = entity.GetComponent<Fighter>();
             fighters[fighter.EntityId] = fighter;
+
+            if (fighter is Player)
+                allyCount++;
         }
     }
 
@@ -98,7 +115,11 @@ public class NetworkManager : GlobalEventListener {
 
     public override void OnEvent(ChangeWireRotationEvent evnt)
     {
-        ((Player) fighters[evnt.entityId]).Wire.transform.parent.localRotation = evnt.rotation;
+        Transform wire = ((Player) fighters[evnt.entityId]).Wire.transform.parent;
+        if (evnt.local)
+            wire.localRotation = evnt.rotation;
+        else
+            wire.rotation = evnt.rotation;
     }
 
     public override void OnEvent(SpawnParticleEvent evnt)

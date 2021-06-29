@@ -13,8 +13,13 @@ public class RedAttack2 : Ability
     {
         target.TargetAbilityManager.StartCoroutine(LiftAndSlam(user, target));
 
-        if (user.CompareTag("Player"))
-            target.TargetAbilityManager.StartCoroutine(WiresLookAtTarget((Player)user, target));
+        if (user is Player player)
+        {
+            target.TargetAbilityManager.StartCoroutine(WiresLookAtTarget(player, target));
+            foreach (Fighter enqueued in target.TargetAbilityManager.UsersInQueue)
+                if (enqueued is Player enqueuedPlayer)
+                    target.TargetAbilityManager.StartCoroutine(WiresLookAtTarget(enqueuedPlayer, target));
+        }
     }
 
     IEnumerator LiftAndSlam(Fighter user, Fighter target)
@@ -74,7 +79,7 @@ public class RedAttack2 : Ability
                 wire.transform.parent.rotation = rotation;
             else
                 ChangeWireRotationEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
-                    user.EntityId, rotation);
+                    user.EntityId, rotation, false);
                 
                 
             yield return null;
@@ -84,6 +89,6 @@ public class RedAttack2 : Ability
             wire.transform.parent.localRotation = defaultWireParentLocalRotation;
         else
             ChangeWireRotationEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
-                    user.EntityId, defaultWireParentLocalRotation);
+                    user.EntityId, defaultWireParentLocalRotation, true);
     }
 }
