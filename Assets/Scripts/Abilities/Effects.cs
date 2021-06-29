@@ -122,7 +122,7 @@ public static class Effects
     public static Collider[] AreaOfEffect(Fighter target, float radius)
     {
         Collider[] colliders = new Collider[3];
-        Physics.OverlapSphereNonAlloc(target.BasePosition, radius, colliders,
+        Physics.OverlapSphereNonAlloc(target.BottomPosition, radius, colliders,
             LayerMask.GetMask(target.GetType().Name));
 
         return colliders;
@@ -136,7 +136,8 @@ public static class Effects
     public static void FireRay(Fighter user, Ability ability)
     {
         // EnemyAttackRay ray = bolt entity
-        EnemyAbilityRay ray = Object.Instantiate(Object.FindObjectOfType<AbilityManager>().enemyAbilityRay);
-        ray.FireRay(user, ability);
+        GameObject ray = Object.Instantiate(Object.FindObjectOfType<AbilityManager>().enemyAbilityRay,
+            user.transform.position, user.transform.rotation);
+        ray.GetComponent<EnemyAbilityRay>().FireRay(user, ability);
     }
 }

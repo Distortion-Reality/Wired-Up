@@ -7,7 +7,7 @@ using Photon.Bolt;
 [RequireComponent(typeof(Rigidbody))]
 public class EnemyAbilityRay : MonoBehaviour
 {
-    const float speed = 2f;
+    const float speed = 10f;
 
     Fighter user;
     Ability ability;
@@ -35,6 +35,9 @@ public class EnemyAbilityRay : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        if (other.gameObject == user.gameObject)
+            return;
+
         if (other.CompareTag("Player"))
         {
             Player target = other.GetComponent<Player>();

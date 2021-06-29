@@ -22,7 +22,8 @@ public abstract class Fighter : MonoBehaviour
     protected BoltEntity entity;
     protected Guid entityId;
 
-    Vector3 pivotOffset;
+    Vector3 centreOffset, topOffset, bottomOffset;
+
     protected Rigidbody rb;
     const float RotationSpeed = 10f;
 
@@ -68,7 +69,9 @@ public abstract class Fighter : MonoBehaviour
     public bool MovementsBlocked { set => movementsBlocked = value; }
 
     protected IFighterState State => entity.GetState<IFighterState>();
-    public Vector3 BasePosition => transform.position - pivotOffset;
+    public Vector3 CentrePosition => transform.position - centreOffset;
+    public Vector3 TopPosition => transform.position - topOffset;
+    public Vector3 BottomPosition => transform.position - bottomOffset;
     protected virtual float MovementSpeed
     {
         get
@@ -84,7 +87,7 @@ public abstract class Fighter : MonoBehaviour
     protected float TargetRange => 2 * AbilityRange;
     public float TargetDistance => DistanceFrom(target);
     public abstract ParticlesId DamageParticles { get; }
-    public abstract Color CharacterUnityColor { get ; }
+    public abstract Color CharacterUnityColor { get; }
 
     public virtual void EntityStart()
     {
@@ -93,10 +96,14 @@ public abstract class Fighter : MonoBehaviour
         UnwrapAttachedToken();
 
         Collider collider = GetComponent<Collider>();
-        float halfHeight = GetComponent<Collider>().bounds.size.y / 2;
-        Vector3 colliderCentrePosition = Vector3.up * collider.bounds.center.y;
-        Vector3 baseColliderPosition = colliderCentrePosition + (Vector3.down * halfHeight);
-        pivotOffset = Vector3.up * transform.position.y - baseColliderPosition;
+        Vector3 colliderHalfHeight = Vector3.down * GetComponent<Collider>().bounds.size.y / 2;
+        Vector3 colliderCentre = Vector3.up * collider.bounds.center.y;
+        Vector3 colliderTop = colliderCentre + colliderHalfHeight;
+        Vector3 colliderBottom = colliderCentre - colliderHalfHeight;
+
+        centreOffset = Vector3.up * transform.position.y - colliderTop;
+        topOffset = Vector3.up * transform.position.y - colliderTop;
+        bottomOffset = Vector3.up * transform.position.y - colliderBottom;
 
         rb = GetComponent<Rigidbody>();
 
@@ -160,7 +167,7 @@ public abstract class Fighter : MonoBehaviour
 
     protected float DistanceFrom(Fighter other)
     {
-        return Vector3.Distance(other.BasePosition, BasePosition);
+        return Vector3.Distance(other.BottomPosition, BottomPosition);
     }
 
     void RegenEnergy()

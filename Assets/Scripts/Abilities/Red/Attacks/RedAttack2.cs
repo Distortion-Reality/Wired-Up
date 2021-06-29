@@ -73,7 +73,7 @@ public class RedAttack2 : Ability
 
         while (!target.Grounded)
         {
-            Quaternion rotation = Quaternion.LookRotation(target.BasePosition - wire.transform.position);
+            Quaternion rotation = Quaternion.LookRotation(target.BottomPosition - wire.transform.position);
 
             if (user.Entity.IsOwner)
                 wire.transform.parent.rotation = rotation;

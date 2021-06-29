@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class AbilityManager : MonoBehaviour
 {
-    public EnemyAbilityRay enemyAbilityRay;
+    public GameObject enemyAbilityRay;
 
     // Start is called before the first frame update
     void Start()

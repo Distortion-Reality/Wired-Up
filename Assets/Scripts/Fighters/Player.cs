@@ -37,7 +37,7 @@ public class Player : Fighter
 
     protected override void InitStats()
     {
-        FighterRangedStatistic hp = new FighterRangedStatistic(10);
+        FighterRangedStatistic hp = new FighterRangedStatistic(100);
         FighterBuffableStatistic armor = new FighterBuffableStatistic(10);
         FighterBuffableStatistic length = new FighterBuffableStatistic(50);
         FighterBuffableStatistic intensity = new FighterBuffableStatistic(50);
