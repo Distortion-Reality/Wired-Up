@@ -75,23 +75,9 @@ public class Player : Fighter
     {
         base.EntityStart();
 
-        // Abilities initialization
-        Ability attack1 = AbilityRegistry.Get(AbilityId.GreenAttack1);
-        Ability attack2 = AbilityRegistry.Get(AbilityId.RedAttack2);
-
-        attacks = new List<Ability>()
-        {
-            attack1,
-            attack2,
-        };
-
-        // Assists initialization
-        Ability assist1 = AbilityRegistry.Get(AbilityId.BlueAssist2);
-
-        assists = new List<Ability>()
-        {
-            assist1
-        };
+        AbilityRegistry.CharacterAbilities abilities = AbilityRegistry.GetAbilities(character);
+        attacks = abilities.attacks;
+        assists = abilities.assists;
 
         // Interaction ability initialization
         interaction = new RedAttack1();

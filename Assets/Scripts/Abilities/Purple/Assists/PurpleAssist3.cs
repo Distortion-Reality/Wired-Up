@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PurpleAssist3 : Ability
@@ -11,8 +12,16 @@ public class PurpleAssist3 : Ability
     {
         int hp = Mathf.RoundToInt(percentage * user.Stats[StatisticManager.StatisticId.HP].CurrentValue);
         Effects.ApplyDamage(user, user, hp);
-        Effects.ApplyHealing(user, target, hp);
+        user.StartCoroutine(WaitForParticles(user, target, hp, user.DamageParticles));
+    }
 
-        user.EndAbility();
+    IEnumerator WaitForParticles(Fighter user, Fighter target, int hp, ParticlesId particlesId)
+    {
+        float duration = Object.FindObjectOfType<ParticlesManager>()
+            .GetParticlesPrefab(particlesId).GetComponent<ParticleSystem>().main.duration;
+        yield return new WaitForSeconds(duration / 2);
+
+        Effects.ApplyHealing(user, target, hp);
+        DelayEndAbility(user, ParticlesId.Heal);
     }
 }

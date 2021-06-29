@@ -53,7 +53,7 @@ public static class Effects
     {
         for (int i = 0; i < times; i++)
         {
-            Effects.CalculateAndApplyDamage(user, target, power);
+            CalculateAndApplyDamage(user, target, power);
             yield return new WaitForSeconds(rate);
         }
     }
@@ -85,6 +85,7 @@ public static class Effects
     {
         target.TargetAbilityManager.StartCoroutine(ApplyStatBuff(target, statId, stages));
         SendSpawnParticleEvent(target, ParticlesId.Buff, user.CharacterUnityColor);
+
     }
 
     public static void DebuffStat(Fighter user, Fighter target, StatisticManager.StatisticId statId, int stages)
@@ -128,7 +129,7 @@ public static class Effects
         return colliders;
     }
 
-    static void SendSpawnParticleEvent(Fighter target, ParticlesId particlesId, Color particlesColor)
+    public static void SendSpawnParticleEvent(Fighter target, ParticlesId particlesId, Color particlesColor)
     {
         SpawnParticleEvent.Post(ReliabilityModes.ReliableOrdered, target.EntityId, (int)particlesId, particlesColor);
     }
