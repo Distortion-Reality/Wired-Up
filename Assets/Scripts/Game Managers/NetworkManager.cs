@@ -9,6 +9,9 @@ public class NetworkManager : GlobalEventListener {
     ParticlesManager particlesManager;
 
     readonly Dictionary<Guid, Fighter> fighters = new Dictionary<Guid, Fighter>();
+    int allyCount = -1;
+
+    public int AllyCount { get => allyCount; }
 
     void Start()
     {
@@ -47,6 +50,9 @@ public class NetworkManager : GlobalEventListener {
         {
             Fighter fighter = entity.GetComponent<Fighter>();
             fighters[fighter.EntityId] = fighter;
+
+            if (fighter is Player)
+                allyCount++;
         }
     }
 

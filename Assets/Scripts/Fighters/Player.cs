@@ -12,7 +12,7 @@ public class Player : Fighter
 
     Slider energyBar;
     public GameObject allyInfoPrefab;
-    static int alliesIndex = 0;
+    const float allyInfoYOffset = 100f;
 
     Transform cam;
     float movementSpeedMultiplier = 1f;
@@ -117,8 +117,11 @@ public class Player : Fighter
         else // Ally
         {
             // Create ally UI
+            NetworkManager networkManager = GameObject.FindObjectOfType<NetworkManager>();
+            float yScale = Screen.height / gui.GetComponent<CanvasScaler>().referenceResolution.y;
+            float yOffset = networkManager.AllyCount * allyInfoYOffset * yScale;
             GameObject allyInfo = Instantiate(allyInfoPrefab, parent: gui.transform);
-            allyInfo.transform.position += new Vector3(0, alliesIndex * 60, 0);
+            allyInfo.transform.position += new Vector3(0, yOffset, 0);
 
             TMPro.TextMeshProUGUI allyName = allyInfo.GetComponentInChildren<TMPro.TextMeshProUGUI>();
             allyName.text = playerName;
@@ -127,8 +130,6 @@ public class Player : Fighter
 
             healthBar = allyInfo.GetComponentInChildren<Slider>();
             healthBar.transform.Find("Fill Area").Find("Fill").GetComponent<Image>().color = color;
-
-            alliesIndex++;
         }
     }
 
