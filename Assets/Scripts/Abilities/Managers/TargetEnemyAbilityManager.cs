@@ -11,9 +11,9 @@ public class TargetEnemyAbilityManager : TargetAbilityManager
     {
         base.EnqueueUserAbility(user, ability);
 
-        if (userAbilityQueue.Count < minAbilities && user is Player)
-            SpawnParticleEvent.Post(ReliabilityModes.ReliableOrdered, (int) ParticlesId.Target, 
-                ((Player)user).Character.UnityColor(), target.transform.position);
+        if (userAbilityQueue.Count < minAbilities && user is Player player)
+            SpawnParticleEvent.Post(ReliabilityModes.ReliableOrdered, (int)ParticlesId.Target, 
+                player.CharacterUnityColor, target.transform.position);
     }
 
     protected override void CheckUserAbilityQueue(UserAbility userAbility)

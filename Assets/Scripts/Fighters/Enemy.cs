@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,6 +18,8 @@ public class Enemy : Fighter
     protected new IEnemyState State => entity.GetState<IEnemyState>();
     protected override float MovementSpeed => 1.5f * base.MovementSpeed;
     public override float AbilityRange => 1.5f * base.AbilityRange;
+    public override ParticlesId DamageParticles => ParticlesId.EnemyDamage;
+    public override Color CharacterUnityColor { get => Color.black; }
 
     protected override void InitStats()
     {
@@ -24,7 +27,7 @@ public class Enemy : Fighter
         FighterBuffableStatistic armor = new FighterBuffableStatistic(50);
         FighterBuffableStatistic length = new FighterBuffableStatistic(50);
         FighterBuffableStatistic intensity = new FighterBuffableStatistic(10);
-        FighterEnergy energy = new FighterEnergy(20);
+        FighterEnergy energy = new FighterEnergy(100);
         FighterBuffableStatistic speed = new FighterBuffableStatistic(50);
 
         stats = new Dictionary<StatisticManager.StatisticId, FighterStatistic>()
@@ -43,8 +46,8 @@ public class Enemy : Fighter
         base.EntityStart();
 
         // Abilities initialization
-        Ability attack1 = new RedAttack1();
-        Ability attack2 = new RedAttack2();
+        Ability attack1 = new EnemyAttack1();
+        Ability attack2 = new EnemyAttack2();
 
         attacks = new List<Ability>()
         {
@@ -52,17 +55,12 @@ public class Enemy : Fighter
             attack2,
         };
 
-        // Assists initialization
-        Ability assist1 = new BlueAssist2();
-
-        assists = new List<Ability>()
-        {
-            assist1
-        };
-
         agent = GetComponent<NavMeshAgent>();
 
         healthBar = Instantiate(enemyHealthBarPrefab, parent: gui.transform).GetComponent<Slider>();
+
+        // Initialize first attack
+        currentAbility = attack1;
     }
 
     public override void OwnerUpdate()
@@ -70,6 +68,9 @@ public class Enemy : Fighter
         base.OwnerUpdate();
 
         UpdateMovement();
+
+        if (FighterStatus == Status.Free && target)
+            UpdateAbility();
     }
 
     protected override void UpdateMovement()
@@ -78,10 +79,28 @@ public class Enemy : Fighter
             FighterStatus != Status.Waiting && FighterStatus != Status.Using &&
             FighterStatus != Status.Stunned && !movementsBlocked)
         {
-            agent.destination = target.BasePosition;
+            agent.destination = target.BottomPosition;
             agent.stoppingDistance = target.AbilityRange + 3;
             agent.speed = MovementSpeed;
         }
+    }
+
+    void UpdateAbility()
+    {
+        if (DistanceFrom(target) < AbilityRange && currentAbility != null)
+            SelectAbility(currentAbility);
+    }
+
+    IEnumerator AbilityAnimationCooldown()
+    {
+        yield return new WaitForSeconds(2f);
+        EndAbility();
+    }
+
+    IEnumerator UseAbilityCooldown()
+    {
+        yield return new WaitForSeconds(2f);
+        currentAbility = attacks[Random.Range(0, attacks.Count)];
     }
 
     public override void EntityUpdate()
@@ -113,12 +132,16 @@ public class Enemy : Fighter
     protected override void UseAbility(Ability ability)
     {
         FighterStatus = Status.Using;
-        ability.DoAbility(this, target);
+        Effects.FireRay(this, ability);
+
+        StartCoroutine(AbilityAnimationCooldown());
     }
 
     protected override void OnEndAbility()
     {
         base.OnEndAbility();
         FighterStatus = Status.Free;
+
+        StartCoroutine(UseAbilityCooldown());
     }
 }

@@ -26,7 +26,7 @@ public class RedAttack1 : Ability
 
         if (user.Charged)
         {
-            Effects.ApplyDamage(user, user.Charged, power);
+            Effects.CalculateAndApplyDamage(user, user.Charged, power);
             user.Charged = null;
         }
 

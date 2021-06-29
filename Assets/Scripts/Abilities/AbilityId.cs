@@ -1,5 +1,6 @@
 public enum AbilityId
 {
+    None,
     BlueAssist2,
     GreenAttack1,
     GreenAttack3,

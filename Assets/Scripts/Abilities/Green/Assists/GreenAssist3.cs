@@ -14,7 +14,7 @@ public class GreenAssist3 : Ability
     public override void DoAbility(Fighter user, Fighter target)
     {
         int selfDamage = user.Stats[StatisticManager.StatisticId.HP].CurrentValue / 4;
-        Effects.ChangeHP(user, user, selfDamage);
+        Effects.ApplyDamage(user, user, selfDamage);
 
         target.TargetAbilityManager.StartCoroutine(HealingOverTimeAOE(user, target));
 
@@ -29,7 +29,7 @@ public class GreenAssist3 : Ability
             foreach (Collider collider in colliders)
             {
                 Fighter fighter = collider.GetComponent<Fighter>();
-                Effects.ApplyHealing(user, fighter, percentage);
+                Effects.CalculateAndApplyHealing(user, fighter, percentage);
             }
 
             yield return new WaitForSeconds(rate);

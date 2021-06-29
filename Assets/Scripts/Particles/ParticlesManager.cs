@@ -13,7 +13,7 @@ public class ParticlesManager : MonoBehaviour
             particles.Add((ParticlesId)i, particlesPrefabs[i]);
     }
 
-    public GameObject GetParticlePrefab(ParticlesId particlesId)
+    public GameObject GetParticlesPrefab(ParticlesId particlesId)
     {
         return particles[particlesId];
     }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.46629983, g: 0.47986937, b: 0.49226838, a: 1}
+  m_IndirectSpecularColor: {r: 0.46765316, g: 0.47983313, b: 0.49221987, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -492,6 +492,7 @@ GameObject:
   - component: {fileID: 336945207}
   - component: {fileID: 336945206}
   - component: {fileID: 336945208}
+  - component: {fileID: 336945211}
   - component: {fileID: 336945209}
   - component: {fileID: 336945210}
   m_Layer: 0
@@ -525,7 +526,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &336945208
 MonoBehaviour:
@@ -571,6 +572,19 @@ MonoBehaviour:
   - {fileID: 7971709731857246437, guid: 58cb3653f1a312d48aedd44005f82af4, type: 3}
   - {fileID: 7509495637113929742, guid: 4c45554861433cb4e9eca2612de431f7, type: 3}
   - {fileID: 8941844998022827710, guid: 0dbfe37d1a4882e42923b7ac8e05c96f, type: 3}
+--- !u!114 &336945211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 336945205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bfa49169abe3134bb51c7eddd7f9fa6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyAbilityRay: {fileID: 4410735498059918412, guid: db12d9f27854a6f44a1f69c7d50639ca, type: 3}
 --- !u!1 &337803945
 GameObject:
   m_ObjectHideFlags: 0
@@ -3482,7 +3496,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1823745214
 GameObject:

@@ -116,15 +116,15 @@ public class NetworkManager : GlobalEventListener {
     public override void OnEvent(ChangeWireRotationEvent evnt)
     {
         Transform wire = ((Player) fighters[evnt.entityId]).Wire.transform.parent;
-        if (evnt.local)
-            wire.localRotation = evnt.rotation;
+        if (evnt.reset)
+            wire.transform.localRotation = Quaternion.identity;
         else
-            wire.rotation = evnt.rotation;
+            wire.transform.LookAt(evnt.lookAt);
     }
 
     public override void OnEvent(SpawnParticleEvent evnt)
     {
-        GameObject prefab = particlesManager.GetParticlePrefab((ParticlesId) evnt.particleId);
+        GameObject prefab = particlesManager.GetParticlesPrefab((ParticlesId) evnt.particleId);
         GameObject particle = Instantiate(prefab, evnt.position, Quaternion.identity);
         ParticleSystem.MainModule main = particle.GetComponent<ParticleSystem>().main;
         main.startColor = new ParticleSystem.MinMaxGradient(evnt.color);
