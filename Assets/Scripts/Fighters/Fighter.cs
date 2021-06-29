@@ -83,6 +83,8 @@ public abstract class Fighter : MonoBehaviour
     public virtual float AbilityRange => 2 * Mathf.Log(10 * stats[StatisticManager.StatisticId.Lng].CurrentValue);
     protected float TargetRange => 2 * AbilityRange;
     public float TargetDistance => DistanceFrom(target);
+    public abstract ParticlesId DamageParticles { get; }
+    public abstract Color CharacterUnityColor { get ; }
 
     public virtual void EntityStart()
     {
@@ -256,7 +258,7 @@ public abstract class Fighter : MonoBehaviour
 
     protected virtual void EnergyChanged() {}
 
-    public void ApplyStatus(Status status, float time = 5f)
+    public void ApplyStatus(Status status, float time)
     {
         StartCoroutine(ApplyStatusForTime(status, time));
     }

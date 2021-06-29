@@ -1,10 +1,10 @@
 public enum ParticlesId
 {
     Target,
-    Damage,
+    PlayerDamage,
     Heal,
     Buff,
     Debuff,
     Stun,
-    EnemyAttack
+    EnemyDamage
 }

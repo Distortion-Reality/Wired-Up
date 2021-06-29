@@ -7,8 +7,8 @@ public class GreenAttack3 : Ability
 
     public override void DoAbility(Fighter user, Fighter target)
     {
-        Effects.ApplyDamage(user, target, power);
-        Effects.ApplyStun(user, target);
+        Effects.CalculateAndApplyDamage(user, target, power);
+        Effects.Stun(user, target);
 
         user.EndAbility();
     }

@@ -1,6 +1,3 @@
-using System.Collections;
-using UnityEngine;
-
 public class PurpleAttack2 : Ability
 {
     const int power = 5;
@@ -12,16 +9,7 @@ public class PurpleAttack2 : Ability
 
     public override void DoAbility(Fighter user, Fighter target)
     {
-        target.TargetAbilityManager.StartCoroutine(DamageOverTime(user, target));
+        Effects.DamageOverTime(user, target, power, rate, times);
         user.EndAbility();
-    }
-
-    static IEnumerator DamageOverTime(Fighter user, Fighter target)
-    {
-        for (int i = 0; i < times; i++)
-        {
-            Effects.ApplyDamage(user, target, power);
-            yield return new WaitForSeconds(rate);
-        }
     }
 }

@@ -17,6 +17,8 @@ public class Enemy : Fighter
     protected new IEnemyState State => entity.GetState<IEnemyState>();
     protected override float MovementSpeed => 1.5f * base.MovementSpeed;
     public override float AbilityRange => 1.5f * base.AbilityRange;
+    public override ParticlesId DamageParticles => ParticlesId.EnemyDamage;
+    public override Color CharacterUnityColor { get => Color.black; }
 
     protected override void InitStats()
     {
@@ -43,21 +45,13 @@ public class Enemy : Fighter
         base.EntityStart();
 
         // Abilities initialization
-        Ability attack1 = new RedAttack1();
-        Ability attack2 = new RedAttack2();
+        Ability attack1 = new EnemyAttack1();
+        Ability attack2 = new EnemyAttack2();
 
         attacks = new List<Ability>()
         {
             attack1,
             attack2,
-        };
-
-        // Assists initialization
-        Ability assist1 = new BlueAssist2();
-
-        assists = new List<Ability>()
-        {
-            assist1
         };
 
         agent = GetComponent<NavMeshAgent>();
@@ -70,6 +64,7 @@ public class Enemy : Fighter
         base.OwnerUpdate();
 
         UpdateMovement();
+        UpdateAbility();
     }
 
     protected override void UpdateMovement()
@@ -82,6 +77,11 @@ public class Enemy : Fighter
             agent.stoppingDistance = target.AbilityRange + 3;
             agent.speed = MovementSpeed;
         }
+    }
+
+    void UpdateAbility()
+    {
+        
     }
 
     public override void EntityUpdate()
@@ -113,7 +113,8 @@ public class Enemy : Fighter
     protected override void UseAbility(Ability ability)
     {
         FighterStatus = Status.Using;
-        ability.DoAbility(this, target);
+        Effects.FireRay(this, ability);
+        FighterStatus = Status.Free;
     }
 
     protected override void OnEndAbility()

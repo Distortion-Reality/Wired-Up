@@ -26,13 +26,13 @@ public class Player : Fighter
     Wire wire;
 
     public string PlayerName { get => playerName; }
-    public CharacterColor Character { get => character; }
-
     public Wire Wire { get => wire; }
 
     protected new IPlayerState State => entity.GetState<IPlayerState>();
     protected override Quaternion DefaultRotation =>
         new Quaternion(transform.rotation.x, cam.rotation.y, transform.rotation.z, cam.rotation.w);
+    public override ParticlesId DamageParticles => ParticlesId.PlayerDamage;
+    public override Color CharacterUnityColor { get => character.UnityColor(); }
 
     protected override void InitStats()
     {

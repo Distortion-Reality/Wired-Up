@@ -10,9 +10,8 @@ public class PurpleAttack1 : Ability
     public override void DoAbility(Fighter user, Fighter target)
     {
         int targetHP = target.Stats[StatisticManager.StatisticId.HP].CurrentValue;
-        int damage = Effects.Damage(user, target, power);
-        Effects.ChangeHP(user, target, damage);
-        Effects.ChangeHP(user, user, Mathf.Min(targetHP, damage));
+        int damage = Effects.CalculateAndApplyDamage(user, target, power);
+        Effects.ApplyHealing(user, user, Mathf.Min(targetHP, damage));
 
         user.EndAbility();
     }

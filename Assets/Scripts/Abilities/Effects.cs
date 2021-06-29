@@ -4,20 +4,15 @@ using Photon.Bolt;
 
 public static class Effects
 {
-    static void SendSpawnParticleEvent(Fighter user, ParticlesId id, Vector3 position)
-    {
-        Color color = ((Player) user).Character.UnityColor();
-        SpawnParticleEvent.Post(ReliabilityModes.ReliableOrdered, (int) id, color, position);
-    }
-
-    public static void ApplyDamage(Fighter user, Fighter target, int power)
-    {
-        ChangeHP(user, target, -Damage(user, target, power));
-    }
-
     public static int Damage(Fighter user, Fighter target, int power)
     {
         int userInt = user.Stats[StatisticManager.StatisticId.Int].CurrentValue;
+
+        return Damage(userInt, target, power);
+    }
+
+    static int Damage(int userInt, Fighter target, int power)
+    {
         int targetArm = target.Stats[StatisticManager.StatisticId.Arm].CurrentValue;
         float randomVal1 = Random.Range(0.8f, 1f);
         float randomVal2 = Random.Range(0.8f, 1f);
@@ -25,11 +20,42 @@ public static class Effects
         return Mathf.RoundToInt(userInt * power * randomVal1 / (targetArm * randomVal2));
     }
 
-    public static int ApplyHealing(Fighter user, Fighter target, float percentage)
+    public static void ApplyDamage(Fighter user, Fighter target, int damage)
     {
-        int healing = Healing(target, percentage);
-        ChangeHP(user, target, healing);
-        return healing;
+        ApplyDamage(user.DamageParticles, user.CharacterUnityColor, target, damage);
+    }
+
+    static void ApplyDamage(ParticlesId damageParticlesId, Color particlesColor, Fighter target, int damage)
+    {
+        ChangeHP(target, -damage);
+        SendSpawnParticleEvent(damageParticlesId, particlesColor, target.transform.position);
+    }
+
+    public static int CalculateAndApplyDamage(Fighter user, Fighter target, int power)
+    {
+        return CalculateAndApplyDamage(user.Stats[StatisticManager.StatisticId.Int].CurrentValue,
+            user.DamageParticles, user.CharacterUnityColor, target, power);
+    }
+
+    public static int CalculateAndApplyDamage(int userInt, ParticlesId damageParticlesId, Color particlesColor, Fighter target, int power)
+    {
+        int damage = Damage(userInt, target, power);
+        ApplyDamage(damageParticlesId, particlesColor, target, damage);
+        return damage;
+    }
+
+    public static void DamageOverTime(Fighter user, Fighter target, int power, float rate, float times)
+    {
+        target.TargetAbilityManager.StartCoroutine(ApplyDamageOverTime(user, target, power, rate, times));
+    }
+
+    static IEnumerator ApplyDamageOverTime(Fighter user, Fighter target, int power, float rate, float times)
+    {
+        for (int i = 0; i < times; i++)
+        {
+            Effects.CalculateAndApplyDamage(user, target, power);
+            yield return new WaitForSeconds(rate);
+        }
     }
 
     public static int Healing(Fighter target, float percentage)
@@ -37,39 +63,60 @@ public static class Effects
         return Mathf.RoundToInt(percentage * target.Stats[StatisticManager.StatisticId.HP].BaseValue);
     }
 
-    public static void ChangeHP(Fighter user, Fighter target, int change)
+    public static void ApplyHealing(Fighter user, Fighter target, int healing)
+    {
+        ChangeHP(target, healing);
+        SendSpawnParticleEvent(ParticlesId.Heal, user.CharacterUnityColor, target.transform.position);
+    }
+
+    public static int CalculateAndApplyHealing(Fighter user, Fighter target, float percentage)
+    {
+        int healing = Healing(target, percentage);
+        ApplyHealing(user, target, healing);
+        return healing;
+    }
+
+    static void ChangeHP(Fighter target, int change)
     {
         target.ChangeStat(StatisticManager.StatisticId.HP, change);
-
-        if (change > 0)
-            SendSpawnParticleEvent(user, ParticlesId.Heal, target.transform.position);
-        else
-            SendSpawnParticleEvent(user, ParticlesId.Damage, target.transform.position);
     }
 
     public static void BuffStat(Fighter user, Fighter target, StatisticManager.StatisticId statId, int stages)
     {
-        target.TargetAbilityManager.StartCoroutine(ApplyStatBuff(user, target, statId, stages));
+        target.TargetAbilityManager.StartCoroutine(ApplyStatBuff(target, statId, stages));
+        SendSpawnParticleEvent(ParticlesId.Buff, user.CharacterUnityColor, target.transform.position);
     }
 
-    static IEnumerator ApplyStatBuff(Fighter user, Fighter target, StatisticManager.StatisticId statId, int stages)
+    public static void DebuffStat(Fighter user, Fighter target, StatisticManager.StatisticId statId, int stages)
+    {
+        target.TargetAbilityManager.StartCoroutine(ApplyStatBuff(target, statId, -stages));
+        SendSpawnParticleEvent(ParticlesId.Debuff, user.CharacterUnityColor, target.transform.position);
+    }
+
+    static IEnumerator ApplyStatBuff(Fighter target, StatisticManager.StatisticId statId, int stages)
     {
         target.ChangeStat(statId, stages);
-
-        if (stages > 0)
-            SendSpawnParticleEvent(user, ParticlesId.Buff, target.transform.position);
-        else
-            SendSpawnParticleEvent(user, ParticlesId.Debuff, target.transform.position);
-
         yield return new WaitForSeconds(45f);
-        target.ChangeStat(statId, - stages);
+        target.ChangeStat(statId, -stages);
     }
 
-    public static void ApplyStun(Fighter user, Fighter target)
+    public static void Stun(Fighter user, Fighter target, float time = 5f)
     {
-        target.ApplyStatus(Fighter.Status.Stunned);
+        target.ApplyStatus(Fighter.Status.Stunned, time);
+        SendSpawnParticleEvent(ParticlesId.Stun, user.CharacterUnityColor, target.transform.position);
+    }
 
-        SendSpawnParticleEvent(user, ParticlesId.Stun, target.transform.position);
+    public static void BlockMovements(Fighter user, Fighter target, float time)
+    {
+        target.TargetAbilityManager.StartCoroutine(ApplyBlockMovements(target, time));
+        SendSpawnParticleEvent(ParticlesId.Stun, user.CharacterUnityColor, target.transform.position);
+    }
+
+    static IEnumerator ApplyBlockMovements(Fighter target, float time)
+    {
+        target.MovementsBlocked = true;
+        yield return new WaitForSeconds(time);
+        target.MovementsBlocked = false;
     }
 
     public static Collider[] AreaOfEffect(Fighter target, float radius)
@@ -79,5 +126,17 @@ public static class Effects
             LayerMask.GetMask(target.GetType().Name));
 
         return colliders;
+    }
+
+    static void SendSpawnParticleEvent(ParticlesId particlesId, Color particlesColor, Vector3 position)
+    {
+        SpawnParticleEvent.Post(ReliabilityModes.ReliableOrdered, (int)particlesId, particlesColor, position);
+    }
+
+    public static void FireRay(Fighter user, Ability ability)
+    {
+        // EnemyAttackRay ray = bolt entity
+        EnemyAbilityRay ray = Object.Instantiate(Object.FindObjectOfType<AbilityManager>().enemyAbilityRay);
+        ray.FireRay(user, ability);
     }
 }

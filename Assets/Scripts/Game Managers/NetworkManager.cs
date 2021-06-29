@@ -103,7 +103,7 @@ public class NetworkManager : GlobalEventListener {
 
     public override void OnEvent(SpawnParticleEvent evnt)
     {
-        GameObject prefab = particlesManager.GetParticlePrefab((ParticlesId) evnt.particleId);
+        GameObject prefab = particlesManager.GetParticlesPrefab((ParticlesId) evnt.particleId);
         GameObject particle = Instantiate(prefab, evnt.position, Quaternion.identity);
         ParticleSystem.MainModule main = particle.GetComponent<ParticleSystem>().main;
         main.startColor = new ParticleSystem.MinMaxGradient(evnt.color);

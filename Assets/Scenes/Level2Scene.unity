@@ -493,6 +493,7 @@ GameObject:
   - component: {fileID: 336945206}
   - component: {fileID: 336945208}
   - component: {fileID: 336945209}
+  - component: {fileID: 336945211}
   - component: {fileID: 336945210}
   m_Layer: 0
   m_Name: Manager
@@ -571,6 +572,19 @@ MonoBehaviour:
   - {fileID: 7971709731857246437, guid: 58cb3653f1a312d48aedd44005f82af4, type: 3}
   - {fileID: 7509495637113929742, guid: 4c45554861433cb4e9eca2612de431f7, type: 3}
   - {fileID: 8941844998022827710, guid: 0dbfe37d1a4882e42923b7ac8e05c96f, type: 3}
+--- !u!114 &336945211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 336945205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bfa49169abe3134bb51c7eddd7f9fa6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyAbilityRay: {fileID: 0}
 --- !u!1001 &388880773
 PrefabInstance:
   m_ObjectHideFlags: 0
