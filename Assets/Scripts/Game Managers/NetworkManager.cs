@@ -32,10 +32,13 @@ public class NetworkManager : GlobalEventListener {
         LevelSpawnInfo spawnInfo = (LevelSpawnInfo) token;
         Transform spawnPoint = GameObject.Find("PlayersSpawnPoint").transform;
         Vector3 spawnPosition = spawnPoint.position;
-        if (characterManager.CurrentCharacter == spawnInfo.left)
+        if (!BoltNetwork.IsServer)
+        {
+            if (characterManager.CurrentCharacter == spawnInfo.left)
             spawnPosition += Vector3.left * 5;
-        else if (characterManager.CurrentCharacter == spawnInfo.right)
+            else if (characterManager.CurrentCharacter == spawnInfo.right)
             spawnPosition += Vector3.right * 5;
+        }
 
         BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Player, info, spawnPosition, spawnPoint.rotation);
 

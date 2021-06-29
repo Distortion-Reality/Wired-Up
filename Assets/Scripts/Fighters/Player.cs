@@ -10,6 +10,7 @@ public class Player : Fighter
     string playerName;
     CharacterColor character;
 
+    GameMenu gameMenu;
     Slider energyBar;
     public GameObject allyInfoPrefab;
     const float allyInfoYOffset = 100f;
@@ -106,6 +107,7 @@ public class Player : Fighter
         cam = Camera.main.transform;
 
         // UI initialization
+        gameMenu = gui.GetComponent<GameMenu>();
         Color color = character.UnityColor();
 
         if (entity.IsOwner)
@@ -135,6 +137,11 @@ public class Player : Fighter
 
     public override void OwnerUpdate()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            gameMenu.Trigger();
+        if (gameMenu.IsOpen)
+            return;
+
         base.OwnerUpdate();
 
         if (FighterStatus != Status.Stunned)
@@ -153,6 +160,9 @@ public class Player : Fighter
 
     public override void OwnerFixedUpdate()
     {
+        if (gameMenu.IsOpen)
+            return;
+        
         UpdateMovement();
 
         base.OwnerFixedUpdate();

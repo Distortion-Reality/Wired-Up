@@ -121,8 +121,12 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
         if ((BoltNetwork.IsServer && (lobbyManager.CanStart() || lobbyManager.ForceStart(entity))))
         {
             LevelSpawnInfo info = new LevelSpawnInfo();
-            info.left = (CharacterColor) lobbyManager.Players[1].currentIndex;
-            info.right = (CharacterColor) lobbyManager.Players[2].currentIndex;
+            if (!lobbyManager.forceStart)
+            {
+                info.left = (CharacterColor) lobbyManager.Players[1].currentIndex;
+                info.right = (CharacterColor) lobbyManager.Players[2].currentIndex;
+            }
+            
             BoltNetwork.LoadScene("Level2Scene", info);
         }
     }
