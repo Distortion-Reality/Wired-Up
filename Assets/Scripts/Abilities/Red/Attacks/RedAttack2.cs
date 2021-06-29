@@ -12,7 +12,6 @@ public class RedAttack2 : Ability
     public override void DoAbility(Fighter user, Fighter target)
     {
         target.TargetAbilityManager.StartCoroutine(LiftAndSlam(user, target));
-        Debug.Log("executing ability for" + ((Player)user).PlayerName);
 
         if (user is Player player)
         {
@@ -65,12 +64,10 @@ public class RedAttack2 : Ability
         Effects.ApplyDamage(user, target, power);
 
         user.EndAbility();
-        Debug.Log("end liftandslam");
     }
 
     IEnumerator WiresLookAtTarget(Player user, Fighter target)
     {
-        Debug.Log("wirelook for " + user.PlayerName);
         Wire wire = user.Wire;
         Quaternion defaultWireParentLocalRotation = wire.transform.parent.localRotation;
 

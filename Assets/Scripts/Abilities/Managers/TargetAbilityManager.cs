@@ -79,9 +79,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
         while (userAbilityQueue.Count > 0)
         {
             UserAbility userAbility = userAbilityQueue.Dequeue();
-            Debug.Log("start ability of " + ((Player)userAbility.User).PlayerName);
             userAbility.DoUserAbility(target);
-            Debug.Log("done ability of " + ((Player)userAbility.User).PlayerName);
 
             yield return new WaitUntil(() => userAbility.User.FighterStatus == Fighter.Status.Disconnecting);
         }
