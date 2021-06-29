@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6068656868746253862}
   - component: {fileID: -4887016945359973865}
   m_Layer: 0
-  m_Name: Enemy Attack Particles
+  m_Name: Enemy Damage Particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4815,7 +4815,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: bb6cdd13aeb95f743847b1cd460889bc, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
