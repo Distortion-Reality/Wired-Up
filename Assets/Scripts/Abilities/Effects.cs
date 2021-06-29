@@ -28,7 +28,7 @@ public static class Effects
     static void ApplyDamage(ParticlesId damageParticlesId, Color particlesColor, Fighter target, int damage)
     {
         ChangeHP(target, -damage);
-        SendSpawnParticleEvent(damageParticlesId, particlesColor, target.transform.position);
+        SendSpawnParticleEvent(target, damageParticlesId, particlesColor);
     }
 
     public static int CalculateAndApplyDamage(Fighter user, Fighter target, int power)
@@ -66,7 +66,7 @@ public static class Effects
     public static void ApplyHealing(Fighter user, Fighter target, int healing)
     {
         ChangeHP(target, healing);
-        SendSpawnParticleEvent(ParticlesId.Heal, user.CharacterUnityColor, target.transform.position);
+        SendSpawnParticleEvent(target, ParticlesId.Heal, user.CharacterUnityColor);
     }
 
     public static int CalculateAndApplyHealing(Fighter user, Fighter target, float percentage)
@@ -84,13 +84,13 @@ public static class Effects
     public static void BuffStat(Fighter user, Fighter target, StatisticManager.StatisticId statId, int stages)
     {
         target.TargetAbilityManager.StartCoroutine(ApplyStatBuff(target, statId, stages));
-        SendSpawnParticleEvent(ParticlesId.Buff, user.CharacterUnityColor, target.transform.position);
+        SendSpawnParticleEvent(target, ParticlesId.Buff, user.CharacterUnityColor);
     }
 
     public static void DebuffStat(Fighter user, Fighter target, StatisticManager.StatisticId statId, int stages)
     {
         target.TargetAbilityManager.StartCoroutine(ApplyStatBuff(target, statId, -stages));
-        SendSpawnParticleEvent(ParticlesId.Debuff, user.CharacterUnityColor, target.transform.position);
+        SendSpawnParticleEvent(target, ParticlesId.Debuff, user.CharacterUnityColor);
     }
 
     static IEnumerator ApplyStatBuff(Fighter target, StatisticManager.StatisticId statId, int stages)
@@ -103,13 +103,13 @@ public static class Effects
     public static void Stun(Fighter user, Fighter target, float time = 5f)
     {
         target.ApplyStatus(Fighter.Status.Stunned, time);
-        SendSpawnParticleEvent(ParticlesId.Stun, user.CharacterUnityColor, target.transform.position);
+        SendSpawnParticleEvent(target, ParticlesId.Stun, user.CharacterUnityColor);
     }
 
     public static void BlockMovements(Fighter user, Fighter target, float time)
     {
         target.TargetAbilityManager.StartCoroutine(ApplyBlockMovements(target, time));
-        SendSpawnParticleEvent(ParticlesId.Stun, user.CharacterUnityColor, target.transform.position);
+        SendSpawnParticleEvent(target, ParticlesId.Stun, user.CharacterUnityColor);
     }
 
     static IEnumerator ApplyBlockMovements(Fighter target, float time)
@@ -128,16 +128,14 @@ public static class Effects
         return colliders;
     }
 
-    static void SendSpawnParticleEvent(ParticlesId particlesId, Color particlesColor, Vector3 position)
+    static void SendSpawnParticleEvent(Fighter target, ParticlesId particlesId, Color particlesColor)
     {
-        SpawnParticleEvent.Post(ReliabilityModes.ReliableOrdered, (int)particlesId, particlesColor, position);
+        SpawnParticleEvent.Post(ReliabilityModes.ReliableOrdered, target.EntityId, (int)particlesId, particlesColor);
     }
 
     public static void FireRay(Fighter user, Ability ability)
     {
-        // EnemyAttackRay ray = bolt entity
-        GameObject ray = Object.Instantiate(Object.FindObjectOfType<AbilityManager>().enemyAbilityRay,
-            user.transform.position, user.transform.rotation);
+        GameObject ray = BoltNetwork.Instantiate(BoltPrefabs.EnemyAttackRay, user.CentrePosition, user.transform.rotation);
         ray.GetComponent<EnemyAbilityRay>().FireRay(user, ability);
     }
 }
