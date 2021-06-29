@@ -124,9 +124,32 @@ public class NetworkManager : GlobalEventListener {
 
     public override void OnEvent(SpawnParticleEvent evnt)
     {
-        GameObject prefab = particlesManager.GetParticlesPrefab((ParticlesId) evnt.particleId);
-        GameObject particle = Instantiate(prefab, evnt.position, Quaternion.identity);
+        ParticlesId id = (ParticlesId) evnt.particleId;
+        Fighter target = fighters[evnt.entityId];
+        Vector3 position;
+        switch (id)
+        {
+            case ParticlesId.EnemyDamage:
+            case ParticlesId.PlayerDamage:
+            case ParticlesId.Heal:
+                position = target.CentrePosition;
+                break;
+            case ParticlesId.Buff:
+            case ParticlesId.Debuff:
+            case ParticlesId.Stun:
+                position = target.TopPosition;
+                break;
+            case ParticlesId.Target:
+                position = target.BottomPosition;
+                break;
+            default:
+                position = Vector3.zero;
+                break;
+        }
+        GameObject prefab = particlesManager.GetParticlesPrefab(id);
+        GameObject particle = Instantiate(prefab, position, target.transform.rotation);
         ParticleSystem.MainModule main = particle.GetComponent<ParticleSystem>().main;
         main.startColor = new ParticleSystem.MinMaxGradient(evnt.color);
+        particle.transform.SetParent(target.transform, true);
     }
 }
