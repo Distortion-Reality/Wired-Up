@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,7 +27,7 @@ public class Enemy : Fighter
         FighterBuffableStatistic armor = new FighterBuffableStatistic(50);
         FighterBuffableStatistic length = new FighterBuffableStatistic(50);
         FighterBuffableStatistic intensity = new FighterBuffableStatistic(10);
-        FighterEnergy energy = new FighterEnergy(20);
+        FighterEnergy energy = new FighterEnergy(100);
         FighterBuffableStatistic speed = new FighterBuffableStatistic(50);
 
         stats = new Dictionary<StatisticManager.StatisticId, FighterStatistic>()
@@ -57,6 +58,9 @@ public class Enemy : Fighter
         agent = GetComponent<NavMeshAgent>();
 
         healthBar = Instantiate(enemyHealthBarPrefab, parent: gui.transform).GetComponent<Slider>();
+
+        // Initialize first attack
+        currentAbility = attack1;
     }
 
     public override void OwnerUpdate()
@@ -64,7 +68,9 @@ public class Enemy : Fighter
         base.OwnerUpdate();
 
         UpdateMovement();
-        UpdateAbility();
+
+        if (FighterStatus == Status.Free && target)
+            UpdateAbility();
     }
 
     protected override void UpdateMovement()
@@ -73,7 +79,7 @@ public class Enemy : Fighter
             FighterStatus != Status.Waiting && FighterStatus != Status.Using &&
             FighterStatus != Status.Stunned && !movementsBlocked)
         {
-            agent.destination = target.BasePosition;
+            agent.destination = target.BottomPosition;
             agent.stoppingDistance = target.AbilityRange + 3;
             agent.speed = MovementSpeed;
         }
@@ -81,7 +87,20 @@ public class Enemy : Fighter
 
     void UpdateAbility()
     {
-        
+        if (DistanceFrom(target) < AbilityRange && currentAbility != null)
+            SelectAbility(currentAbility);
+    }
+
+    IEnumerator AbilityAnimationCooldown()
+    {
+        yield return new WaitForSeconds(2f);
+        EndAbility();
+    }
+
+    IEnumerator UseAbilityCooldown()
+    {
+        yield return new WaitForSeconds(2f);
+        currentAbility = attacks[Random.Range(0, attacks.Count)];
     }
 
     public override void EntityUpdate()
@@ -114,12 +133,15 @@ public class Enemy : Fighter
     {
         FighterStatus = Status.Using;
         Effects.FireRay(this, ability);
-        FighterStatus = Status.Free;
+
+        StartCoroutine(AbilityAnimationCooldown());
     }
 
     protected override void OnEndAbility()
     {
         base.OnEndAbility();
         FighterStatus = Status.Free;
+
+        StartCoroutine(UseAbilityCooldown());
     }
 }

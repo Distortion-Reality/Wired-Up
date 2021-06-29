@@ -11484,8 +11484,7 @@ GameObject:
   - component: {fileID: 8675912992726391284}
   - component: {fileID: 6261644948766717272}
   - component: {fileID: 8675912992726391281}
-  - component: {fileID: 8675912992726391279}
-  - component: {fileID: 8675912992536992478}
+  - component: {fileID: 7318276593717771212}
   - component: {fileID: -7587929950226072440}
   - component: {fileID: -5094576705429482036}
   - component: {fileID: 6049302253457917196}
@@ -11550,8 +11549,8 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 116
   m_CollisionDetection: 0
---- !u!135 &8675912992726391279
-SphereCollider:
+--- !u!65 &7318276593717771212
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -11561,22 +11560,8 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.41
-  m_Center: {x: 0, y: 1.88, z: 0.58}
---- !u!136 &8675912992536992478
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8675912992726391280}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.6
-  m_Height: 2.2
-  m_Direction: 1
-  m_Center: {x: 0, y: 1.1, z: 0.1}
+  m_Size: {x: 1, y: 2, z: 0.8}
+  m_Center: {x: 0, y: 1, z: 0.1}
 --- !u!114 &-7587929950226072440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11591,7 +11576,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sceneGuid: 
   _serializerGuid: 799b3f77-3c57-471d-a6ab-aafd43b42df6
-  _prefabId: 2
+  _prefabId: 1
   _updateRate: 1
   _autoFreezeProxyFrames: 0
   _clientPredicted: 1

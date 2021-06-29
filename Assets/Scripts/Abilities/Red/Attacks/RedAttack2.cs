@@ -74,10 +74,10 @@ public class RedAttack2 : Ability
         while (!target.Grounded)
         {
             if (user.Entity.IsOwner)
-                wire.transform.parent.LookAt(target.BasePosition);
+                wire.transform.parent.LookAt(target.BottomPosition);
             else
                 ChangeWireRotationEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
-                    user.EntityId, target.BasePosition, false);
+                    user.EntityId, target.BottomPosition, false);
             yield return null;
         }
 

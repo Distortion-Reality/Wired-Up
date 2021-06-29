@@ -4330,7 +4330,7 @@ GameObject:
   - component: {fileID: 8963619295255102013}
   - component: {fileID: 1523669455697562272}
   m_Layer: 0
-  m_Name: Yellow Player Prefab
+  m_Name: Yellow Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
