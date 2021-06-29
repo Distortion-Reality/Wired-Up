@@ -12,6 +12,8 @@ public class LobbyManager : GlobalEventListener
     public float xSpawnPosOffset = 250.0f;
     public bool forceStart = false;
 
+    public List<LobbyPlayer> Players { get => allPlayers; }
+
     void Start()
     {
         canvas = GetComponent<Canvas>().transform;

@@ -28,8 +28,16 @@ public class NetworkManager : GlobalEventListener {
             name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName),
             character = characterManager.CurrentCharacter
         };
-        Transform players = GameObject.Find("Players").transform;
-        BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Player, info, players.position, players.rotation);
+
+        LevelSpawnInfo spawnInfo = (LevelSpawnInfo) token;
+        Transform spawnPoint = GameObject.Find("PlayersSpawnPoint").transform;
+        Vector3 spawnPosition = spawnPoint.position;
+        if (characterManager.CurrentCharacter == spawnInfo.left)
+            spawnPosition += Vector3.left * 5;
+        else if (characterManager.CurrentCharacter == spawnInfo.right)
+            spawnPosition += Vector3.right * 5;
+
+        BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Player, info, spawnPosition, spawnPoint.rotation);
 
         // Setup player camera
         GameObject playerCamera = GameObject.Find("PlayerCamera");
