@@ -11,7 +11,7 @@ public class TargetEnemyAbilityManager : TargetAbilityManager
         base.EnqueueUserAbility(user, ability);
 
         if (userAbilityQueue.Count < minAbilities && user is Player player)
-            Effects.SendSpawnParticleEvent(ParticlesId.Target, player.CharacterUnityColor, target.BottomPosition);
+            Effects.SendSpawnParticleEvent(target, ParticlesId.Target, player.CharacterUnityColor);
     }
 
     protected override void CheckUserAbilityQueue(UserAbility userAbility)
@@ -19,7 +19,7 @@ public class TargetEnemyAbilityManager : TargetAbilityManager
         if (usersAreUsing)
         {
             userAbility.UseEnergy();
-            userAbility.User.FighterStatus = Fighter.Status.Using; // TODO: send event to change state
+            userAbility.User.FighterStatus = Fighter.Status.Using;
         }
         else if (userAbilityQueue.Count == 1)
             StartCoroutine(WaitForOtherAbilities());

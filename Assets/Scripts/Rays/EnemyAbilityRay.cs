@@ -5,12 +5,17 @@ using Photon.Bolt;
 [RequireComponent(typeof(LineRenderer))]
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
-public class EnemyAbilityRay : MonoBehaviour
+public class EnemyAbilityRay : EntityBehaviour<IEnemyRayState>
 {
     const float speed = 10f;
 
     Fighter user;
     Ability ability;
+
+    public override void Attached()
+    {
+        state.SetTransforms(state.transform, transform, transform);
+    }
 
     public void FireRay(Fighter user, Ability ability)
     {
