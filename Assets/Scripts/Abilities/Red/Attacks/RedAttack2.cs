@@ -61,7 +61,7 @@ public class RedAttack2 : Ability
         if (targetIsEnemy)
             ((Enemy)target).SetAgentUpdatePosition(true);
 
-        Effects.ApplyDamage(user, target, power);
+        Effects.CalculateAndApplyDamage(user, target, power);
 
         user.EndAbility();
     }
@@ -80,8 +80,6 @@ public class RedAttack2 : Ability
             else
                 ChangeWireRotationEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
                     user.EntityId, rotation, false);
-                
-                
             yield return null;
         }
 
