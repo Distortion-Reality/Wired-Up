@@ -134,9 +134,9 @@ public static class Effects
         SpawnParticleEvent.Post(ReliabilityModes.ReliableOrdered, target.EntityId, (int)particlesId, particlesColor);
     }
 
-    public static void FireRay(Fighter user, Ability ability)
+    public static void FireRay(Enemy user, Ability ability)
     {
-        GameObject ray = BoltNetwork.Instantiate(BoltPrefabs.EnemyAttackRay, user.CentrePosition, user.transform.rotation);
+        GameObject ray = BoltNetwork.Instantiate(BoltPrefabs.EnemyAttackRay, user.FirePosition, user.transform.rotation);
         ray.GetComponent<EnemyAbilityRay>().FireRay(user, ability);
     }
 }

@@ -6,5 +6,8 @@ public enum ParticlesId
     Buff,
     Debuff,
     Stun,
-    EnemyDamage
+    EnemyDamage,
+    KirinDamage,
+    KirinBurst,
+    Death
 }

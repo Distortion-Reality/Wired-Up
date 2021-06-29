@@ -22,14 +22,15 @@ public class Enemy : Fighter
     public override float AbilityRange => 1.5f * base.AbilityRange;
     public override ParticlesId DamageParticles => ParticlesId.EnemyDamage;
     public override Color CharacterUnityColor { get => Color.black; }
+    public virtual Vector3 FirePosition => CentrePosition;
 
     protected override void InitStats()
     {
-        FighterRangedStatistic hp = new FighterRangedStatistic(100);
-        FighterBuffableStatistic armor = new FighterBuffableStatistic(50);
+        FighterRangedStatistic hp = new FighterRangedStatistic(80);
+        FighterBuffableStatistic armor = new FighterBuffableStatistic(30);
         FighterBuffableStatistic length = new FighterBuffableStatistic(50);
-        FighterBuffableStatistic intensity = new FighterBuffableStatistic(10);
-        FighterEnergy energy = new FighterEnergy(100);
+        FighterBuffableStatistic intensity = new FighterBuffableStatistic(30);
+        FighterEnergy energy = new FighterEnergy(50);
         FighterBuffableStatistic speed = new FighterBuffableStatistic(50);
 
         stats = new Dictionary<StatisticManager.StatisticId, FighterStatistic>()

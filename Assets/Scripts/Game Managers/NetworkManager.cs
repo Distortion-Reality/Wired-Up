@@ -20,8 +20,10 @@ public class NetworkManager : GlobalEventListener {
 
     public override void SceneLoadLocalDone(string scene, IProtocolToken token)
     {
+        Destroy(GameObject.Find("Menu Audio"));
+
         // Spawn player
-        CharacterManager characterManager = GameObject.FindObjectOfType<CharacterManager>();
+        CharacterManager characterManager = FindObjectOfType<CharacterManager>();
         PlayerInfo info = new PlayerInfo
         {
             guid = Guid.NewGuid(),
@@ -131,7 +133,10 @@ public class NetworkManager : GlobalEventListener {
         {
             case ParticlesId.EnemyDamage:
             case ParticlesId.PlayerDamage:
+            case ParticlesId.KirinDamage:
+            case ParticlesId.KirinBurst:
             case ParticlesId.Heal:
+            case ParticlesId.Death:
                 position = target.CentrePosition;
                 break;
             case ParticlesId.Buff:
