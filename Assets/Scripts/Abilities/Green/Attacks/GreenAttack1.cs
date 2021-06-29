@@ -8,6 +8,6 @@ public class GreenAttack1 : Ability
     public override void DoAbility(Fighter user, Fighter target)
     {
         Effects.BlockMovements(user, target, time);
-        user.EndAbility();
+        DelayEndAbility(user, ParticlesId.Stun);
     }
 }

@@ -15,6 +15,14 @@ public class GreenAssist3 : Ability
     {
         int selfDamage = user.Stats[StatisticManager.StatisticId.HP].CurrentValue / 4;
         Effects.ApplyDamage(user, user, selfDamage);
+        user.StartCoroutine(WaitForParticles(user, target, user.DamageParticles));
+    }
+
+    IEnumerator WaitForParticles(Fighter user, Fighter target, ParticlesId particlesId)
+    {
+        float duration = Object.FindObjectOfType<ParticlesManager>()
+            .GetParticlesPrefab(particlesId).GetComponent<ParticleSystem>().main.duration;
+        yield return new WaitForSeconds(duration);
 
         target.TargetAbilityManager.StartCoroutine(HealingOverTimeAOE(user, target));
 

@@ -4,9 +4,9 @@ using Photon.Bolt;
 
 public class RedAttack2 : Ability
 {
-    const int power = 30;
+    const int power = 40;
 
-    public override int Energy => 20;
+    public override int Energy => 30;
     public override AbilityId Id => AbilityId.RedAttack2;
 
     public override void DoAbility(Fighter user, Fighter target)

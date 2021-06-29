@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using Photon.Bolt;
 
 public class TargetEnemyAbilityManager : TargetAbilityManager
 {
@@ -12,8 +11,7 @@ public class TargetEnemyAbilityManager : TargetAbilityManager
         base.EnqueueUserAbility(user, ability);
 
         if (userAbilityQueue.Count < minAbilities && user is Player player)
-            SpawnParticleEvent.Post(ReliabilityModes.ReliableOrdered, (int)ParticlesId.Target, 
-                player.CharacterUnityColor, target.transform.position);
+            Effects.SendSpawnParticleEvent(ParticlesId.Target, player.CharacterUnityColor, target.BottomPosition);
     }
 
     protected override void CheckUserAbilityQueue(UserAbility userAbility)

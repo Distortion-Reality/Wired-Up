@@ -10,6 +10,6 @@ public class PurpleAttack2 : Ability
     public override void DoAbility(Fighter user, Fighter target)
     {
         Effects.DamageOverTime(user, target, power, rate, times);
-        user.EndAbility();
+        DelayEndAbility(user, user.DamageParticles);
     }
 }
