@@ -4,6 +4,15 @@ using Photon.Bolt;
 
 public class EnemyManager : GlobalEventListener
 {
+    [Header("Peripherals Prefabs")]
+    public GameObject blue;
+    public GameObject red;
+    public GameObject green;
+    public GameObject yellow;
+    
+    [Header("Bosses Prefabs")]
+    public GameObject kirin;
+
     readonly List<Player> players = new List<Player>();
     readonly List<Enemy> enemies = new List<Enemy>();
 
@@ -29,5 +38,23 @@ public class EnemyManager : GlobalEventListener
             players.Remove(entity.GetComponent<Player>());
         else if (entity.StateIs<IEnemyState>())
             enemies.Remove(entity.GetComponent<Enemy>());
+    }
+
+    public GameObject GetPrefab(EnemyId id)
+    {
+        switch (id)
+        {
+            case EnemyId.BluePeripheral:
+                return blue;
+            case EnemyId.GreenPeripheral:
+                return green;
+            case EnemyId.RedPeripheral:
+                return red;
+            case EnemyId.YellowPeripheral:
+                return yellow;
+            case EnemyId.Kirin:
+                return kirin;
+        }
+        return null;
     }
 }

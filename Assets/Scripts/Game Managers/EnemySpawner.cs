@@ -3,12 +3,17 @@ using Photon.Bolt;
 
 public class EnemySpawner : EntitySpawner
 {
-    public GameObject modelPrefab;
+    public EnemyId enemyId;
 
-    protected override BoltEntity InstantiatePrefab(FighterInfo info)
+    protected override FighterInfo CreateToken()
     {
-        BoltEntity boltEntity = base.InstantiatePrefab(info);
-        Instantiate(modelPrefab, parent: boltEntity.transform);
-        return boltEntity;
+        return new EnemyInfo();
+    }
+
+    protected override FighterInfo BuildToken()
+    {
+        EnemyInfo token = (EnemyInfo) base.BuildToken();
+        token.enemyId = enemyId;
+        return token; 
     }
 }

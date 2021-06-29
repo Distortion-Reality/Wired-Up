@@ -64,14 +64,11 @@ public class Player : Fighter
         character = info.character;
     }
 
-    protected override void InitAnimator()
+    protected override void LoadModel()
     {
-        // Load character model
         CharacterManager characterManager = FindObjectOfType<CharacterManager>();
-        GameObject modelPrefab = characterManager.GetPrefab(character);
-        GameObject model = Instantiate(modelPrefab, parent: transform);
-
-        animator = model.GetComponent<Animator>();
+        GameObject prefab = characterManager.GetPrefab(character);
+        Instantiate(prefab, parent: transform);
     }
 
     public override void EntityStart()
