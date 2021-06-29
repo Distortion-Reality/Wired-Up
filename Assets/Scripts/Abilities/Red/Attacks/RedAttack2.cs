@@ -69,24 +69,22 @@ public class RedAttack2 : Ability
     IEnumerator WiresLookAtTarget(Player user, Fighter target)
     {
         Wire wire = user.Wire;
-        Quaternion defaultWireParentLocalRotation = wire.transform.parent.localRotation;
+        //Quaternion defaultWireParentLocalRotation = wire.transform.parent.localRotation;
 
         while (!target.Grounded)
         {
-            Quaternion rotation = Quaternion.LookRotation(target.BasePosition - wire.transform.position);
-
             if (user.Entity.IsOwner)
-                wire.transform.parent.rotation = rotation;
+                wire.transform.parent.LookAt(target.BasePosition);
             else
                 ChangeWireRotationEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
-                    user.EntityId, rotation, false);
+                    user.EntityId, target.BasePosition, false);
             yield return null;
         }
 
         if (user.Entity.IsOwner)
-            wire.transform.parent.localRotation = defaultWireParentLocalRotation;
+            wire.transform.parent.localRotation = Quaternion.identity;
         else
             ChangeWireRotationEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
-                    user.EntityId, defaultWireParentLocalRotation, true);
+                    user.EntityId, Vector3.zero, true);
     }
 }
