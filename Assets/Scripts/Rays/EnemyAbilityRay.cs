@@ -7,7 +7,7 @@ using Photon.Bolt;
 [RequireComponent(typeof(Rigidbody))]
 public class EnemyAbilityRay : EntityBehaviour<IEnemyRayState>
 {
-    const float speed = 10f;
+    const float speed = 20f;
 
     Fighter user;
     Ability ability;
