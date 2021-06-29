@@ -12,9 +12,15 @@ public class RedAttack2 : Ability
     public override void DoAbility(Fighter user, Fighter target)
     {
         target.TargetAbilityManager.StartCoroutine(LiftAndSlam(user, target));
+        Debug.Log("executing ability for" + ((Player)user).PlayerName);
 
-        if (user.CompareTag("Player"))
-            target.TargetAbilityManager.StartCoroutine(WiresLookAtTarget((Player)user, target));
+        if (user is Player player)
+        {
+            target.TargetAbilityManager.StartCoroutine(WiresLookAtTarget(player, target));
+            foreach (Fighter enqueued in target.TargetAbilityManager.UsersInQueue)
+                if (enqueued is Player enqueuedPlayer)
+                    target.TargetAbilityManager.StartCoroutine(WiresLookAtTarget(enqueuedPlayer, target));
+        }
     }
 
     IEnumerator LiftAndSlam(Fighter user, Fighter target)
@@ -59,10 +65,12 @@ public class RedAttack2 : Ability
         Effects.ApplyDamage(user, target, power);
 
         user.EndAbility();
+        Debug.Log("end liftandslam");
     }
 
     IEnumerator WiresLookAtTarget(Player user, Fighter target)
     {
+        Debug.Log("wirelook for " + user.PlayerName);
         Wire wire = user.Wire;
         Quaternion defaultWireParentLocalRotation = wire.transform.parent.localRotation;
 
@@ -74,7 +82,7 @@ public class RedAttack2 : Ability
                 wire.transform.parent.rotation = rotation;
             else
                 ChangeWireRotationEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
-                    user.EntityId, rotation);
+                    user.EntityId, rotation, false);
                 
                 
             yield return null;
@@ -84,6 +92,6 @@ public class RedAttack2 : Ability
             wire.transform.parent.localRotation = defaultWireParentLocalRotation;
         else
             ChangeWireRotationEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
-                    user.EntityId, defaultWireParentLocalRotation);
+                    user.EntityId, defaultWireParentLocalRotation, true);
     }
 }

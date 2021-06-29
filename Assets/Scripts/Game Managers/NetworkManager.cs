@@ -98,7 +98,11 @@ public class NetworkManager : GlobalEventListener {
 
     public override void OnEvent(ChangeWireRotationEvent evnt)
     {
-        ((Player) fighters[evnt.entityId]).Wire.transform.parent.localRotation = evnt.rotation;
+        Transform wire = ((Player) fighters[evnt.entityId]).Wire.transform.parent;
+        if (evnt.local)
+            wire.localRotation = evnt.rotation;
+        else
+            wire.rotation = evnt.rotation;
     }
 
     public override void OnEvent(SpawnParticleEvent evnt)
