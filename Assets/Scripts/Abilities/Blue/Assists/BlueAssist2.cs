@@ -13,6 +13,6 @@ public class BlueAssist2 : Ability
         StatisticManager.StatisticId statId = StatisticManager.BuffableStats[statIndex];
         Effects.BuffStat(user, target, statId, stages);
 
-        user.EndAbility();
+        DelayEndAbility(user, ParticlesId.Buff);
     }
 }

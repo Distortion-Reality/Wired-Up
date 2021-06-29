@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PurpleAttack1 : Ability
@@ -11,8 +12,16 @@ public class PurpleAttack1 : Ability
     {
         int targetHP = target.Stats[StatisticManager.StatisticId.HP].CurrentValue;
         int damage = Effects.CalculateAndApplyDamage(user, target, power);
-        Effects.ApplyHealing(user, user, Mathf.Min(targetHP, damage));
+        user.StartCoroutine(WaitForParticles(user, targetHP, damage, user.DamageParticles));
+    }
 
-        user.EndAbility();
+    IEnumerator WaitForParticles(Fighter user, int targetHP, int damage, ParticlesId particlesId)
+    {
+        float duration = Object.FindObjectOfType<ParticlesManager>()
+            .GetParticlesPrefab(particlesId).GetComponent<ParticleSystem>().main.duration;
+        yield return new WaitForSeconds(duration / 2);
+
+        Effects.ApplyHealing(user, user, Mathf.Min(targetHP, damage));
+        DelayEndAbility(user, ParticlesId.Heal);
     }
 }

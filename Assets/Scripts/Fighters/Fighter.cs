@@ -22,7 +22,7 @@ public abstract class Fighter : MonoBehaviour
     protected BoltEntity entity;
     protected Guid entityId;
 
-    Vector3 centreOffset, topOffset, bottomOffset;
+    float centreOffset, topOffset, bottomOffset;
 
     protected Rigidbody rb;
     const float RotationSpeed = 10f;
@@ -69,9 +69,9 @@ public abstract class Fighter : MonoBehaviour
     public bool MovementsBlocked { set => movementsBlocked = value; }
 
     protected IFighterState State => entity.GetState<IFighterState>();
-    public Vector3 CentrePosition => transform.position - centreOffset;
-    public Vector3 TopPosition => transform.position - topOffset;
-    public Vector3 BottomPosition => transform.position - bottomOffset;
+    public Vector3 CentrePosition => transform.position + OffsetVector(centreOffset);
+    public Vector3 TopPosition => transform.position + OffsetVector(topOffset);
+    public Vector3 BottomPosition => transform.position + OffsetVector(bottomOffset);
     protected virtual float MovementSpeed
     {
         get
@@ -96,14 +96,14 @@ public abstract class Fighter : MonoBehaviour
         UnwrapAttachedToken();
 
         Collider collider = GetComponent<Collider>();
-        Vector3 colliderHalfHeight = Vector3.down * GetComponent<Collider>().bounds.size.y / 2;
-        Vector3 colliderCentre = Vector3.up * collider.bounds.center.y;
-        Vector3 colliderTop = colliderCentre + colliderHalfHeight;
-        Vector3 colliderBottom = colliderCentre - colliderHalfHeight;
+        float colliderHalfHeight = GetComponent<Collider>().bounds.size.y / 2;
+        float colliderCentre = collider.bounds.center.y;
+        float colliderTop = colliderCentre + colliderHalfHeight;
+        float colliderBottom = colliderCentre - colliderHalfHeight;
 
-        centreOffset = Vector3.up * transform.position.y - colliderTop;
-        topOffset = Vector3.up * transform.position.y - colliderTop;
-        bottomOffset = Vector3.up * transform.position.y - colliderBottom;
+        centreOffset = colliderCentre - transform.position.y;
+        topOffset = colliderTop - transform.position.y;
+        bottomOffset = colliderBottom - transform.position.y;
 
         rb = GetComponent<Rigidbody>();
 
@@ -306,6 +306,11 @@ public abstract class Fighter : MonoBehaviour
     {
         return Quaternion.LookRotation(
             Vector3.ProjectOnPlane(target.transform.position - rb.position, transform.up));
+    }
+
+    Vector3 OffsetVector(float offset)
+    {
+        return Vector3.up * offset;
     }
 
     void Die()

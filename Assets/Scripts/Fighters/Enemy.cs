@@ -45,7 +45,6 @@ public class Enemy : Fighter
     {
         base.EntityStart();
 
-        // Abilities initialization
         Ability attack1 = new EnemyAttack1();
         Ability attack2 = new EnemyAttack2();
 
@@ -60,7 +59,7 @@ public class Enemy : Fighter
         healthBar = Instantiate(enemyHealthBarPrefab, parent: gui.transform).GetComponent<Slider>();
 
         // Initialize first attack
-        currentAbility = attack1;
+        currentAbility = attacks[Random.Range(0, attacks.Count)];
     }
 
     public override void OwnerUpdate()

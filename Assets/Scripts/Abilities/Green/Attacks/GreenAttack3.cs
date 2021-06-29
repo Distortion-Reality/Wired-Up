@@ -1,6 +1,9 @@
+using System.Collections;
+using UnityEngine;
+
 public class GreenAttack3 : Ability
 {
-    const int power = 20;
+    const int power = 10;
 
     public override int Energy => 30;
     public override AbilityId Id => AbilityId.GreenAttack3;
@@ -8,8 +11,16 @@ public class GreenAttack3 : Ability
     public override void DoAbility(Fighter user, Fighter target)
     {
         Effects.CalculateAndApplyDamage(user, target, power);
-        Effects.Stun(user, target);
+        user.StartCoroutine(WaitForParticles(user, target, user.DamageParticles));
+    }
 
-        user.EndAbility();
+    IEnumerator WaitForParticles(Fighter user, Fighter target, ParticlesId particlesId)
+    {
+        float duration = Object.FindObjectOfType<ParticlesManager>()
+            .GetParticlesPrefab(particlesId).GetComponent<ParticleSystem>().main.duration;
+        yield return new WaitForSeconds(duration / 2);
+
+        Effects.Stun(user, target);
+        DelayEndAbility(user, ParticlesId.Stun);
     }
 }
