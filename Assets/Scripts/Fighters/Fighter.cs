@@ -113,7 +113,9 @@ public abstract class Fighter : MonoBehaviour
 
         InitStats();
         
-        InitAnimator();
+        LoadModel();
+
+        animator = GetComponentInChildren<Animator>();
 
         // Setup Bolt states
         State.SetTransforms(State.transform, transform, transform);
@@ -135,10 +137,7 @@ public abstract class Fighter : MonoBehaviour
 
     protected abstract void InitStats();
 
-    protected virtual void InitAnimator()
-    {
-        animator = GetComponent<Animator>();
-    }
+    protected abstract void LoadModel();
 
     public virtual void EntityUpdate()
     {

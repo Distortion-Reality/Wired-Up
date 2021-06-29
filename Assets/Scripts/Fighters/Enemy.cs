@@ -9,6 +9,8 @@ using UnityEngine.AI;
 [RequireComponent(typeof(TargetEnemyAbilityManager))]
 public class Enemy : Fighter
 {
+    EnemyId id;
+
     public GameObject enemyHealthBarPrefab;
     const float HealthBarMinDistance = 10f;
     const float HealthBarMaxDistance = 60f;
@@ -39,6 +41,21 @@ public class Enemy : Fighter
             { StatisticManager.StatisticId.Nrg, energy },
             { StatisticManager.StatisticId.Spd, speed }
         };
+    }
+
+    protected override void UnwrapAttachedToken()
+    {
+        base.UnwrapAttachedToken();
+
+        EnemyInfo info = (EnemyInfo) entity.AttachToken;
+        id = info.enemyId;
+    }
+
+    protected override void LoadModel()
+    {
+        EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
+        GameObject prefab = enemyManager.GetPrefab(id);
+        Instantiate(prefab, parent: transform);
     }
 
     public override void EntityStart()

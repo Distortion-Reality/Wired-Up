@@ -3,25 +3,25 @@ using UnityEngine;
 using Photon.Bolt;
 
 public class EntitySpawner : MonoBehaviour {
-
     public GameObject prefab;
 
     void Start()
     {
         if (BoltNetwork.IsServer)
-        {
-            FighterInfo info = new FighterInfo
-            {
-                guid = Guid.NewGuid()
-            };
-            InstantiatePrefab(info);
-        }
+            BoltNetwork.Instantiate(prefab, BuildToken(), transform.position, transform.rotation);
 
         Destroy(gameObject);
     }
 
-    protected virtual BoltEntity InstantiatePrefab(FighterInfo info)
+    protected virtual FighterInfo CreateToken()
     {
-        return BoltNetwork.Instantiate(prefab, info, transform.position, transform.rotation);
+        return new FighterInfo();
+    }
+
+    protected virtual FighterInfo BuildToken()
+    {
+        FighterInfo token = CreateToken();
+        token.guid = Guid.NewGuid();
+        return token; 
     }
 }

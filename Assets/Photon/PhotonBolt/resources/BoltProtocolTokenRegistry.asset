@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: BoltProtocolTokenRegistry
   m_EditorClassIdentifier: 
   protocolTokenRegistry:
+  - DisplayName: EnemyInfo
+    AssemblyName: EnemyInfo, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   - DisplayName: FighterInfo
     AssemblyName: FighterInfo, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
