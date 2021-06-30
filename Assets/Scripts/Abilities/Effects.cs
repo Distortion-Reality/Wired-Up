@@ -97,7 +97,7 @@ public static class Effects
     static IEnumerator ApplyStatBuff(Fighter target, StatisticManager.StatisticId statId, int stages)
     {
         target.ChangeStat(statId, stages);
-        yield return new WaitForSeconds(45f);
+        yield return new WaitForSeconds(10f);
         target.ChangeStat(statId, -stages);
     }
 

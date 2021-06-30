@@ -11,7 +11,7 @@ public class FighterBuffableStatistic : FighterStatistic
     public override int ApplyChange(int change)
     {
         stage += change;
-        currentValue += Mathf.RoundToInt(Mathf.Clamp(stage, - maxStage, maxStage) * stageBuff * baseValue);
+        currentValue = baseValue + Mathf.RoundToInt(Mathf.Clamp(stage, - maxStage, maxStage) * stageBuff * baseValue);
         return currentValue;
     }
 }
