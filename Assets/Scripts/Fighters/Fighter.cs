@@ -316,11 +316,7 @@ public abstract class Fighter : MonoBehaviour
         foreach (Fighter fighter in fighters)
             if (fighter.target == this && (fighter.fighterStatus == Status.Connecting ||
                 fighter.fighterStatus == Status.Waiting || fighter.fighterStatus == Status.Using))
-            {
-                Debug.Log(fighter);
                 fighter.EndAbility();
-            }
-                
 
         BoltNetwork.Destroy(gameObject);
     }

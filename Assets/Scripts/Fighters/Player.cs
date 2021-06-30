@@ -262,7 +262,9 @@ public class Player : Fighter
     protected override void OnEndAbility()
     {
         base.OnEndAbility();
-        wire.Disconnect();
+
+        if (wire.gameObject.activeSelf)
+            wire.Disconnect();
     }
 
     public void InterruptWaiting()
