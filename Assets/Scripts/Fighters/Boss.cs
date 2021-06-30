@@ -46,7 +46,9 @@ public class Boss : Enemy
             Collider[] colliders = new Collider[3];
             Physics.OverlapSphereNonAlloc(BottomPosition, HealthBarMaxDistance, colliders,
                 LayerMask.GetMask("Player"));
-            healthBar.gameObject.SetActive(true);
+            foreach (Collider collider in colliders)
+                if (collider)
+                    healthBar.gameObject.SetActive(true);
         }
     }
 
