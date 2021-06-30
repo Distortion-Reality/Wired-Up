@@ -312,7 +312,7 @@ public abstract class Fighter : MonoBehaviour
         return Vector3.up * offset;
     }
 
-    void Die()
+    protected virtual void Die()
     {
         while (targetAbilityManager.UserAbilityQueueCount > 0)
         {

@@ -765,15 +765,6 @@
       "Groups": []
     },
     {
-      "$type": "Photon.Bolt.Compiler.CommandDefinition, bolt.compiler",
-      "Input": [],
-      "Result": [],
-      "Properties": [],
-      "Name": "NewCommand",
-      "Guid": "b703b3d1-96e4-4d28-a839-b7bd0f762dff",
-      "Groups": []
-    },
-    {
       "$type": "Photon.Bolt.Compiler.EventDefinition, bolt.compiler",
       "Properties": [
         {
@@ -1233,6 +1224,51 @@
       },
       "Name": "EnemyRayState",
       "Guid": "ce076215-6ca6-4cab-a2ee-cd4ca544fb2d",
+      "Groups": []
+    },
+    {
+      "$type": "Photon.Bolt.Compiler.EventDefinition, bolt.compiler",
+      "Properties": [
+        {
+          "Name": "playerName",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Photon.Bolt.Compiler.PropertyTypeString, bolt.compiler",
+            "MaxLength": 20,
+            "Encoding": 1
+          },
+          "AssetSettings": {
+            "$type": "Photon.Bolt.Compiler.PropertyEventSettings, bolt.compiler"
+          }
+        },
+        {
+          "Name": "character",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Photon.Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
+            "MaxValue": 7,
+            "CompressionEnabled": true
+          },
+          "AssetSettings": {
+            "$type": "Photon.Bolt.Compiler.PropertyEventSettings, bolt.compiler"
+          }
+        }
+      ],
+      "Name": "GameLoseEvent",
+      "Guid": "c80cfc6a-2f6a-458b-a742-695411d4b106",
+      "Groups": []
+    },
+    {
+      "$type": "Photon.Bolt.Compiler.EventDefinition, bolt.compiler",
+      "Properties": [],
+      "Name": "GameWinEvent",
+      "Guid": "eaf70650-0e01-48a3-acf1-957ff562886d",
       "Groups": []
     }
   ],

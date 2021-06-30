@@ -5,9 +5,12 @@ using Photon.Bolt;
 public class FighterEntity : EntityBehaviour<IFighterState>
 {
     Fighter fighter;
+    GameOver gameOver;
 
     public override void Attached()
     {
+        gameOver = GameOver.FindObjectOfType<GameOver>();
+
         fighter = GetComponent<Fighter>();
         fighter.EntityStart();
     }
@@ -20,8 +23,11 @@ public class FighterEntity : EntityBehaviour<IFighterState>
     // Update is called once per frame
     void Update()
     {
-        if (!entity.IsAttached)
+        if (!entity.IsAttached || gameOver.IsGameOver)
+        {
+            fighter.EntityDestroyed();
             return;
+        }
         
         if (entity.IsOwner)
             fighter.OwnerUpdate();
@@ -32,6 +38,9 @@ public class FighterEntity : EntityBehaviour<IFighterState>
     // SimulateOwner is a FixedUpdate run only if entity.IsOwner
     public override void SimulateOwner()
     {
+        if (!entity.IsAttached || gameOver.IsGameOver)
+            return;
+        
         fighter.OwnerFixedUpdate();
     }
 }

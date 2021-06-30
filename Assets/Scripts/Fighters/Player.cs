@@ -11,6 +11,7 @@ public class Player : Fighter
     CharacterColor character;
 
     GameMenu gameMenu;
+    GameOver gameOver;
     Slider energyBar;
     public GameObject allyInfoPrefab;
     const float allyInfoYOffset = 100f;
@@ -91,6 +92,7 @@ public class Player : Fighter
 
         // UI initialization
         gameMenu = gui.GetComponent<GameMenu>();
+        gameOver = gui.GetComponent<GameOver>();
         Color color = character.UnityColor();
 
         if (entity.IsOwner)
@@ -289,5 +291,12 @@ public class Player : Fighter
     protected override void EnergyChanged()
     {
         energyBar.value = Energy.PercentageValue;
+    }
+
+    protected override void Die()
+    {
+        base.Die();
+
+        GameLoseEvent.Post(ReliabilityModes.ReliableOrdered, playerName, (int) character);
     }
 }
