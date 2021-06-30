@@ -36,8 +36,11 @@ public class GreenAssist3 : Ability
             Collider[] colliders = Effects.AreaOfEffect(target, radius);
             foreach (Collider collider in colliders)
             {
-                Fighter fighter = collider.GetComponent<Fighter>();
-                Effects.CalculateAndApplyHealing(user, fighter, percentage);
+                if (collider)
+                {
+                    Fighter fighter = collider.GetComponent<Fighter>();
+                    Effects.CalculateAndApplyHealing(user, fighter, percentage);
+                }
             }
 
             yield return new WaitForSeconds(rate);

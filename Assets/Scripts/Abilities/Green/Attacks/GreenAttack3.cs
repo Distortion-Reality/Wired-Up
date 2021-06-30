@@ -20,7 +20,12 @@ public class GreenAttack3 : Ability
             .GetParticlesPrefab(particlesId).GetComponent<ParticleSystem>().main.duration;
         yield return new WaitForSeconds(duration / 2);
 
-        Effects.Stun(user, target);
-        DelayEndAbility(user, ParticlesId.Stun);
+        if (target)
+        {
+            Effects.Stun(user, target);
+            DelayEndAbility(user, ParticlesId.Stun);
+        }
+        else
+            user.EndAbility();
     }
 }
