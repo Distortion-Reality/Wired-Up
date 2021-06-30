@@ -314,11 +314,11 @@ public abstract class Fighter : MonoBehaviour
 
     protected virtual void Die()
     {
-        while (targetAbilityManager.UserAbilityQueueCount > 0)
-        {
-            Fighter user = targetAbilityManager.DequeueUserAbilityQueue();
-            user.EndAbility();
-        }
+        Fighter[] fighters = FindObjectsOfType<Fighter>();
+        foreach (Fighter fighter in fighters)
+            if (fighter.target == this && (fighter.fighterStatus == Status.Connecting ||
+                fighter.fighterStatus == Status.Waiting || fighter.fighterStatus == Status.Using))
+                fighter.EndAbility();
 
         BoltNetwork.Destroy(gameObject);
     }

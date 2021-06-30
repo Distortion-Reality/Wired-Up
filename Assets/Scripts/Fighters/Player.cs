@@ -18,10 +18,10 @@ public class Player : Fighter
 
     Transform cam;
     float movementSpeedMultiplier = 1f;
-    const int DashEnergy = 10;
+    const int DashEnergy = 20;
     const float DashMultiplier = 2f,
         DashDuration = 0.25f,
-        DashCooldown = 5f;
+        DashCooldown = 4f;
     float nextDashTime = 0f;
 
     Ability interaction;
