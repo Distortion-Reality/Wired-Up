@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class DontDestroyOnLoad : MonoBehaviour
+public class MenuAudio : MonoBehaviour
 {
     void Awake()
     {

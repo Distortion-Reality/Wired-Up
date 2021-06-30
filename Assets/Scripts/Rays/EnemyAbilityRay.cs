@@ -27,11 +27,14 @@ public class EnemyAbilityRay : EntityBehaviour<IEnemyRayState>
 
     IEnumerator MoveRay()
     {
-        float startPosition = transform.localPosition.z;
+        float totalDistance = 0f;
 
-        while (transform.localPosition.z - startPosition < user.AbilityRange && user)
+        while (totalDistance < user.AbilityRange && user)
         {
-            transform.Translate(speed * Time.deltaTime * Vector3.forward, Space.Self);
+            Vector3 translation = speed * Time.deltaTime * Vector3.forward;
+            transform.Translate(translation, Space.Self);
+            totalDistance += Vector3.Magnitude(translation);
+
             yield return null;
         }
 

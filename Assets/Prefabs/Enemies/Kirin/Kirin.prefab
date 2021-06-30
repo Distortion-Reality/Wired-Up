@@ -10048,8 +10048,8 @@ GameObject:
   - component: {fileID: 7135508612687646055}
   - component: {fileID: 5585790952200479179}
   m_Layer: 0
-  m_Name: KirinModel
-  m_TagString: Enemy
+  m_Name: Kirin
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

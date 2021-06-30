@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,9 +12,9 @@ public class Boss : Enemy
 
     protected override void InitStats()
     {
-        FighterRangedStatistic hp = new FighterRangedStatistic(500);
+        FighterRangedStatistic hp = new FighterRangedStatistic(200);
         FighterBuffableStatistic armor = new FighterBuffableStatistic(100);
-        FighterBuffableStatistic length = new FighterBuffableStatistic(50);
+        FighterBuffableStatistic length = new FighterBuffableStatistic(100);
         FighterBuffableStatistic intensity = new FighterBuffableStatistic(100);
         FighterEnergy energy = new FighterEnergy(100);
         FighterBuffableStatistic speed = new FighterBuffableStatistic(75);
@@ -39,5 +40,19 @@ public class Boss : Enemy
     protected override void UpdateHealthBarTransform()
     {
         // Health bar is fixed on canvas
+    }
+
+    protected override void UseAbility(Ability ability)
+    {
+        FighterStatus = Status.Using;
+        animator.SetTrigger("AttackShoot");
+
+        StartCoroutine(WaitForAnimation(ability));
+    }
+
+    IEnumerator WaitForAnimation(Ability ability)
+    {
+        yield return new WaitForSeconds(1f);
+        base.UseAbility(ability);
     }
 }
