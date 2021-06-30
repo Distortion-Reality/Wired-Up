@@ -69,7 +69,6 @@ public class RedAttack2 : Ability
     IEnumerator WiresLookAtTarget(Player user, Fighter target)
     {
         Wire wire = user.Wire;
-        //Quaternion defaultWireParentLocalRotation = wire.transform.parent.localRotation;
 
         while (!target.Grounded)
         {

@@ -346,7 +346,7 @@ public abstract class Fighter : MonoBehaviour
         {
             charging = false;
             if (!collision.gameObject.CompareTag(tag) &&
-                collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Player"))
+                (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Player")))
                 charged = collision.gameObject.GetComponent<Fighter>();
         }
     }

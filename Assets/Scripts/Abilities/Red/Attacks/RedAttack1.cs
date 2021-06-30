@@ -11,10 +11,15 @@ public class RedAttack1 : Ability
 
     public override void DoAbility(Fighter user, Fighter target)
     {
+        /*
         if (user.Entity.IsOwner)
             DoCharge(user, target);
         else
             ChargeEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered, user.EntityId);
+        */
+
+        Effects.CalculateAndApplyDamage(user, target, power);
+        DelayEndAbility(user, ParticlesId.PlayerDamage);
     }
 
     public static void DoCharge(Fighter user, Fighter target)
