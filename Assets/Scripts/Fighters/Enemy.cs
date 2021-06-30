@@ -108,6 +108,30 @@ public class Enemy : Fighter
             SelectAbility(currentAbility);
     }
 
+    protected override void UpdateRotation()
+    {
+        if (!target)
+            return;
+
+        Quaternion rotation;
+        if (FighterStatus != Status.Free &&
+            FighterStatus != Status.Disconnecting)
+            rotation = LookAtTargetRotation();
+        else
+        {
+            Quaternion finalRotation = LookAtTargetRotation();
+            rotation = Quaternion.Slerp(transform.rotation, finalRotation, 10f * Time.fixedDeltaTime);
+        }
+
+        transform.rotation = rotation;
+    }
+
+    Quaternion LookAtTargetRotation()
+    {
+        return Quaternion.LookRotation(
+            Vector3.ProjectOnPlane(target.transform.position - rb.position, transform.up));
+    }
+
     IEnumerator AbilityAnimationCooldown()
     {
         yield return new WaitForSeconds(2f);

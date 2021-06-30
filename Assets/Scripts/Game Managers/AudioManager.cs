@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,30 +10,41 @@ public class AudioManager : MonoBehaviour
     public AudioClip bossBattle;
     public AudioClip bossDefeated;
 
+    Dictionary<AudioClip, float> audioClipVolumes;
+
     // Start is called before the first frame update
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
+
+        audioClipVolumes = new Dictionary<AudioClip, float>()
+        {
+            { background, 0.5f },
+            { battle, 0.1f },
+            { bossBattle, 0.1f },
+            { bossDefeated, 0.1f }
+        };
     }
 
     // Update is called once per frame
     void Update()
     {
         if (GameObject.Find("BossHealthBar(Clone)"))
-            PlayAudioClip(bossBattle);
+            PlayAudioClip(bossBattle, audioClipVolumes[bossBattle]);
         else if (!GameObject.Find("KirinBoss(Clone)"))
-            PlayAudioClip(bossDefeated);
+            PlayAudioClip(bossDefeated, audioClipVolumes[bossDefeated]);
         else if (GameObject.Find("EnemyHealthBar(Clone)"))
-            PlayAudioClip(battle);
+            PlayAudioClip(battle, audioClipVolumes[battle]);
         else
-            PlayAudioClip(background);
+            PlayAudioClip(background, audioClipVolumes[background]);
     }
 
-    void PlayAudioClip(AudioClip audioClip)
+    void PlayAudioClip(AudioClip audioClip, float volume)
     {
         if (audioSource.clip != audioClip)
         {
             audioSource.clip = audioClip;
+            audioSource.volume = volume;
             audioSource.Play();
         }
     }

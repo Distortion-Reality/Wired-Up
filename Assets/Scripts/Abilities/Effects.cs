@@ -136,9 +136,7 @@ public static class Effects
 
     public static void FireRay(Enemy user, Ability ability)
     {
-        // Da sistemare la rotazione
-        Quaternion rotation = Quaternion.LookRotation(user.Target.BottomPosition - user.BottomPosition);
-        GameObject ray = BoltNetwork.Instantiate(BoltPrefabs.EnemyAttackRay, user.FirePosition, rotation);
+        GameObject ray = BoltNetwork.Instantiate(BoltPrefabs.EnemyAttackRay, user.FirePosition, user.transform.rotation);
         ray.GetComponent<EnemyAbilityRay>().FireRay(user, ability);
     }
 }

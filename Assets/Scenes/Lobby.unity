@@ -531,7 +531,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   xSpawnPosOffset: 250
-  forceStart: 0
+  forceStart: 1
 --- !u!1 &586100993
 GameObject:
   m_ObjectHideFlags: 0
