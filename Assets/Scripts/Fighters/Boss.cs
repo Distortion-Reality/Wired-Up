@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Bolt;
 
 public class Boss : Enemy
 {
     readonly string bossName = "Kirin";
+    const float HealthBarMaxDistance = 60f;
 
     public override ParticlesId DamageParticles => ParticlesId.KirinDamage;
     public override Vector3 FirePosition =>
@@ -37,9 +39,22 @@ public class Boss : Enemy
         healthBar.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = bossName;
     }
 
-    protected override void UpdateHealthBarTransform()
+    protected override void UpdateHealthBar()
     {
-        // Health bar is fixed on canvas
+        if (!healthBar.gameObject.activeSelf)
+        {
+            Collider[] colliders = new Collider[3];
+            Physics.OverlapSphereNonAlloc(BottomPosition, HealthBarMaxDistance, colliders,
+                LayerMask.GetMask("Player"));
+            healthBar.gameObject.SetActive(true);
+        }
+    }
+
+    protected override void Die()
+    {
+        base.Die();
+
+        GameWinEvent.Post(ReliabilityModes.ReliableOrdered);
     }
 
     protected override void UseAbility(Ability ability)

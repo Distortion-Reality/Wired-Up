@@ -124,10 +124,10 @@ public class Enemy : Fighter
     {
         base.EntityUpdate();
 
-        UpdateHealthBarTransform();
+        UpdateHealthBar();
     }
 
-    protected virtual void UpdateHealthBarTransform()
+    protected virtual void UpdateHealthBar()
     {
         float cameraDistance = Vector3.Distance(Camera.main.transform.position, transform.position);
         if (cameraDistance > HealthBarMaxDistance)

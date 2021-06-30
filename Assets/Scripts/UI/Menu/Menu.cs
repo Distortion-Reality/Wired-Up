@@ -10,7 +10,6 @@ public class Menu : GlobalEventListener
 
     void Start()
     {
-        PlayerPrefs.DeleteKey(PlayerPrefKey.PlayerName);
         if (!PlayerPrefs.HasKey(PlayerPrefKey.PlayerName))
         {
             PlayerPrefs.SetString(PlayerPrefKey.PlayerName, "Player #" 

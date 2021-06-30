@@ -7,6 +7,7 @@ using Photon.Bolt;
 public class NetworkManager : GlobalEventListener {
 
     ParticlesManager particlesManager;
+    GameOver gameOver;
 
     readonly Dictionary<Guid, Fighter> fighters = new Dictionary<Guid, Fighter>();
     int allyCount = -1;
@@ -16,6 +17,7 @@ public class NetworkManager : GlobalEventListener {
     void Start()
     {
         particlesManager = GetComponent<ParticlesManager>();
+        gameOver = GameObject.FindObjectOfType<GameOver>();
     }
 
     public override void SceneLoadLocalDone(string scene, IProtocolToken token)
@@ -156,5 +158,15 @@ public class NetworkManager : GlobalEventListener {
         ParticleSystem.MainModule main = particle.GetComponent<ParticleSystem>().main;
         main.startColor = new ParticleSystem.MinMaxGradient(evnt.color);
         particle.transform.SetParent(target.transform, true);
+    }
+
+    public override void OnEvent(GameLoseEvent evnt)
+    {
+        gameOver.Lose(evnt.playerName, (CharacterColor) evnt.character);
+    }
+
+    public override void OnEvent(GameWinEvent evnt)
+    {
+        gameOver.Win();
     }
 }
