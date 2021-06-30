@@ -20,12 +20,12 @@ public class AudioManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (GameObject.Find("EnemyHealthBar(Clone)"))
-            PlayAudioClip(battle);
-        else if (GameObject.Find("BossHealthBar(Clone)"))
+        if (GameObject.Find("BossHealthBar(Clone)"))
             PlayAudioClip(bossBattle);
         else if (!GameObject.Find("KirinBoss(Clone)"))
             PlayAudioClip(bossDefeated);
+        else if (GameObject.Find("EnemyHealthBar(Clone)"))
+            PlayAudioClip(battle);
         else
             PlayAudioClip(background);
     }
