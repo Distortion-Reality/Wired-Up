@@ -117,6 +117,12 @@ public class NetworkManager : GlobalEventListener {
         fighters[evnt.entityId].EndAbility();
     }
 
+    public override void OnEvent(ChargeEvent evnt)
+    {
+        Fighter user = fighters[evnt.entityId];
+        RedAttack1.DoCharge(user, user.Target);
+    }
+
     public override void OnEvent(ChangeWireRotationEvent evnt)
     {
         Transform wire = ((Player) fighters[evnt.entityId]).Wire.transform.parent;

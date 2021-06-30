@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using Photon.Bolt;
 
 public class RedAttack1 : Ability
 {
@@ -10,10 +11,18 @@ public class RedAttack1 : Ability
 
     public override void DoAbility(Fighter user, Fighter target)
     {
+        if (user.Entity.IsOwner)
+            DoCharge(user, target);
+        else
+            ChargeEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered, user.EntityId);
+    }
+
+    public static void DoCharge(Fighter user, Fighter target)
+    {
         target.TargetAbilityManager.StartCoroutine(Charge(user));
     }
 
-    IEnumerator Charge(Fighter user)
+    static IEnumerator Charge(Fighter user)
     {
         user.Charging = true;
         while (user.Charging)

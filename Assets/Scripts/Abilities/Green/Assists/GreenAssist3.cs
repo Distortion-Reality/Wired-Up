@@ -13,7 +13,7 @@ public class GreenAssist3 : Ability
 
     public override void DoAbility(Fighter user, Fighter target)
     {
-        int selfDamage = user.Stats[StatisticManager.StatisticId.HP].CurrentValue / 4;
+        int selfDamage = user.Stats[StatisticManager.StatisticId.HP].CurrentValue / 8;
         Effects.ApplyDamage(user, user, selfDamage);
         user.StartCoroutine(WaitForParticles(user, target, user.DamageParticles));
     }

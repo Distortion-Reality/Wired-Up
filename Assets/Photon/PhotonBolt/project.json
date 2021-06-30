@@ -1271,6 +1271,27 @@
       "Name": "GameWinEvent",
       "Guid": "eaf70650-0e01-48a3-acf1-957ff562886d",
       "Groups": []
+    },
+    {
+      "$type": "Photon.Bolt.Compiler.EventDefinition, bolt.compiler",
+      "Properties": [
+        {
+          "Name": "entityId",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Photon.Bolt.Compiler.PropertyTypeGuid, bolt.compiler"
+          },
+          "AssetSettings": {
+            "$type": "Photon.Bolt.Compiler.PropertyEventSettings, bolt.compiler"
+          }
+        }
+      ],
+      "Name": "ChargeEvent",
+      "Guid": "933d8742-fb60-4c86-b6b7-71161b82ab3d",
+      "Groups": []
     }
   ],
   "ActiveGroup": "Everything"
