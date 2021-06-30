@@ -27,7 +27,7 @@ public class GameOver : MonoBehaviour
     {
         isGameOver = true;
 
-        messageText.GetComponent<TMPro.TextMeshProUGUI>().text = result;
+        resultText.GetComponent<TMPro.TextMeshProUGUI>().text = result;
         messageText.GetComponent<TMPro.TextMeshProUGUI>().text = message;
 
         panel.SetActive(true);
