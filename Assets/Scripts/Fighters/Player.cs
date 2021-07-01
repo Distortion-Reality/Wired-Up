@@ -127,6 +127,10 @@ public class Player : Fighter
         if (gameMenu.IsOpen)
             return;
 
+        // Escape button for bugs and glitches
+        if (Input.GetKeyDown(KeyCode.P))
+            EndAbility();
+
         base.OwnerUpdate();
 
         if (FighterStatus != Status.Stunned)
