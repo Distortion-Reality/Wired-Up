@@ -129,7 +129,10 @@ public class Player : Fighter
 
         // Escape button for bugs and glitches
         if (Input.GetKeyDown(KeyCode.P))
+        {
+            target.TargetAbilityManager.ClearUserAbilityQueue();
             EndAbility();
+        }
 
         base.OwnerUpdate();
 

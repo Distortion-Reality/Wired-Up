@@ -70,6 +70,11 @@ public abstract class TargetAbilityManager : MonoBehaviour
             RemoveAbilityEvent.Post(target.Entity.Source, ReliabilityModes.ReliableOrdered, user.EntityId, target.EntityId);
     }
 
+    public void ClearUserAbilityQueue()
+    {
+        userAbilityQueue.Clear();
+    }
+
     protected abstract void CheckUserAbilityQueue(UserAbility userAbility);
 
     protected IEnumerator DoAbilities()
