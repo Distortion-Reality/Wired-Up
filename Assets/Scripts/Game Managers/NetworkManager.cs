@@ -56,6 +56,7 @@ public class NetworkManager : GlobalEventListener {
     public override void Disconnected(BoltConnection connection)
     {
         BoltLauncher.Shutdown();
+        NetworkPlayerRegistry.Clear();
         SceneManager.LoadScene("Menu", LoadSceneMode.Single);
     }
 

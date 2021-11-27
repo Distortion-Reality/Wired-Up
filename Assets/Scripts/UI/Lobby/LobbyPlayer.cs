@@ -2,9 +2,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Bolt;
+using System;
 
-public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
+public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>, IPlayer
 {
+    Guid id;
     List<GameObject> models = new List<GameObject>();
     int currentIndex = 0;
     public int CurrentCharacter { get => currentIndex; }
@@ -18,6 +20,9 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
     Button previousCharacterButton;
     Button readyButton;
     public Button ReadyButton { get => readyButton; }
+
+    public Guid Id => id;
+    public string Name => playerName.text;
 
     public override void Attached()
     {
@@ -41,16 +46,18 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
             readyButton = GameObject.Find("ReadyButton").GetComponent<Button>();
             readyButton.onClick.AddListener(() => state.ready = !ready);
 
-            state.name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName);
             state.character = 0;
             state.ready = false;
         }
 
-        state.AddCallback("name", NameChanged);
+        LobbyPlayerToken token = (LobbyPlayerToken) entity.AttachToken;
+        id = token.Id;
+        playerName.text = token.Name;
+
+
         state.AddCallback("character", CharacterChanged);
         state.AddCallback("ready", ReadyChanged);
 
-        NameChanged();
         models[currentIndex].SetActive(true);
     }
 
@@ -94,11 +101,6 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
         lobbyManager.CheckOwnerCharacterAvailable();
     }
 
-     void NameChanged()
-    {
-        playerName.text = state.name;
-    }
-
     void ReadyChanged()
     {
         ready = state.ready;
@@ -123,11 +125,27 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
             LevelSpawnInfo info = new LevelSpawnInfo();
             if (!lobbyManager.forceStart)
             {
-                info.left = (CharacterColor) lobbyManager.Players[1].currentIndex;
-                info.right = (CharacterColor) lobbyManager.Players[2].currentIndex;
+                info.left = (CharacterColor) lobbyManager.AllPlayers[1].currentIndex;
+                info.right = (CharacterColor) lobbyManager.AllPlayers[2].currentIndex;
             }
             
+            GameStartEvent.Post();
             BoltNetwork.LoadScene("Level2Scene", info);
         }
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj == null || GetType() != obj.GetType())
+        {
+            return false;
+        }
+        
+        return Id.Equals(((IPlayer) obj).Id);
+    }
+    
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }

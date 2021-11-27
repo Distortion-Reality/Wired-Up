@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Bolt;
+using System;
 
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
-public class Player : Fighter
+public class Player : Fighter, IPlayer
 {
     string playerName;
     CharacterColor character;
@@ -27,7 +28,6 @@ public class Player : Fighter
     Ability interaction;
     Wire wire;
 
-    public string PlayerName { get => playerName; }
     public Wire Wire { get => wire; }
 
     protected new IPlayerState State => entity.GetState<IPlayerState>();
@@ -35,6 +35,9 @@ public class Player : Fighter
         new Quaternion(transform.rotation.x, cam.rotation.y, transform.rotation.z, cam.rotation.w);
     public override ParticlesId DamageParticles => ParticlesId.PlayerDamage;
     public override Color CharacterUnityColor { get => character.UnityColor(); }
+
+    public Guid Id => entityId;
+    public string Name => playerName;
 
     protected override void InitStats()
     {
@@ -307,5 +310,20 @@ public class Player : Fighter
         base.Die();
 
         GameLoseEvent.Post(ReliabilityModes.ReliableOrdered, playerName, (int) character);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj == null || GetType() != obj.GetType())
+        {
+            return false;
+        }
+        
+        return Id.Equals(((IPlayer) obj).Id);
+    }
+    
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }

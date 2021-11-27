@@ -6,25 +6,6 @@
       "$type": "Photon.Bolt.Compiler.StateDefinition, bolt.compiler",
       "Properties": [
         {
-          "Name": "name",
-          "Enabled": true,
-          "Expanded": true,
-          "ReplicationMode": 1,
-          "Priority": 1,
-          "PropertyType": {
-            "$type": "Photon.Bolt.Compiler.PropertyTypeString, bolt.compiler",
-            "MaxLength": 20,
-            "Encoding": 1
-          },
-          "AssetSettings": {
-            "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",
-            "ExtrapolationErrorTolerance": 0.25,
-            "_ExtrapolationCorrectionFrames": 6,
-            "ExtrapolationMaxFrames": 9,
-            "SnapMagnitude": 10.0
-          }
-        },
-        {
           "Name": "character",
           "Enabled": true,
           "Expanded": true,
@@ -1291,6 +1272,15 @@
       ],
       "Name": "ChargeEvent",
       "Guid": "933d8742-fb60-4c86-b6b7-71161b82ab3d",
+      "Groups": []
+    },
+    {
+      "$type": "Photon.Bolt.Compiler.EventDefinition, bolt.compiler",
+      "Properties": [],
+      "EntitySenders": 3,
+      "GlobalSenders": 1,
+      "Name": "GameStartEvent",
+      "Guid": "a964215c-7a1c-4984-bc93-8b79184f4043",
       "Groups": []
     }
   ],

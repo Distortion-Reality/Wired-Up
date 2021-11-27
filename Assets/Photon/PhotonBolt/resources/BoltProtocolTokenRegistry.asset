@@ -24,3 +24,6 @@ MonoBehaviour:
   - DisplayName: LevelSpawnInfo
     AssemblyName: LevelSpawnInfo, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  - DisplayName: LobbyPlayerToken
+    AssemblyName: LobbyPlayerToken, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null

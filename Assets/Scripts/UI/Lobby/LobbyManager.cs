@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Photon.Bolt;
@@ -6,13 +8,12 @@ using Photon.Bolt;
 public class LobbyManager : GlobalEventListener
 {
     Transform canvas;
-
-    List<LobbyPlayer> allPlayers = new List<LobbyPlayer>(3);
-
+    
     public float xSpawnPosOffset = 250.0f;
     public bool forceStart = false;
+    public bool starting = false;
 
-    public List<LobbyPlayer> Players { get => allPlayers; }
+    public List<LobbyPlayer> AllPlayers { get => NetworkPlayerRegistry.AllPlayers.Select(player => (LobbyPlayer) player.PlayerObject).ToList<LobbyPlayer>(); }
 
     void Start()
     {
@@ -22,7 +23,12 @@ public class LobbyManager : GlobalEventListener
     public override void SceneLoadLocalDone(string scene, IProtocolToken token)
     {
         // Spawn lobby player
-        BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.LobbyPlayer);
+        LobbyPlayerToken lbToken = new LobbyPlayerToken()
+        {
+            Id = Guid.NewGuid(),
+            Name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName)
+        };
+        BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.LobbyPlayer, lbToken);
         entity.transform.SetParent(canvas, false);
     }
 
@@ -39,15 +45,22 @@ public class LobbyManager : GlobalEventListener
                 entity.transform.localPosition += FindAvailableSpawnPosition();
                 entity.transform.SetParent(canvas, false);
             }
-            allPlayers.Add(entity.GetComponent<LobbyPlayer>());
+            NetworkPlayerRegistry.CreatePlayer(entity.GetComponent<LobbyPlayer>(), entity.Source);
         }
+    }
+
+    public override void OnEvent(GameStartEvent evnt)
+    {
+        starting = true;
+        Debug.Log("received starting event");
     }
 
     public override void EntityDetached(BoltEntity entity)
     {
-        if (entity.StateIs<ILobbyPlayerState>())
+        if (entity.StateIs<ILobbyPlayerState>() && !starting)
         {
-            allPlayers.Remove(entity.GetComponent<LobbyPlayer>());
+            NetworkPlayerRegistry.DestroyPlayer(entity.GetComponent<LobbyPlayer>());
+            Debug.Log("destroyed player " + entity.IsOwner);
         }
     }
 
@@ -55,7 +68,7 @@ public class LobbyManager : GlobalEventListener
     {
         float x;
         // Owner is always the first
-        if (allPlayers.Count == 1)
+        if (AllPlayers.Count == 1)
         {
             // Choose left
             x = -xSpawnPosOffset;
@@ -63,7 +76,7 @@ public class LobbyManager : GlobalEventListener
         else
         {
             // Choose opposite of the occupied slot
-            x = -allPlayers[1].transform.localPosition.x;
+            x = -AllPlayers[1].transform.localPosition.x;
         }
         return new Vector3(x, 0.0f, 0.0f);
     }
@@ -79,11 +92,13 @@ public class LobbyManager : GlobalEventListener
     public void ReturnToMenu()
     {
         BoltLauncher.Shutdown();
+        NetworkPlayerRegistry.Clear();
         SceneManager.LoadScene("Menu", LoadSceneMode.Single);
     }
 
     public void CheckOwnerCharacterAvailable()
     {
+        List<LobbyPlayer> allPlayers = AllPlayers;
         LobbyPlayer owner = allPlayers[0];
         
         bool available = true;
@@ -105,6 +120,7 @@ public class LobbyManager : GlobalEventListener
 
     public bool CanStart()
     {
+        List<LobbyPlayer> allPlayers = AllPlayers;
         return allPlayers.Count == 3 && allPlayers.TrueForAll(player => player.IsReady);
     }
 }
