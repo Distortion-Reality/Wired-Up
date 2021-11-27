@@ -52,7 +52,6 @@ public class LobbyManager : GlobalEventListener
     public override void OnEvent(GameStartEvent evnt)
     {
         starting = true;
-        Debug.Log("received starting event");
     }
 
     public override void EntityDetached(BoltEntity entity)
@@ -60,7 +59,6 @@ public class LobbyManager : GlobalEventListener
         if (entity.StateIs<ILobbyPlayerState>() && !starting)
         {
             NetworkPlayerRegistry.DestroyPlayer(entity.GetComponent<LobbyPlayer>());
-            Debug.Log("destroyed player " + entity.IsOwner);
         }
     }
 
