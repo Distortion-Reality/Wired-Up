@@ -131,7 +131,7 @@ public abstract class Fighter : MonoBehaviour
 
     protected virtual void UnwrapAttachedToken()
     {
-        FighterInfo info = (FighterInfo) entity.AttachToken;
+        FighterToken info = (FighterToken) entity.AttachToken;
         entityId = info.guid;
     }
 

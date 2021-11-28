@@ -28,6 +28,8 @@ public class Player : Fighter, IPlayer
     Ability interaction;
     Wire wire;
 
+    static int allyIndex = 0;
+
     public Wire Wire { get => wire; }
 
     protected new IPlayerState State => entity.GetState<IPlayerState>();
@@ -63,7 +65,7 @@ public class Player : Fighter, IPlayer
     {
         base.UnwrapAttachedToken();
 
-        PlayerInfo info = (PlayerInfo) entity.AttachToken;
+        PlayerToken info = (PlayerToken) entity.AttachToken;
         playerName = info.name;
         character = info.character;
     }
@@ -107,9 +109,8 @@ public class Player : Fighter, IPlayer
         else // Ally
         {
             // Create ally UI
-            NetworkManager networkManager = GameObject.FindObjectOfType<NetworkManager>();
             float yScale = Screen.height / gui.GetComponent<CanvasScaler>().referenceResolution.y;
-            float yOffset = networkManager.AllyCount * allyInfoYOffset * yScale;
+            float yOffset = allyIndex++ * allyInfoYOffset * yScale;
             GameObject allyInfo = Instantiate(allyInfoPrefab, parent: gui.transform);
             allyInfo.transform.position += new Vector3(0, yOffset, 0);
 

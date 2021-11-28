@@ -5,9 +5,6 @@ public class CharacterManager : MonoBehaviour
     public GameObject redPrefab, bluePrefab, greenPrefab, purplePrefab, yellowPrefab;
 
     public Material redWireMaterial, blueWireMaterial, greenWireMaterial, purpleWireMaterial, yellowWireMaterial;
-    
-    CharacterColor currentCharacter;
-    public CharacterColor CurrentCharacter { get => currentCharacter; set => currentCharacter = value; }
 
     public GameObject GetPrefab(CharacterColor id)
     {

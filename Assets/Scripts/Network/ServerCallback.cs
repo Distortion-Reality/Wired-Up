@@ -1,55 +1,45 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Bolt;
 
-[BoltGlobalBehaviour(BoltNetworkModes.Server)]
+[BoltGlobalBehaviour(BoltNetworkModes.Server, "Level2Scene")]
 public class ServerCallback : Photon.Bolt.GlobalEventListener
 {
-    public override void Disconnected(BoltConnection connection)
-    {
-        Debug.Log("Disconnected:" + connection.ConnectionId);
-    }
+    float playerSpawnOffset = 5;
 
     public override void SceneLoadLocalDone(string scene, IProtocolToken token)
     {
         Debug.Log("SceneLoadLocalDone: " + scene);
         // Spawn server player
+        BoltEntity entity = SpawnPlayer(null);
+        entity.TakeControl();
     }
 
     public override void SceneLoadRemoteDone(BoltConnection connection, IProtocolToken token)
     {
         Debug.Log("SceneLoadRemoteDone: " + connection.ConnectionId);
         // Spawn client player
+        BoltEntity entity = SpawnPlayer(connection);
+        entity.AssignControl(connection);
     }
 
-    /*BoltEntity Spawn(string name, CharacterColor character)
+    BoltEntity SpawnPlayer(BoltConnection connection = null)
     {
-        CharacterManager characterManager = FindObjectOfType<CharacterManager>();
-        PlayerInfo info = new PlayerInfo
+        LobbyPlayer player = (LobbyPlayer) NetworkPlayerRegistry.GetPlayer(connection).PlayerObject;
+        PlayerToken token = new PlayerToken
         {
-            guid = Guid.NewGuid(),
-            name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName),
-            character = characterManager.CurrentCharacter
+            guid = player.Id,
+            name = player.Name,
+            character = (CharacterColor) player.CurrentCharacter
         };
 
-        LevelSpawnInfo spawnInfo = (LevelSpawnInfo) token;
         Transform spawnPoint = GameObject.Find("PlayersSpawnPoint").transform;
         Vector3 spawnPosition = spawnPoint.position;
         if (!BoltNetwork.IsServer)
         {
-            if (characterManager.CurrentCharacter == spawnInfo.left)
-            spawnPosition += Vector3.left * 5;
-            else if (characterManager.CurrentCharacter == spawnInfo.right)
-            spawnPosition += Vector3.right * 5;
+            spawnPosition += Vector3.left * playerSpawnOffset;
+            playerSpawnOffset *= -1; // spawn next player right
         }
 
-        BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Player, info, spawnPosition, spawnPoint.rotation);
-        return entity;
-        if (IsServer)
-            entity.TakeControl();
-        else
-            entity.AssignControl(connection);
-    }*/
+        return BoltNetwork.Instantiate(BoltPrefabs.Player, token, spawnPosition, spawnPoint.rotation);
+    }
 }

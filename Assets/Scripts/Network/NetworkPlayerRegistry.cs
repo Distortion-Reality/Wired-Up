@@ -43,6 +43,6 @@ public static class NetworkPlayerRegistry
 
     public static NetworkPlayer GetPlayer(IPlayer playerObject)
     {
-        return players.Find(player => player.PlayerObject.Equals(playerObject));
+        return players.Find(player => player.PlayerObject.Id.Equals(playerObject.Id));
     }
 }

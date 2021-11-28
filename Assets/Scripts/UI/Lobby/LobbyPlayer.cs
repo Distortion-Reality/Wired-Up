@@ -111,9 +111,6 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>, IPlayer
         {
             nextCharacterButton.interactable = !ready;
             previousCharacterButton.interactable = !ready;
-
-            if (ready)
-                characterManager.CurrentCharacter = (CharacterColor) currentIndex;
         }
         else
         {
@@ -121,16 +118,9 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>, IPlayer
         }
 
         if ((BoltNetwork.IsServer && (lobbyManager.CanStart() || lobbyManager.ForceStart(entity))))
-        {
-            LevelSpawnInfo info = new LevelSpawnInfo();
-            if (!lobbyManager.forceStart)
-            {
-                info.left = (CharacterColor) lobbyManager.AllPlayers[1].currentIndex;
-                info.right = (CharacterColor) lobbyManager.AllPlayers[2].currentIndex;
-            }
-            
+        {   
             GameStartEvent.Post();
-            BoltNetwork.LoadScene("Level2Scene", info);
+            BoltNetwork.LoadScene("Level2Scene");
         }
     }
 

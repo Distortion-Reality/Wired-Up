@@ -1,6 +1,6 @@
 using UdpKit;
 
-public class PlayerInfo : FighterInfo
+public class PlayerToken : FighterToken
 {
     public string name;
     public CharacterColor character;

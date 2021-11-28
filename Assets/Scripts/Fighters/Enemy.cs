@@ -48,7 +48,7 @@ public class Enemy : Fighter
     {
         base.UnwrapAttachedToken();
 
-        EnemyInfo info = (EnemyInfo) entity.AttachToken;
+        EnemyToken info = (EnemyToken) entity.AttachToken;
         id = info.enemyId;
     }
 
