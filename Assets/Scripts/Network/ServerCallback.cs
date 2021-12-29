@@ -8,7 +8,6 @@ public class ServerCallback : Photon.Bolt.GlobalEventListener
 
     public override void SceneLoadLocalDone(string scene, IProtocolToken token)
     {
-        Debug.Log("SceneLoadLocalDone: " + scene);
         // Spawn server player
         BoltEntity entity = SpawnPlayer(null);
         entity.TakeControl();
@@ -16,7 +15,6 @@ public class ServerCallback : Photon.Bolt.GlobalEventListener
 
     public override void SceneLoadRemoteDone(BoltConnection connection, IProtocolToken token)
     {
-        Debug.Log("SceneLoadRemoteDone: " + connection.ConnectionId);
         // Spawn client player
         BoltEntity entity = SpawnPlayer(connection);
         entity.AssignControl(connection);

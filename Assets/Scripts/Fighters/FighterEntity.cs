@@ -29,18 +29,30 @@ public class FighterEntity : EntityBehaviour<IFighterState>
             return;
         }
         
-        if (entity.IsOwner)
+        if (entity.IsControllerOrOwner)
             fighter.OwnerUpdate();
         
         fighter.EntityUpdate();
     }
 
     // SimulateOwner is a FixedUpdate run only if entity.IsOwner
-    public override void SimulateOwner()
+    void FixedUpdate()
     {
         if (!entity.IsAttached || gameOver.IsGameOver)
             return;
         
-        fighter.OwnerFixedUpdate();
+        if (entity.IsControllerOrOwner)
+            fighter.OwnerFixedUpdate();
+    }
+
+    // SimulateOwner is a FixedUpdate run only if entity.HasControl
+    public override void SimulateController()
+    {
+        fighter.ControllerFixedUpdate();
+    }
+
+    public override void ExecuteCommand(Command command, bool resetState)
+    {
+        fighter.ExecuteCommand(command, resetState);
     }
 }

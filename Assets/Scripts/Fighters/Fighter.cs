@@ -46,8 +46,15 @@ public abstract class Fighter : MonoBehaviour
 
     public BoltEntity Entity { get => entity; }
     public Guid EntityId { get => entityId; }
+
+    public virtual void ControllerFixedUpdate()
+    {
+        // Implemented by Player
+    }
+
     public Rigidbody Rb { get => rb; set => rb = value; }
     public Dictionary<StatisticManager.StatisticId, FighterStatistic> Stats { get => stats; }
+
     public Status FighterStatus
     {
         get => (Status) State.status;
@@ -118,7 +125,7 @@ public abstract class Fighter : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
 
         // Setup Bolt states
-        State.SetTransforms(State.transform, transform, transform);
+        State.SetTransforms(State.transform, transform);
         for (int i = 0; i < 5; i++)
         {
             State.statistics[i] = stats[(StatisticManager.StatisticId) i].CurrentValue;
@@ -131,8 +138,8 @@ public abstract class Fighter : MonoBehaviour
 
     protected virtual void UnwrapAttachedToken()
     {
-        FighterToken info = (FighterToken) entity.AttachToken;
-        entityId = info.guid;
+        FighterToken token = (FighterToken) entity.AttachToken;
+        entityId = token.guid;
     }
 
     protected abstract void InitStats();
@@ -148,6 +155,11 @@ public abstract class Fighter : MonoBehaviour
     {                                                                                                                                                                                   
         UpdateTarget();
         RegenEnergy();
+    }
+
+    public virtual void ExecuteCommand(Command command, bool resetState)
+    {
+        // Implemented by Player
     }
 
     public virtual void OwnerFixedUpdate()

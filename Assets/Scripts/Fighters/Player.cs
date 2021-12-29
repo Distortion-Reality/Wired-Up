@@ -100,7 +100,7 @@ public class Player : Fighter, IPlayer
         gameOver = gui.GetComponent<GameOver>();
         Color color = character.UnityColor();
 
-        if (entity.IsOwner)
+        if (entity.HasControl) // Doesn't work ok server because he has not assigned control to himself yet, compare uuid?
         {
             healthBar = GameObject.Find("PlayerEnergyBar").GetComponent<Slider>();
             energyBar = GameObject.Find("PlayerHealthBar").GetComponent<Slider>();
@@ -126,6 +126,9 @@ public class Player : Fighter, IPlayer
 
     public override void OwnerUpdate()
     {
+        if (!entity.HasControl)
+            return;
+
         if (Input.GetKeyDown(KeyCode.Escape))
             gameMenu.Trigger();
         if (gameMenu.IsOpen)
@@ -156,6 +159,9 @@ public class Player : Fighter, IPlayer
 
     public override void OwnerFixedUpdate()
     {
+        if (!entity.HasControl)
+            return;
+        
         if (gameMenu.IsOpen)
             return;
         
@@ -172,13 +178,32 @@ public class Player : Fighter, IPlayer
             StartCoroutine(Dash());
     }
 
+    Vector3 dir;
+    bool sendInput = false;
+
+    public override void ControllerFixedUpdate()
+    {
+        if (!sendInput)
+            return;
+        
+        IPlayerInputCommandInput input = PlayerInputCommand.Create();
+        input.Velocity = dir;
+        entity.QueueInput(input);
+        Debug.Log("Sent command: " + dir);
+        sendInput = false;
+    }
+
     protected override void UpdateMovement()
     {
-        Vector3 dir;
-
         if (FighterStatus == Status.Waiting || FighterStatus == Status.Using ||
             FighterStatus == Status.Stunned || movementsBlocked)
-            dir = Vector3.zero;
+        {
+            if (!dir.Equals(Vector3.zero))
+            {
+                dir = Vector3.zero;
+                sendInput = true;
+            }
+        }
         else
         {
             float x = Input.GetAxisRaw("Horizontal");
@@ -187,10 +212,17 @@ public class Player : Fighter, IPlayer
             dir = cam.right * x + cam.forward * z;
             dir.Normalize();
             dir *= movementSpeedMultiplier * MovementSpeed;
+            sendInput = true;
         }
+    }
 
-        dir.y = rb.velocity.y;
-        rb.velocity = dir;
+    public override void ExecuteCommand(Command command, bool resetState)
+    {
+        PlayerInputCommand cmd = (PlayerInputCommand) command;
+        Debug.Log("Received command:" + cmd.Input.Velocity);
+        Vector3 vel = cmd.Input.Velocity;
+        vel.y = rb.velocity.y;
+        rb.velocity = vel;
     }
 
     IEnumerator Dash()

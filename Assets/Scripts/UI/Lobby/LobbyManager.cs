@@ -45,6 +45,7 @@ public class LobbyManager : GlobalEventListener
                 entity.transform.localPosition += FindAvailableSpawnPosition();
                 entity.transform.SetParent(canvas, false);
             }
+
             NetworkPlayerRegistry.CreatePlayer(entity.GetComponent<LobbyPlayer>(), entity.Source);
         }
     }
