@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using Photon.Bolt;
+using UnityEngine;
 
 public static class NetworkPlayerRegistry
 {
@@ -16,7 +17,7 @@ public static class NetworkPlayerRegistry
         NetworkPlayer player = new NetworkPlayer(connection, playerObject);
         
         if (connection != null)
-            connection.UserData = player;   
+            connection.UserData = player;
 
         players.Add(player);
 
@@ -43,6 +44,8 @@ public static class NetworkPlayerRegistry
 
     public static NetworkPlayer GetPlayer(IPlayer playerObject)
     {
-        return players.Find(player => player.PlayerObject.Id.Equals(playerObject.Id));
+        var tmp = players.Find(player => player.PlayerObject.Id.Equals(playerObject.Id));
+        Debug.Log("Get player null: "+ tmp == null);
+        return tmp;
     }
 }

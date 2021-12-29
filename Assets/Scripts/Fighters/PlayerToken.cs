@@ -4,6 +4,7 @@ public class PlayerToken : FighterToken
 {
     public string name;
     public CharacterColor character;
+    public bool serverController;
 
     public override void Write(UdpPacket packet)
     {
@@ -11,6 +12,7 @@ public class PlayerToken : FighterToken
 
         packet.WriteString(name);
         packet.WriteInt(((int) character));
+        packet.WriteBool(serverController);
     }
 
     public override void Read(UdpPacket packet)
@@ -19,5 +21,6 @@ public class PlayerToken : FighterToken
 
         name = packet.ReadString();
         character = (CharacterColor) packet.ReadInt();
+        serverController = packet.ReadBool();
     }
 }

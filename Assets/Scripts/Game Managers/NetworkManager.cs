@@ -35,6 +35,7 @@ public class NetworkManager : GlobalEventListener {
         Cinemachine.CinemachineFreeLook cinemachine = playerCamera.GetComponent<Cinemachine.CinemachineFreeLook>();
         cinemachine.Follow = entity.transform;
         cinemachine.LookAt = entity.transform.Find("CameraLookTarget");
+        Debug.Log("Camera setup");
     }
 
     public override void EntityAttached(BoltEntity entity)
@@ -46,6 +47,7 @@ public class NetworkManager : GlobalEventListener {
 
             if (fighter is Player player)
             {
+                Debug.Log("Get player " + player.Id);
                 NetworkPlayerRegistry.GetPlayer(player).PlayerObject = player;
             }
         }

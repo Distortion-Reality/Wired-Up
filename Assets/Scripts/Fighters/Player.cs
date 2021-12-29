@@ -100,7 +100,7 @@ public class Player : Fighter, IPlayer
         gameOver = gui.GetComponent<GameOver>();
         Color color = character.UnityColor();
 
-        if (entity.HasControl) // Doesn't work ok server because he has not assigned control to himself yet, compare uuid?
+        if (entity.HasControl || (BoltNetwork.IsServer && ((PlayerToken) entity.AttachToken).serverController)) // Workaround using token bool, better using a ControlGained method.
         {
             healthBar = GameObject.Find("PlayerHealthBar").GetComponent<Slider>();
             energyBar = GameObject.Find("PlayerEnergyBar").GetComponent<Slider>();
@@ -178,7 +178,8 @@ public class Player : Fighter, IPlayer
             StartCoroutine(Dash());
     }
 
-    Vector3 dir;
+    Vector3 dir = Vector3.zero;
+    Vector3 oldDir = Vector3.zero;
     bool sendInput = false;
 
     public override void ControllerFixedUpdate()
@@ -188,9 +189,11 @@ public class Player : Fighter, IPlayer
         
         IPlayerInputCommandInput input = PlayerInputCommand.Create();
         input.Velocity = dir;
+        input.Rotation = rb.rotation;
         entity.QueueInput(input);
         Debug.Log("Sent command: " + dir);
         sendInput = false;
+        oldDir = dir;
     }
 
     protected override void UpdateMovement()
@@ -198,7 +201,7 @@ public class Player : Fighter, IPlayer
         if (FighterStatus == Status.Waiting || FighterStatus == Status.Using ||
             FighterStatus == Status.Stunned || movementsBlocked)
         {
-            if (!dir.Equals(Vector3.zero))
+            if (!oldDir.Equals(Vector3.zero))
             {
                 dir = Vector3.zero;
                 sendInput = true;
@@ -212,7 +215,16 @@ public class Player : Fighter, IPlayer
             dir = cam.right * x + cam.forward * z;
             dir.Normalize();
             dir *= movementSpeedMultiplier * MovementSpeed;
-            sendInput = true;
+
+            if (dir.Equals(Vector3.zero) && dir.Equals(oldDir))
+            {
+                sendInput = false;
+            }
+            else
+            {
+                sendInput = true;
+            }
+            sendInput = true; // always send temporally because of rotation
         }
     }
 
@@ -223,6 +235,7 @@ public class Player : Fighter, IPlayer
         Vector3 vel = cmd.Input.Velocity;
         vel.y = rb.velocity.y;
         rb.velocity = vel;
+        rb.MoveRotation(cmd.Input.Rotation);
     }
 
     IEnumerator Dash()

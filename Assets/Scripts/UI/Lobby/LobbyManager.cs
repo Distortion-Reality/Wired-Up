@@ -45,7 +45,7 @@ public class LobbyManager : GlobalEventListener
                 entity.transform.localPosition += FindAvailableSpawnPosition();
                 entity.transform.SetParent(canvas, false);
             }
-
+            Debug.Log("Player added to registry:" + entity.GetComponent<LobbyPlayer>().Id);
             NetworkPlayerRegistry.CreatePlayer(entity.GetComponent<LobbyPlayer>(), entity.Source);
         }
     }
