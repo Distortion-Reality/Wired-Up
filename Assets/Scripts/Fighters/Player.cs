@@ -102,8 +102,8 @@ public class Player : Fighter, IPlayer
 
         if (entity.HasControl) // Doesn't work ok server because he has not assigned control to himself yet, compare uuid?
         {
-            healthBar = GameObject.Find("PlayerEnergyBar").GetComponent<Slider>();
-            energyBar = GameObject.Find("PlayerHealthBar").GetComponent<Slider>();
+            healthBar = GameObject.Find("PlayerHealthBar").GetComponent<Slider>();
+            energyBar = GameObject.Find("PlayerEnergyBar").GetComponent<Slider>();
             healthBar.transform.Find("Fill Area").Find("Fill").GetComponent<Image>().color = color;
         }
         else // Ally
