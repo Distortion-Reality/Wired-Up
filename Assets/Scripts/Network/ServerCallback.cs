@@ -33,7 +33,7 @@ public class ServerCallback : Photon.Bolt.GlobalEventListener
 
         Transform spawnPoint = GameObject.Find("PlayersSpawnPoint").transform;
         Vector3 spawnPosition = spawnPoint.position;
-        if (!BoltNetwork.IsServer)
+        if (connection != null)
         {
             spawnPosition += -spawnPoint.right * playerSpawnOffset;
             playerSpawnOffset *= -1; // spawn next player right
