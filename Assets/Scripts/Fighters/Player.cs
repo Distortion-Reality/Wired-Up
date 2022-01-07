@@ -6,8 +6,11 @@ using Photon.Bolt;
 using System;
 
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
+[RequireComponent(typeof(CharacterController))]
 public class Player : Fighter, IPlayer
 {
+    CharacterController controller;
+
     string playerName;
     CharacterColor character;
 
@@ -81,6 +84,8 @@ public class Player : Fighter, IPlayer
     {
         base.EntityStart();
 
+        controller = GetComponent<CharacterController>();
+
         AbilityRegistry.CharacterAbilities abilities = AbilityRegistry.GetAbilities(character);
         attacks = abilities.attacks;
         assists = abilities.assists;
@@ -109,6 +114,7 @@ public class Player : Fighter, IPlayer
         else // Ally
         {
             // Create ally UI
+            // TODO: allyIndex is static and is not reset after new game
             float yScale = Screen.height / gui.GetComponent<CanvasScaler>().referenceResolution.y;
             float yOffset = allyIndex++ * allyInfoYOffset * yScale;
             GameObject allyInfo = Instantiate(allyInfoPrefab, parent: gui.transform);
@@ -122,6 +128,12 @@ public class Player : Fighter, IPlayer
             healthBar = allyInfo.GetComponentInChildren<Slider>();
             healthBar.transform.Find("Fill Area").Find("Fill").GetComponent<Image>().color = color;
         }
+
+        /*if (!entity.IsOwner)
+        {
+            rb.detectCollisions = false;
+            //rb.isKinematic = true;
+        }*/
     }
 
     public override void OwnerUpdate()
@@ -140,6 +152,9 @@ public class Player : Fighter, IPlayer
             target.TargetAbilityManager.ClearUserAbilityQueue();
             EndAbility();
         }
+
+        if (FighterStatus != Status.Stunned)
+            UpdateRotation();
 
         base.OwnerUpdate();
 
@@ -167,7 +182,7 @@ public class Player : Fighter, IPlayer
         
         UpdateMovement();
 
-        base.OwnerFixedUpdate();
+        //base.OwnerFixedUpdate();
     }
 
     void CheckDashInput()
@@ -181,23 +196,70 @@ public class Player : Fighter, IPlayer
     Vector3 dir = Vector3.zero;
     Vector3 oldDir = Vector3.zero;
     bool sendInput = false;
+    Quaternion rot = Quaternion.identity;
+    Quaternion oldRot = Quaternion.identity;
+    bool sendRotation = false;
 
     public override void ControllerFixedUpdate()
     {
-        if (!sendInput)
-            return;
+        if (sendInput)
+        {
+            IPlayerInputCommandInput input = PlayerInputCommand.Create();
+            input.Velocity = dir;
+            entity.QueueInput(input);
+            Debug.Log("Sent input command: " + dir);
+            sendInput = false;
+            oldDir = dir;
+        }
         
-        IPlayerInputCommandInput input = PlayerInputCommand.Create();
-        input.Velocity = dir;
-        input.Rotation = rb.rotation;
-        entity.QueueInput(input);
-        Debug.Log("Sent command: " + dir);
-        sendInput = false;
-        oldDir = dir;
+        if (sendRotation)
+        {
+            IPlayerRotateCommandInput rotInput = PlayerRotateCommand.Create();
+            rotInput.Rotation = rot;
+            entity.QueueInput(rotInput);
+            //Debug.Log("Sent rot command: " + rot);
+            sendRotation = false;
+            oldRot = rot;
+        }
     }
 
     protected override void UpdateMovement()
     {
+        // Don't send input if can't move (except the first time to notify it stopped)
+        if (FighterStatus == Status.Waiting || FighterStatus == Status.Using ||
+            FighterStatus == Status.Stunned || movementsBlocked)
+        {
+            if (!oldDir.Equals(Vector3.zero))
+            {
+                dir = Vector3.zero;
+                sendInput = true;
+            }
+        }
+        else
+        {
+            float x = Input.GetAxisRaw("Horizontal");
+            float z = Input.GetAxisRaw("Vertical");
+
+            dir = cam.right * x + cam.forward * z;
+            dir.Normalize();
+            dir *= movementSpeedMultiplier * MovementSpeed;
+            dir.y = 0f;
+
+            // Don't send input if didn't move
+            if (dir.Equals(Vector3.zero) && dir.Equals(oldDir))
+            {
+                sendInput = false;
+            }
+            else
+            {
+                sendInput = true;
+            }
+        }
+    }
+
+    /*protected override void UpdateMovement()
+    {
+        // Don't send input if can't move (except the first time to notify it stopped)
         if (FighterStatus == Status.Waiting || FighterStatus == Status.Using ||
             FighterStatus == Status.Stunned || movementsBlocked)
         {
@@ -216,6 +278,7 @@ public class Player : Fighter, IPlayer
             dir.Normalize();
             dir *= movementSpeedMultiplier * MovementSpeed;
 
+            // Don't send input if didn't move
             if (dir.Equals(Vector3.zero) && dir.Equals(oldDir))
             {
                 sendInput = false;
@@ -224,18 +287,49 @@ public class Player : Fighter, IPlayer
             {
                 sendInput = true;
             }
-            sendInput = true; // always send temporally because of rotation
         }
+    }*/
+
+    protected override void UpdateRotation()
+    {
+        rot = CalculateRotation();
+        if (!rot.Equals(oldRot))
+            sendRotation = true;
+        
     }
 
     public override void ExecuteCommand(Command command, bool resetState)
     {
-        PlayerInputCommand cmd = (PlayerInputCommand) command;
-        Debug.Log("Received command:" + cmd.Input.Velocity);
-        Vector3 vel = cmd.Input.Velocity;
-        vel.y = rb.velocity.y;
-        rb.velocity = vel;
-        rb.MoveRotation(cmd.Input.Rotation);
+        //if (!entity.IsOwner)
+        //    return;
+
+        if (command is PlayerInputCommand && command.IsFirstExecution)
+        {
+            PlayerInputCommand cmd = (PlayerInputCommand) command;
+            Debug.Log("Received input command " + cmd.Input.Velocity);
+
+            if (resetState)
+            {
+                //rb.velocity = cmd.Result.Velocity;
+                //rb.MovePosition(cmd.Result.Position);
+                transform.position = cmd.Result.Position;
+            }
+            else
+            {
+                Vector3 vel = cmd.Input.Velocity;
+                controller.Move(vel * BoltNetwork.FrameDeltaTime);
+
+                //cmd.Result.Velocity = vel;
+                //cmd.Result.Position = rb.position;
+                cmd.Result.Position = transform.position;
+            }
+        }
+        else if (command is PlayerRotateCommand)
+        {
+            PlayerRotateCommand cmd = (PlayerRotateCommand) command;
+            //Debug.Log("Received rot command " + cmd.Input.Rotation);
+            transform.rotation = cmd.Input.Rotation;
+        }
     }
 
     IEnumerator Dash()

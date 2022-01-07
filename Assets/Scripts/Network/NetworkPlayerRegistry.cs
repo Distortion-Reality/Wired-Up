@@ -17,15 +17,20 @@ public static class NetworkPlayerRegistry
         NetworkPlayer player = new NetworkPlayer(connection, playerObject);
         
         if (connection != null)
+        {
             connection.UserData = player;
+            Debug.Log(connection.ConnectionId);
+        }
 
         players.Add(player);
+        Debug.Log("Add player " + playerObject.Id);
 
         return player;
     }
 
     public static void DestroyPlayer(IPlayer playerObject)
     {
+        Debug.Log("Remove player " + playerObject.Id);
         players.Remove(GetPlayer(playerObject));
     }
 
@@ -44,8 +49,6 @@ public static class NetworkPlayerRegistry
 
     public static NetworkPlayer GetPlayer(IPlayer playerObject)
     {
-        var tmp = players.Find(player => player.PlayerObject.Id.Equals(playerObject.Id));
-        Debug.Log("Get player null: "+ tmp == null);
-        return tmp;
+        return players.Find(player => player.PlayerObject.Id.Equals(playerObject.Id));
     }
 }

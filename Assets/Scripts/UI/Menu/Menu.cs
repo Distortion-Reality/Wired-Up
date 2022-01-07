@@ -25,7 +25,8 @@ public class Menu : GlobalEventListener
 
     public void Host()
     {
-        BoltLauncher.StartServer();
+        if (!BoltNetwork.IsRunning)
+            BoltLauncher.StartServer();
     }
 
     public override void BoltStartDone()
@@ -39,7 +40,8 @@ public class Menu : GlobalEventListener
 
     public void Join()
     {
-        BoltLauncher.StartClient();
+        if (!BoltNetwork.IsRunning)
+            BoltLauncher.StartClient();
     }
 
     public override void SessionListUpdated(Map<Guid, UdpSession> sessionList)

@@ -45,7 +45,6 @@ public class LobbyManager : GlobalEventListener
                 entity.transform.localPosition += FindAvailableSpawnPosition();
                 entity.transform.SetParent(canvas, false);
             }
-            Debug.Log("Player added to registry:" + entity.GetComponent<LobbyPlayer>().Id);
             NetworkPlayerRegistry.CreatePlayer(entity.GetComponent<LobbyPlayer>(), entity.Source);
         }
     }
@@ -53,13 +52,16 @@ public class LobbyManager : GlobalEventListener
     public override void OnEvent(GameStartEvent evnt)
     {
         starting = true;
+        //BoltNetwork.Detach(((LobbyPlayer) NetworkPlayerRegistry.Self.PlayerObject).entity);
     }
 
     public override void EntityDetached(BoltEntity entity)
     {
         if (entity.StateIs<ILobbyPlayerState>() && !starting)
         {
-            NetworkPlayerRegistry.DestroyPlayer(entity.GetComponent<LobbyPlayer>());
+            // Doesn't work because is called before receiving GameStartEvent
+            // If someone leaves lobby this breaks. Use join/quit player events sent by server?
+            //NetworkPlayerRegistry.DestroyPlayer(entity.GetComponent<LobbyPlayer>());
         }
     }
 
@@ -82,7 +84,7 @@ public class LobbyManager : GlobalEventListener
 
     public override void Disconnected(BoltConnection connection)
     {
-        if (BoltNetwork.Server != null && BoltNetwork.Server.Equals(connection))
+        if (BoltNetwork.Server != null && BoltNetwork.Server.Equals(connection)) // Server disconnected
         {
             ReturnToMenu();
         }

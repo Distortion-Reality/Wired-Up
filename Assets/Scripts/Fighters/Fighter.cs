@@ -5,8 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Bolt;
 
-[RequireComponent(typeof(Collider))]
-[RequireComponent(typeof(Rigidbody))]
 public abstract class Fighter : MonoBehaviour
 {
     public enum Status
@@ -130,7 +128,8 @@ public abstract class Fighter : MonoBehaviour
         {
             State.statistics[i] = stats[(StatisticManager.StatisticId) i].CurrentValue;
         }
-        State.status = (int) fighterStatus;
+        if (entity.IsOwner)
+            State.status = (int) fighterStatus;
 
         State.AddCallback("statistics[]", StatisticChanged);
         State.AddCallback("status", StatusChanged);
@@ -298,6 +297,11 @@ public abstract class Fighter : MonoBehaviour
 
     protected virtual void UpdateRotation()
     {
+        rb.MoveRotation(CalculateRotation());
+    }
+
+    protected Quaternion CalculateRotation()
+    {
         Quaternion rotation;
         if (FighterStatus != Status.Free &&
             FighterStatus != Status.Disconnecting)
@@ -305,16 +309,15 @@ public abstract class Fighter : MonoBehaviour
         else
         {
             Quaternion finalRotation = (target == null) ? DefaultRotation : LookAtTargetRotation();
-            rotation = Quaternion.Slerp(rb.rotation, finalRotation, RotationSpeed * Time.fixedDeltaTime);
+            rotation = Quaternion.Slerp(transform.rotation, finalRotation, RotationSpeed * Time.fixedDeltaTime);
         }
-
-        rb.MoveRotation(rotation);
+        return rotation;
     }
 
     Quaternion LookAtTargetRotation()
     {
         return Quaternion.LookRotation(
-            Vector3.ProjectOnPlane(target.transform.position - rb.position, transform.up));
+            Vector3.ProjectOnPlane(target.transform.position - transform.position, transform.up));
     }
 
     Vector3 OffsetVector(float offset)

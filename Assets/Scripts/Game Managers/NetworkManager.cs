@@ -47,7 +47,6 @@ public class NetworkManager : GlobalEventListener {
 
             if (fighter is Player player)
             {
-                Debug.Log("Get player " + player.Id);
                 NetworkPlayerRegistry.GetPlayer(player).PlayerObject = player;
             }
         }
