@@ -4,14 +4,14 @@ public class EnemySpawner : EntitySpawner
 {
     public EnemyId enemyId;
 
-    protected override FighterInfo CreateToken()
+    protected override FighterToken CreateToken()
     {
-        return new EnemyInfo();
+        return new EnemyToken();
     }
 
-    protected override FighterInfo BuildToken()
+    protected override FighterToken BuildToken()
     {
-        EnemyInfo token = (EnemyInfo) base.BuildToken();
+        EnemyToken token = (EnemyToken) base.BuildToken();
         token.enemyId = enemyId;
         return token; 
     }

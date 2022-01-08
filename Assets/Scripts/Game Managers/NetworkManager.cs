@@ -26,14 +26,14 @@ public class NetworkManager : GlobalEventListener {
 
         // Spawn player
         CharacterManager characterManager = FindObjectOfType<CharacterManager>();
-        PlayerInfo info = new PlayerInfo
+        PlayerToken info = new PlayerToken
         {
             guid = Guid.NewGuid(),
             name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName),
             character = characterManager.CurrentCharacter
         };
 
-        LevelSpawnInfo spawnInfo = (LevelSpawnInfo) token;
+        LevelSpawnToken spawnInfo = (LevelSpawnToken) token;
         Transform spawnPoint = GameObject.Find("PlayersSpawnPoint").transform;
         Vector3 spawnPosition = spawnPoint.position;
         if (!BoltNetwork.IsServer)

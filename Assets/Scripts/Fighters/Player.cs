@@ -60,9 +60,9 @@ public class Player : Fighter
     {
         base.UnwrapAttachedToken();
 
-        PlayerInfo info = (PlayerInfo) entity.AttachToken;
-        playerName = info.name;
-        character = info.character;
+        PlayerToken token = (PlayerToken) entity.AttachToken;
+        playerName = token.name;
+        character = token.character;
     }
 
     protected override void LoadModel()
