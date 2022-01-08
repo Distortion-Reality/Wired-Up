@@ -1372,8 +1372,7 @@
             ]
           },
           "AssetSettings": {
-            "$type": "Photon.Bolt.Compiler.PropertyCommandSettings, bolt.compiler",
-            "SmoothCorrection": true
+            "$type": "Photon.Bolt.Compiler.PropertyCommandSettings, bolt.compiler"
           }
         },
         {
@@ -1417,11 +1416,12 @@
           },
           "AssetSettings": {
             "$type": "Photon.Bolt.Compiler.PropertyCommandSettings, bolt.compiler",
-            "SmoothCorrection": true,
             "SnapMagnitude": 2.0
           }
         }
       ],
+      "IsInstant": true,
+      "LimitOnePerFrame": true,
       "Properties": [],
       "Name": "PlayerInputCommand",
       "Guid": "33978396-fb2f-4dd4-a29e-f697bee3a993",

@@ -303,19 +303,21 @@ public class Player : Fighter, IPlayer
         //if (!entity.IsOwner)
         //    return;
 
-        if (command is PlayerInputCommand && command.IsFirstExecution)
+        if (command is PlayerInputCommand)
         {
             PlayerInputCommand cmd = (PlayerInputCommand) command;
-            Debug.Log("Received input command " + cmd.Input.Velocity);
+            //Debug.Log("Received input command " + cmd.Input.Velocity + " " + resetState);
 
             if (resetState)
             {
+                Debug.Log("Received reset input command " + cmd.Input.Velocity);
                 //rb.velocity = cmd.Result.Velocity;
                 //rb.MovePosition(cmd.Result.Position);
                 transform.position = cmd.Result.Position;
             }
-            else
+            else if (command.IsFirstExecution)
             {
+                Debug.Log("Received input command " + cmd.Input.Velocity);
                 Vector3 vel = cmd.Input.Velocity;
                 controller.Move(vel * BoltNetwork.FrameDeltaTime);
 
