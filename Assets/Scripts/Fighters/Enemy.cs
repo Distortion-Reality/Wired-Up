@@ -126,12 +126,6 @@ public class Enemy : Fighter
         transform.rotation = rotation;
     }
 
-    Quaternion LookAtTargetRotation()
-    {
-        return Quaternion.LookRotation(
-            Vector3.ProjectOnPlane(target.transform.position - rb.position, transform.up));
-    }
-
     IEnumerator AbilityAnimationCooldown()
     {
         yield return new WaitForSeconds(2f);

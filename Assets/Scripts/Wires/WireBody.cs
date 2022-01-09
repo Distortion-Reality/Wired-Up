@@ -13,25 +13,15 @@ public class WireBody : EntityBehaviour<IPlayerState>
 
     Vector3 LocalScale
     {
-        get => state.wireBodyScale;
-        set => state.wireBodyScale = value;
+        get => transform.parent.localScale;
+        set => transform.parent.localScale = value;
     }
 
     public float Length => defaultLength * LocalScale.y;
 
     public override void Attached()
     {
-        if (entity.IsOwner)
-            state.wireBodyScale = transform.parent.localScale;
-
-        state.AddCallback("wireBodyScale", ScaleChanged);
-
         defaultLocalScale = LocalScale;
-    }
-
-    void ScaleChanged()
-    {
-        transform.parent.localScale = state.wireBodyScale;
     }
 
     public void Init(Wire wire, WireHead wireHead)
@@ -61,7 +51,7 @@ public class WireBody : EntityBehaviour<IPlayerState>
         if (!entity.IsOwner || other.CompareTag("Terrain"))
             return;
 
-        switch (player.FighterStatus)
+        switch (player.FighterStatusLocal)
         {
             case Fighter.Status.Waiting:
                 if (other.gameObject != player.Target.gameObject)

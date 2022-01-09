@@ -87,6 +87,9 @@ public class Player : Fighter
         CharacterManager characterManager = FindObjectOfType<CharacterManager>();
         foreach (Renderer renderer in wire.GetComponentsInChildren<Renderer>())
             renderer.material = characterManager.GetWireMaterial(character);
+        State.OnwireConnect += wire.Connect;
+        State.OnwireDisconnect += wire.Disconnect;
+        State.AddCallback("wireStayConnectedTarget", WireStayConnectedTarget);
 
         cam = Camera.main.transform;
 
@@ -136,15 +139,15 @@ public class Player : Fighter
 
         base.OwnerUpdate();
 
-        if (FighterStatus != Status.Stunned)
+        if (FighterStatusLocal != Status.Stunned)
         {
             CheckDashInput();
             
-            if (FighterStatus != Status.Using)
+            if (FighterStatusLocal != Status.Using)
             {
                 CheckTargetInput();
 
-                if (FighterStatus != Status.Disconnecting && target)
+                if (FighterStatusLocal != Status.Disconnecting && target)
                     CheckAbilityInput();
             }
         }
@@ -163,7 +166,7 @@ public class Player : Fighter
     void CheckDashInput()
     {
         if (Input.GetButtonDown("Dash") && Time.time > nextDashTime &&
-            FighterStatus == Status.Free &&
+            FighterStatusLocal == Status.Free &&
             CheckAndUseEnergy(DashEnergy))
             StartCoroutine(Dash());
     }
@@ -172,8 +175,8 @@ public class Player : Fighter
     {
         Vector3 dir;
 
-        if (FighterStatus == Status.Waiting || FighterStatus == Status.Using ||
-            FighterStatus == Status.Stunned || movementsBlocked)
+        if (FighterStatusLocal == Status.Waiting || FighterStatusLocal == Status.Using ||
+            FighterStatusLocal == Status.Stunned || movementsBlocked)
             dir = Vector3.zero;
         else
         {
@@ -263,7 +266,7 @@ public class Player : Fighter
     {
         CheckAndUpdatePlayerStatus();
         currentAbility = ability;
-        wire.Connect();
+        State.wireConnect();
     }
 
     protected override void OnEndAbility()
@@ -271,7 +274,10 @@ public class Player : Fighter
         base.OnEndAbility();
 
         if (wire.gameObject.activeSelf)
-            wire.Disconnect();
+        {
+            FighterStatusLocal = Fighter.Status.Disconnecting;
+            State.wireDisconnect();
+        }
     }
 
     public void InterruptWaiting()
@@ -280,20 +286,29 @@ public class Player : Fighter
         EndAbility();
     }
 
+    void WireStayConnectedTarget()
+    {
+        if (State.wireStayConnectedTarget == null)
+            return;
+        
+        target = State.wireStayConnectedTarget.GetComponent<Fighter>();
+        wire.StayConnected();
+    }
+
     public void EnqueueUserAbilityToTarget(Fighter actualTarget)
     {
         target = actualTarget;
-        FighterStatus = Status.Waiting;
         target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
         
-        wire.StayConnected();
+        State.wireStayConnectedTarget = null;
+        State.wireStayConnectedTarget = target.Entity;
     }
 
     void CheckAndUpdatePlayerStatus()
     {
-        if (FighterStatus == Status.Waiting)
+        if (FighterStatusLocal == Status.Waiting)
             InterruptWaiting();
-        else if (FighterStatus == Status.Connecting)
+        else if (FighterStatusLocal == Status.Connecting)
             EndAbility();
     }
 

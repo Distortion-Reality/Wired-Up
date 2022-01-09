@@ -138,78 +138,13 @@
       "$type": "Photon.Bolt.Compiler.StateDefinition, bolt.compiler",
       "Properties": [
         {
-          "Name": "wireTransform",
+          "Name": "wireConnect",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
-            "$type": "Photon.Bolt.Compiler.PropertyTypeTransform, bolt.compiler",
-            "PositionSelection": 14,
-            "RotationSelection": 14,
-            "PositionCompression": [
-              {
-                "MinValue": -64,
-                "MaxValue": 64,
-                "Accuracy": 0.01,
-                "Enabled": true,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "Shift": 64.0,
-                "BitsRequired": 14
-              },
-              {
-                "MinValue": -64,
-                "MaxValue": 64,
-                "Accuracy": 0.01,
-                "Enabled": true,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "Shift": 64.0,
-                "BitsRequired": 14
-              },
-              {
-                "MinValue": -64,
-                "MaxValue": 64,
-                "Accuracy": 0.01,
-                "Enabled": true,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "Shift": 64.0,
-                "BitsRequired": 14
-              }
-            ],
-            "RotationCompression": [
-              {
-                "MaxValue": 360,
-                "Accuracy": 0.01,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "BitsRequired": 16
-              },
-              {
-                "MaxValue": 360,
-                "Accuracy": 0.01,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "BitsRequired": 16
-              },
-              {
-                "MaxValue": 360,
-                "Accuracy": 0.01,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "BitsRequired": 16
-              }
-            ],
-            "RotationCompressionQuaternion": {
-              "MinValue": -1,
-              "MaxValue": 1,
-              "Accuracy": 0.01,
-              "Pack": 100.0,
-              "Read": 0.01,
-              "Shift": 1.0,
-              "BitsRequired": 8
-            }
+            "$type": "Photon.Bolt.Compiler.PropertyTypeTrigger, bolt.compiler"
           },
           "AssetSettings": {
             "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",
@@ -220,39 +155,13 @@
           }
         },
         {
-          "Name": "wireBodyScale",
+          "Name": "wireDisconnect",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
-            "$type": "Photon.Bolt.Compiler.PropertyTypeVector, bolt.compiler",
-            "Selection": 14,
-            "Compression": [
-              {
-                "MaxValue": 255,
-                "Accuracy": 0.01,
-                "Enabled": true,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "BitsRequired": 15
-              },
-              {
-                "MaxValue": 255,
-                "Accuracy": 0.01,
-                "Enabled": true,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "BitsRequired": 15
-              },
-              {
-                "MaxValue": 255,
-                "Accuracy": 0.01,
-                "Enabled": true,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "BitsRequired": 15
-              }
-            ]
+            "$type": "Photon.Bolt.Compiler.PropertyTypeTrigger, bolt.compiler"
           },
           "AssetSettings": {
             "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",
@@ -263,95 +172,13 @@
           }
         },
         {
-          "Name": "wireHeadTransform",
+          "Name": "wireStayConnectedTarget",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
-            "$type": "Photon.Bolt.Compiler.PropertyTypeTransform, bolt.compiler",
-            "PositionSelection": 14,
-            "RotationSelection": 14,
-            "ExtrapolationVelocityMode": 1,
-            "PositionCompression": [
-              {
-                "MinValue": -64,
-                "MaxValue": 64,
-                "Accuracy": 0.01,
-                "Enabled": true,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "Shift": 64.0,
-                "BitsRequired": 14
-              },
-              {
-                "MinValue": -64,
-                "MaxValue": 64,
-                "Accuracy": 0.01,
-                "Enabled": true,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "Shift": 64.0,
-                "BitsRequired": 14
-              },
-              {
-                "MinValue": -64,
-                "MaxValue": 64,
-                "Accuracy": 0.01,
-                "Enabled": true,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "Shift": 64.0,
-                "BitsRequired": 14
-              }
-            ],
-            "RotationCompression": [
-              {
-                "MaxValue": 360,
-                "Accuracy": 0.01,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "BitsRequired": 16
-              },
-              {
-                "MaxValue": 360,
-                "Accuracy": 0.01,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "BitsRequired": 16
-              },
-              {
-                "MaxValue": 360,
-                "Accuracy": 0.01,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "BitsRequired": 16
-              }
-            ],
-            "RotationCompressionQuaternion": {
-              "MinValue": -1,
-              "MaxValue": 1,
-              "Accuracy": 0.01,
-              "Pack": 100.0,
-              "Read": 0.01,
-              "Shift": 1.0,
-              "BitsRequired": 8
-            }
-          },
-          "AssetSettings": {
-            "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",
-            "ExtrapolationErrorTolerance": 0.25,
-            "_ExtrapolationCorrectionFrames": 6,
-            "ExtrapolationMaxFrames": 9,
-            "SnapMagnitude": 10.0
-          }
-        },
-        {
-          "Name": "wireActive",
-          "Enabled": true,
-          "Expanded": true,
-          "Priority": 1,
-          "PropertyType": {
-            "$type": "Photon.Bolt.Compiler.PropertyTypeBool, bolt.compiler"
+            "$type": "Photon.Bolt.Compiler.PropertyTypeEntity, bolt.compiler"
           },
           "AssetSettings": {
             "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",

@@ -56,10 +56,10 @@ public abstract class Fighter : MonoBehaviour
             if (entity.IsOwner)
                 State.status = (int) value;
             else
-                ChangeStatusEvent.Post(entity.Source, ReliabilityModes.ReliableOrdered, entityId, 
-                    (int) Fighter.Status.Using);
+                ChangeStatusEvent.Post(entity.Source, ReliabilityModes.ReliableOrdered, entityId, (int) value);
         }
     }
+    public Status FighterStatusLocal { get => fighterStatus; set => fighterStatus = value; }
     public TargetAbilityManager TargetAbilityManager { get => targetAbilityManager; }
     public Fighter Target { get => target; set => target = value; }
     public Animator Animator { get => animator; }
@@ -123,7 +123,8 @@ public abstract class Fighter : MonoBehaviour
         {
             State.statistics[i] = stats[(StatisticManager.StatisticId) i].CurrentValue;
         }
-        State.status = (int) fighterStatus;
+        if (entity.IsOwner)
+            State.status = (int) fighterStatus;
 
         State.AddCallback("statistics[]", StatisticChanged);
         State.AddCallback("status", StatusChanged);
@@ -287,8 +288,8 @@ public abstract class Fighter : MonoBehaviour
     protected virtual void UpdateRotation()
     {
         Quaternion rotation;
-        if (FighterStatus != Status.Free &&
-            FighterStatus != Status.Disconnecting)
+        if (FighterStatusLocal != Status.Free &&
+            FighterStatusLocal != Status.Disconnecting)
             rotation = LookAtTargetRotation();
         else
         {
@@ -299,7 +300,7 @@ public abstract class Fighter : MonoBehaviour
         rb.MoveRotation(rotation);
     }
 
-    Quaternion LookAtTargetRotation()
+    public Quaternion LookAtTargetRotation()
     {
         return Quaternion.LookRotation(
             Vector3.ProjectOnPlane(target.transform.position - rb.position, transform.up));

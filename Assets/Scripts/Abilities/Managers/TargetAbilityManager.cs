@@ -86,7 +86,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
             UserAbility userAbility = userAbilityQueue.Dequeue();
             userAbility.DoUserAbility(target);
 
-            yield return new WaitUntil(() => userAbility.User.FighterStatus == Fighter.Status.Disconnecting);
+            yield return new WaitUntil(() => userAbility.User.FighterStatusLocal == Fighter.Status.Disconnecting);
         }
 
         usersAreUsing = false;
