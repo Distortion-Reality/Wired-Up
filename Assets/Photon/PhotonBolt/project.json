@@ -142,7 +142,7 @@
           "Enabled": true,
           "Expanded": true,
           "ReplicationMode": 1,
-          "Priority": 1,
+          "Priority": 10,
           "PropertyType": {
             "$type": "Photon.Bolt.Compiler.PropertyTypeTrigger, bolt.compiler"
           },
@@ -159,7 +159,7 @@
           "Enabled": true,
           "Expanded": true,
           "ReplicationMode": 1,
-          "Priority": 1,
+          "Priority": 10,
           "PropertyType": {
             "$type": "Photon.Bolt.Compiler.PropertyTypeTrigger, bolt.compiler"
           },
@@ -176,7 +176,7 @@
           "Enabled": true,
           "Expanded": true,
           "ReplicationMode": 1,
-          "Priority": 1,
+          "Priority": 10,
           "PropertyType": {
             "$type": "Photon.Bolt.Compiler.PropertyTypeEntity, bolt.compiler"
           },
