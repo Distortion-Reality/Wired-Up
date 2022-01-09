@@ -13,14 +13,15 @@ MonoBehaviour:
   m_Name: BoltProtocolTokenRegistry
   m_EditorClassIdentifier: 
   protocolTokenRegistry:
-  - DisplayName: EnemyInfo
-    AssemblyName: EnemyInfo, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-  - DisplayName: FighterInfo
-    AssemblyName: FighterInfo, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+  - DisplayName: EnemyToken
+    AssemblyName: EnemyToken, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  - DisplayName: PlayerInfo
-    AssemblyName: PlayerInfo, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+  - DisplayName: FighterToken
+    AssemblyName: FighterToken, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  - DisplayName: LevelSpawnInfo
-    AssemblyName: LevelSpawnInfo, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+  - DisplayName: PlayerToken
+    AssemblyName: PlayerToken, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - DisplayName: LevelSpawnToken
+    AssemblyName: LevelSpawnToken, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null

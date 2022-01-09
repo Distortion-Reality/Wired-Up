@@ -13,11 +13,6 @@ public class WireHead : EntityBehaviour<IPlayerState>
 
     public float Length => defaultLength * transform.localScale.y;
 
-    public override void Attached()
-    {
-        state.SetTransforms(state.wireHeadTransform, transform, transform);
-    }
-
     public void Init(Wire wire, WireBody wireBody)
     {
         player = GetComponentInParent<Player>();
@@ -45,7 +40,7 @@ public class WireHead : EntityBehaviour<IPlayerState>
         if (!entity.IsOwner || other.CompareTag("Terrain"))
             return;
 
-        switch (player.FighterStatus)
+        switch (player.FighterStatusLocal)
         {
             case Fighter.Status.Waiting:
                 if (other.gameObject != player.Target.gameObject && !other.GetComponent<WireHead>())

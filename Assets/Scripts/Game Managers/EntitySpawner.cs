@@ -14,14 +14,14 @@ public class EntitySpawner : MonoBehaviour
         Destroy(gameObject);
     }
 
-    protected virtual FighterInfo CreateToken()
+    protected virtual FighterToken CreateToken()
     {
-        return new FighterInfo();
+        return new FighterToken();
     }
 
-    protected virtual FighterInfo BuildToken()
+    protected virtual FighterToken BuildToken()
     {
-        FighterInfo token = CreateToken();
+        FighterToken token = CreateToken();
         token.guid = Guid.NewGuid();
         return token; 
     }

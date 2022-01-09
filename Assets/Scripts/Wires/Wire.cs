@@ -23,18 +23,6 @@ public class Wire : EntityBehaviour<IPlayerState>
     public override void Attached()
     {
         WireStart();
-
-        if (entity.IsOwner)
-            state.wireActive = gameObject.activeSelf;
-        state.SetTransforms(state.wireTransform, transform.parent, transform.parent);
-
-        state.AddCallback("wireActive", ActiveChanged);
-    }
-
-    void ActiveChanged()
-    {
-        if (!entity.IsOwner)
-            gameObject.SetActive(state.wireActive);
     }
 
     void WireStart()
@@ -52,7 +40,8 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     public void Connect()
     {
-        if (player.FighterStatus == Fighter.Status.Disconnecting)
+        Debug.Log("Connect");
+        if (player.FighterStatusLocal == Fighter.Status.Disconnecting)
             StartCoroutine(ConnectWhenDisconnected());
         else
         {
@@ -63,18 +52,22 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     public void StayConnected()
     {
+        Debug.Log("Stay connected");
+        player.FighterStatusLocal = Fighter.Status.Waiting;
         StartCoroutine(AdjustExtension());
     }
 
     public void Disconnect()
     {
-        player.FighterStatus = Fighter.Status.Disconnecting;
+        Debug.Log("Disconnect");
+        if (!entity.IsOwner)
+            player.FighterStatusLocal = Fighter.Status.Disconnecting;
         StartCoroutine(Retract());
     }
 
     void StartConnecting()
     {
-        player.FighterStatus = Fighter.Status.Connecting;
+        player.FighterStatusLocal = Fighter.Status.Connecting;
         StartCoroutine(Extend());
     }
 
@@ -100,7 +93,7 @@ public class Wire : EntityBehaviour<IPlayerState>
     IEnumerator ConnectWhenDisconnected()
     {
         connectWhenDisconnected = true;
-        yield return new WaitUntil(() => player.FighterStatus != Fighter.Status.Disconnecting);
+        yield return new WaitUntil(() => player.FighterStatusLocal != Fighter.Status.Disconnecting);
 
         connectWhenDisconnected = false;
         StartConnecting();
@@ -108,9 +101,9 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     IEnumerator Extend()
     {
-        while (player.FighterStatus == Fighter.Status.Connecting)
+        while (player.FighterStatusLocal == Fighter.Status.Connecting)
         {
-            if (Length >= player.AbilityRange)
+            if (player.Entity.IsOwner && Length >= player.AbilityRange)
                 player.EndAbility();
             else
             {
@@ -122,10 +115,11 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     IEnumerator AdjustExtension()
     {
-        while (player.FighterStatus == Fighter.Status.Waiting ||
-            player.FighterStatus == Fighter.Status.Using)
+        while (player.FighterStatusLocal == Fighter.Status.Waiting ||
+            player.FighterStatusLocal == Fighter.Status.Using)
         {
             ApplyExtension(player.TargetDistance - Length);
+            transform.rotation = player.LookAtTargetRotation() * defaultLocalRotation;
 
             yield return null;
         }
@@ -153,21 +147,9 @@ public class Wire : EntityBehaviour<IPlayerState>
 
         transform.localRotation = defaultLocalRotation;
 
-        player.FighterStatus = Fighter.Status.Free;
+        player.FighterStatusLocal = Fighter.Status.Free;
 
         if (!connectWhenDisconnected)
             gameObject.SetActive(false);
-    }
-
-    void OnEnable()
-    {
-        if (entity.IsOwner)
-            state.wireActive = true;
-    }
-
-    void OnDisable()
-    {
-        if (entity.IsAttached && entity.IsOwner)
-            state.wireActive = false;
     }
 }

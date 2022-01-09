@@ -1,7 +1,7 @@
 using Photon.Bolt;
 using UdpKit;
 
-public class LevelSpawnInfo : IProtocolToken
+public class LevelSpawnToken : IProtocolToken
 {
     public CharacterColor center, left, right;
     

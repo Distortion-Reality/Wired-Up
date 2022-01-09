@@ -48,8 +48,8 @@ public class Enemy : Fighter
     {
         base.UnwrapAttachedToken();
 
-        EnemyInfo info = (EnemyInfo) entity.AttachToken;
-        id = info.enemyId;
+        EnemyToken token = (EnemyToken) entity.AttachToken;
+        id = token.enemyId;
     }
 
     protected override void LoadModel()
@@ -124,12 +124,6 @@ public class Enemy : Fighter
         }
 
         transform.rotation = rotation;
-    }
-
-    Quaternion LookAtTargetRotation()
-    {
-        return Quaternion.LookRotation(
-            Vector3.ProjectOnPlane(target.transform.position - rb.position, transform.up));
     }
 
     IEnumerator AbilityAnimationCooldown()
