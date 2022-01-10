@@ -15,7 +15,7 @@ public class Enemy : Fighter
     const float HealthBarMinDistance = 10f;
     const float HealthBarMaxDistance = 60f;
 
-    NavMeshAgent agent;
+    protected NavMeshAgent agent;
 
     protected new IEnemyState State => entity.GetState<IEnemyState>();
     protected override float MovementSpeed => 1.5f * base.MovementSpeed;
