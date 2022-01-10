@@ -104,7 +104,7 @@ public class Player : Fighter
         else // Ally
         {
             // Create ally UI
-            NetworkManager networkManager = GameObject.FindObjectOfType<NetworkManager>();
+            NetworkManager networkManager = FindObjectOfType<NetworkManager>();
             float yScale = Screen.height / gui.GetComponent<CanvasScaler>().referenceResolution.y;
             float yOffset = networkManager.AllyCount * allyInfoYOffset * yScale;
             GameObject allyInfo = Instantiate(allyInfoPrefab, parent: gui.transform);
@@ -272,7 +272,7 @@ public class Player : Fighter
 
         if (wire.gameObject.activeSelf)
         {
-            FighterStatusLocal = Fighter.Status.Disconnecting;
+            FighterStatusLocal = Status.Disconnecting;
             WireDisconnectEvent.Post(ReliabilityModes.ReliableOrdered, entityId);
         }
     }

@@ -40,7 +40,6 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     public void Connect()
     {
-        Debug.Log("Connect");
         if (player.FighterStatusLocal == Fighter.Status.Disconnecting)
             StartCoroutine(ConnectWhenDisconnected());
         else
@@ -52,14 +51,12 @@ public class Wire : EntityBehaviour<IPlayerState>
 
     public void StayConnected()
     {
-        Debug.Log("Stay connected");
         player.FighterStatusLocal = Fighter.Status.Waiting;
         StartCoroutine(AdjustExtension());
     }
 
     public void Disconnect()
     {
-        Debug.Log("Disconnect");
         if (!gameObject.activeSelf)
             return;
         if (!entity.IsOwner)
@@ -141,7 +138,7 @@ public class Wire : EntityBehaviour<IPlayerState>
                 ResetExtension();
             else
             {
-                ApplyExtension(- retraction);
+                ApplyExtension(-retraction);
 
                 yield return null;
             }

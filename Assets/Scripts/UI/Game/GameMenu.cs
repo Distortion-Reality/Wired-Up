@@ -6,7 +6,7 @@ public class GameMenu : MonoBehaviour
 {
     public GameObject panel;
 
-    public bool IsOpen => panel.gameObject.activeSelf;
+    public bool IsOpen => panel.activeSelf;
 
     public void Trigger()
     {
