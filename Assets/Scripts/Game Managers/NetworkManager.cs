@@ -39,9 +39,9 @@ public class NetworkManager : GlobalEventListener {
         if (!BoltNetwork.IsServer)
         {
             if (characterManager.CurrentCharacter == spawnInfo.left)
-            spawnPosition += Vector3.left * 5;
+                spawnPosition += Vector3.left * 5;
             else if (characterManager.CurrentCharacter == spawnInfo.right)
-            spawnPosition += Vector3.right * 5;
+                spawnPosition += Vector3.right * 5;
         }
 
         BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Player, info, spawnPosition, spawnPoint.rotation);
@@ -130,6 +130,23 @@ public class NetworkManager : GlobalEventListener {
             wire.transform.localRotation = Quaternion.identity;
         else
             wire.transform.LookAt(evnt.lookAt);
+    }
+
+    public override void OnEvent(WireConnectEvent evnt)
+    {
+        ((Player) fighters[evnt.entityId]).Wire.Connect();
+    }
+
+    public override void OnEvent(WireStayConnectedTargetEvent evnt)
+    {
+        Player sender = (Player) fighters[evnt.senderId];
+        sender.Target = fighters[evnt.targetId];
+        sender.Wire.StayConnected();
+    }
+
+    public override void OnEvent(WireDisconnectEvent evnt)
+    {
+        ((Player) fighters[evnt.entityId]).Wire.Disconnect();
     }
 
     public override void OnEvent(SpawnParticleEvent evnt)

@@ -136,59 +136,7 @@
     },
     {
       "$type": "Photon.Bolt.Compiler.StateDefinition, bolt.compiler",
-      "Properties": [
-        {
-          "Name": "wireConnect",
-          "Enabled": true,
-          "Expanded": true,
-          "ReplicationMode": 1,
-          "Priority": 10,
-          "PropertyType": {
-            "$type": "Photon.Bolt.Compiler.PropertyTypeTrigger, bolt.compiler"
-          },
-          "AssetSettings": {
-            "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",
-            "ExtrapolationErrorTolerance": 0.25,
-            "_ExtrapolationCorrectionFrames": 6,
-            "ExtrapolationMaxFrames": 9,
-            "SnapMagnitude": 10.0
-          }
-        },
-        {
-          "Name": "wireDisconnect",
-          "Enabled": true,
-          "Expanded": true,
-          "ReplicationMode": 1,
-          "Priority": 10,
-          "PropertyType": {
-            "$type": "Photon.Bolt.Compiler.PropertyTypeTrigger, bolt.compiler"
-          },
-          "AssetSettings": {
-            "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",
-            "ExtrapolationErrorTolerance": 0.25,
-            "_ExtrapolationCorrectionFrames": 6,
-            "ExtrapolationMaxFrames": 9,
-            "SnapMagnitude": 10.0
-          }
-        },
-        {
-          "Name": "wireStayConnectedTarget",
-          "Enabled": true,
-          "Expanded": true,
-          "ReplicationMode": 1,
-          "Priority": 10,
-          "PropertyType": {
-            "$type": "Photon.Bolt.Compiler.PropertyTypeEntity, bolt.compiler"
-          },
-          "AssetSettings": {
-            "$type": "Photon.Bolt.Compiler.PropertyStateSettings, bolt.compiler",
-            "ExtrapolationErrorTolerance": 0.25,
-            "_ExtrapolationCorrectionFrames": 6,
-            "ExtrapolationMaxFrames": 9,
-            "SnapMagnitude": 10.0
-          }
-        }
-      ],
+      "Properties": [],
       "ParentGuid": "ce5991b7-d2a3-4cfc-b513-902d8119adae",
       "PacketMaxBits": 512,
       "PacketMaxProperties": 16,
@@ -1118,6 +1066,82 @@
       ],
       "Name": "ChargeEvent",
       "Guid": "933d8742-fb60-4c86-b6b7-71161b82ab3d",
+      "Groups": []
+    },
+    {
+      "$type": "Photon.Bolt.Compiler.EventDefinition, bolt.compiler",
+      "Properties": [
+        {
+          "Name": "senderId",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Photon.Bolt.Compiler.PropertyTypeGuid, bolt.compiler"
+          },
+          "AssetSettings": {
+            "$type": "Photon.Bolt.Compiler.PropertyEventSettings, bolt.compiler"
+          }
+        },
+        {
+          "Name": "targetId",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Photon.Bolt.Compiler.PropertyTypeGuid, bolt.compiler"
+          },
+          "AssetSettings": {
+            "$type": "Photon.Bolt.Compiler.PropertyEventSettings, bolt.compiler"
+          }
+        }
+      ],
+      "Name": "WireStayConnectedTargetEvent",
+      "Guid": "a2410b28-a2e1-433b-baee-f4e42412f954",
+      "Groups": []
+    },
+    {
+      "$type": "Photon.Bolt.Compiler.EventDefinition, bolt.compiler",
+      "Properties": [
+        {
+          "Name": "entityId",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Photon.Bolt.Compiler.PropertyTypeGuid, bolt.compiler"
+          },
+          "AssetSettings": {
+            "$type": "Photon.Bolt.Compiler.PropertyEventSettings, bolt.compiler"
+          }
+        }
+      ],
+      "Name": "WireConnectEvent",
+      "Guid": "c24ed85d-b853-43b0-83a3-1c5f0dbb9b73",
+      "Groups": []
+    },
+    {
+      "$type": "Photon.Bolt.Compiler.EventDefinition, bolt.compiler",
+      "Properties": [
+        {
+          "Name": "entityId",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Photon.Bolt.Compiler.PropertyTypeGuid, bolt.compiler"
+          },
+          "AssetSettings": {
+            "$type": "Photon.Bolt.Compiler.PropertyEventSettings, bolt.compiler"
+          }
+        }
+      ],
+      "Name": "WireDisconnectEvent",
+      "Guid": "080b8127-9c2a-4bc5-912c-0b60d0b61564",
       "Groups": []
     }
   ],

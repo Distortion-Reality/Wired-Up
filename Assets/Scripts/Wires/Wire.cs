@@ -60,6 +60,8 @@ public class Wire : EntityBehaviour<IPlayerState>
     public void Disconnect()
     {
         Debug.Log("Disconnect");
+        if (!gameObject.activeSelf)
+            return;
         if (!entity.IsOwner)
             player.FighterStatusLocal = Fighter.Status.Disconnecting;
         StartCoroutine(Retract());

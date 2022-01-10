@@ -87,9 +87,6 @@ public class Player : Fighter
         CharacterManager characterManager = FindObjectOfType<CharacterManager>();
         foreach (Renderer renderer in wire.GetComponentsInChildren<Renderer>())
             renderer.material = characterManager.GetWireMaterial(character);
-        State.OnwireConnect += wire.Connect;
-        State.OnwireDisconnect += wire.Disconnect;
-        State.AddCallback("wireStayConnectedTarget", WireStayConnectedTarget);
 
         cam = Camera.main.transform;
 
@@ -266,7 +263,7 @@ public class Player : Fighter
     {
         CheckAndUpdatePlayerStatus();
         currentAbility = ability;
-        State.wireConnect();
+        WireConnectEvent.Post(ReliabilityModes.ReliableOrdered, entityId);
     }
 
     protected override void OnEndAbility()
@@ -276,7 +273,7 @@ public class Player : Fighter
         if (wire.gameObject.activeSelf)
         {
             FighterStatusLocal = Fighter.Status.Disconnecting;
-            State.wireDisconnect();
+            WireDisconnectEvent.Post(ReliabilityModes.ReliableOrdered, entityId);
         }
     }
 
@@ -286,22 +283,12 @@ public class Player : Fighter
         EndAbility();
     }
 
-    void WireStayConnectedTarget()
-    {
-        if (State.wireStayConnectedTarget == null)
-            return;
-        
-        target = State.wireStayConnectedTarget.GetComponent<Fighter>();
-        wire.StayConnected();
-    }
-
     public void EnqueueUserAbilityToTarget(Fighter actualTarget)
     {
         target = actualTarget;
         target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
         
-        State.wireStayConnectedTarget = null;
-        State.wireStayConnectedTarget = target.Entity;
+        WireStayConnectedTargetEvent.Post(ReliabilityModes.ReliableOrdered, entityId, target.EntityId);
     }
 
     void CheckAndUpdatePlayerStatus()
