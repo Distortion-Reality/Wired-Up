@@ -60,9 +60,9 @@ public class Player : Fighter
     {
         base.UnwrapAttachedToken();
 
-        PlayerInfo info = (PlayerInfo) entity.AttachToken;
-        playerName = info.name;
-        character = info.character;
+        PlayerToken token = (PlayerToken) entity.AttachToken;
+        playerName = token.name;
+        character = token.character;
     }
 
     protected override void LoadModel()
@@ -104,7 +104,7 @@ public class Player : Fighter
         else // Ally
         {
             // Create ally UI
-            NetworkManager networkManager = GameObject.FindObjectOfType<NetworkManager>();
+            NetworkManager networkManager = FindObjectOfType<NetworkManager>();
             float yScale = Screen.height / gui.GetComponent<CanvasScaler>().referenceResolution.y;
             float yOffset = networkManager.AllyCount * allyInfoYOffset * yScale;
             GameObject allyInfo = Instantiate(allyInfoPrefab, parent: gui.transform);
@@ -136,15 +136,15 @@ public class Player : Fighter
 
         base.OwnerUpdate();
 
-        if (FighterStatus != Status.Stunned)
+        if (FighterStatusLocal != Status.Stunned)
         {
             CheckDashInput();
             
-            if (FighterStatus != Status.Using)
+            if (FighterStatusLocal != Status.Using)
             {
                 CheckTargetInput();
 
-                if (FighterStatus != Status.Disconnecting && target)
+                if (FighterStatusLocal != Status.Disconnecting && target)
                     CheckAbilityInput();
             }
         }
@@ -163,7 +163,7 @@ public class Player : Fighter
     void CheckDashInput()
     {
         if (Input.GetButtonDown("Dash") && Time.time > nextDashTime &&
-            FighterStatus == Status.Free &&
+            FighterStatusLocal == Status.Free &&
             CheckAndUseEnergy(DashEnergy))
             StartCoroutine(Dash());
     }
@@ -172,8 +172,8 @@ public class Player : Fighter
     {
         Vector3 dir;
 
-        if (FighterStatus == Status.Waiting || FighterStatus == Status.Using ||
-            FighterStatus == Status.Stunned || movementsBlocked)
+        if (FighterStatusLocal == Status.Waiting || FighterStatusLocal == Status.Using ||
+            FighterStatusLocal == Status.Stunned || movementsBlocked)
             dir = Vector3.zero;
         else
         {
@@ -263,7 +263,7 @@ public class Player : Fighter
     {
         CheckAndUpdatePlayerStatus();
         currentAbility = ability;
-        wire.Connect();
+        WireConnectEvent.Post(ReliabilityModes.ReliableOrdered, entityId);
     }
 
     protected override void OnEndAbility()
@@ -271,7 +271,10 @@ public class Player : Fighter
         base.OnEndAbility();
 
         if (wire.gameObject.activeSelf)
-            wire.Disconnect();
+        {
+            FighterStatusLocal = Status.Disconnecting;
+            WireDisconnectEvent.Post(ReliabilityModes.ReliableOrdered, entityId);
+        }
     }
 
     public void InterruptWaiting()
@@ -283,17 +286,16 @@ public class Player : Fighter
     public void EnqueueUserAbilityToTarget(Fighter actualTarget)
     {
         target = actualTarget;
-        FighterStatus = Status.Waiting;
         target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
         
-        wire.StayConnected();
+        WireStayConnectedTargetEvent.Post(ReliabilityModes.ReliableOrdered, entityId, target.EntityId);
     }
 
     void CheckAndUpdatePlayerStatus()
     {
-        if (FighterStatus == Status.Waiting)
+        if (FighterStatusLocal == Status.Waiting)
             InterruptWaiting();
-        else if (FighterStatus == Status.Connecting)
+        else if (FighterStatusLocal == Status.Connecting)
             EndAbility();
     }
 

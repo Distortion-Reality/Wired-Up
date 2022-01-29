@@ -1,6 +1,6 @@
 using UdpKit;
 
-public class EnemyInfo : FighterInfo
+public class EnemyToken : FighterToken
 {
     public EnemyId enemyId;
     public override void Write(UdpPacket packet)

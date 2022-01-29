@@ -7,7 +7,9 @@ public class Boss : Enemy
 {
     readonly string bossName = "Kirin";
     const float HealthBarMaxDistance = 60f;
+    private float velocity;
 
+    protected new IBossState State => entity.GetState<IBossState>();
     public override ParticlesId DamageParticles => ParticlesId.KirinDamage;
     public override Vector3 FirePosition =>
         new Vector3(base.FirePosition.x, target.CentrePosition.y, base.FirePosition.z);
@@ -37,6 +39,9 @@ public class Boss : Enemy
         base.EntityStart();
 
         healthBar.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = bossName;
+
+        State.SetAnimator(animator);
+        State.Animator.applyRootMotion = entity.IsOwner;
     }
 
     protected override void UpdateHealthBar()
@@ -52,6 +57,20 @@ public class Boss : Enemy
         }
     }
 
+    public override void OwnerFixedUpdate()
+    {
+        base.OwnerFixedUpdate();
+
+        float speed = Mathf.Abs(agent.velocity.x) + Mathf.Abs(agent.velocity.z);
+        speed = Mathf.Clamp(speed, 0f, 0.2f);
+        //State.Speed = Mathf.SmoothDamp(State.Speed, speed, ref velocity, 0.1f);
+        if (agent.isStopped)
+            speed = 0f;
+        //State.Speed = speed; owner sees it in wrong position
+        State.Direction = 0f;
+        State.OnGround = true;
+    }
+
     protected override void Die()
     {
         base.Die();
@@ -62,7 +81,7 @@ public class Boss : Enemy
     protected override void UseAbility(Ability ability)
     {
         FighterStatus = Status.Using;
-        animator.SetTrigger("AttackShoot");
+        State.AttackShoot();
 
         StartCoroutine(WaitForAnimation(ability));
     }
