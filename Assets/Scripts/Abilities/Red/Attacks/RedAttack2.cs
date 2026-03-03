@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using Photon.Bolt;
 
 public class RedAttack2 : Ability
 {
@@ -72,7 +71,7 @@ public class RedAttack2 : Ability
 
         while (!target.Grounded)
         {
-            if (user.Entity.IsOwner)
+            if (user.Entity.HasStateAuthority)
                 wire.transform.parent.LookAt(target.BottomPosition);
             else
                 ChangeWireRotationEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,
@@ -80,7 +79,7 @@ public class RedAttack2 : Ability
             yield return null;
         }
 
-        if (user.Entity.IsOwner)
+        if (user.Entity.HasStateAuthority)
             wire.transform.parent.localRotation = Quaternion.identity;
         else
             ChangeWireRotationEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered,

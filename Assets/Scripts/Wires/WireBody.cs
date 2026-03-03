@@ -1,10 +1,10 @@
+using Fusion;
 using UnityEngine;
-using Photon.Bolt;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
-public class WireBody : EntityBehaviour<IPlayerState>
+public class WireBody : NetworkBehaviour
 {
     Player player;
 
@@ -19,7 +19,7 @@ public class WireBody : EntityBehaviour<IPlayerState>
 
     public float Length => defaultLength * LocalScale.y;
 
-    public override void Attached()
+    public override void Spawned()
     {
         defaultLocalScale = LocalScale;
     }
@@ -48,7 +48,7 @@ public class WireBody : EntityBehaviour<IPlayerState>
 
     void OnTriggerEnter(Collider other)
     {
-        if (!entity.IsOwner || other.CompareTag("Terrain"))
+        if (!Object.HasStateAuthority || other.CompareTag("Terrain"))
             return;
 
         switch (player.FighterStatusLocal)

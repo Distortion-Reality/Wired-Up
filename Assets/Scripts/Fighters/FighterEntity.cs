@@ -1,21 +1,21 @@
+using Fusion;
 using UnityEngine;
-using Photon.Bolt;
 
-[RequireComponent(typeof(BoltEntity))]
-public class FighterEntity : EntityBehaviour<IFighterState>
+[RequireComponent(typeof(NetworkObject))]
+public class FighterEntity : NetworkBehaviour
 {
     Fighter fighter;
     GameOver gameOver;
 
-    public override void Attached()
+    public override void Spawned()
     {
-        gameOver = GameOver.FindObjectOfType<GameOver>();
+        gameOver = FindObjectOfType<GameOver>();
 
         fighter = GetComponent<Fighter>();
         fighter.EntityStart();
     }
 
-    public override void Detached()
+    public override void Despawned(NetworkRunner runner, bool hasState)
     {
         fighter.EntityDestroyed();
     }
@@ -23,22 +23,21 @@ public class FighterEntity : EntityBehaviour<IFighterState>
     // Update is called once per frame
     void Update()
     {
-        if (!entity.IsAttached || gameOver.IsGameOver)
+        if (!Object.HasStateAuthority || gameOver.IsGameOver)
         {
             fighter.EntityDestroyed();
             return;
         }
         
-        if (entity.IsOwner)
+        if (Object.HasStateAuthority)
             fighter.OwnerUpdate();
         
         fighter.EntityUpdate();
     }
 
-    // SimulateOwner is a FixedUpdate run only if entity.IsOwner
-    public override void SimulateOwner()
+    public override void FixedUpdateNetwork()
     {
-        if (!entity.IsAttached || gameOver.IsGameOver)
+        if (!Object.HasStateAuthority || gameOver.IsGameOver)
             return;
         
         fighter.OwnerFixedUpdate();

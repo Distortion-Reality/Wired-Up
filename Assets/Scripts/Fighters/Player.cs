@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Photon.Bolt;
 
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
 public class Player : Fighter
@@ -95,7 +94,7 @@ public class Player : Fighter
         gameOver = gui.GetComponent<GameOver>();
         Color color = character.UnityColor();
 
-        if (entity.IsOwner)
+        if (entity.HasStateAuthority)
         {
             healthBar = GameObject.Find("PlayerEnergyBar").GetComponent<Slider>();
             energyBar = GameObject.Find("PlayerHealthBar").GetComponent<Slider>();

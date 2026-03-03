@@ -1,13 +1,13 @@
+using Fusion;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Photon.Bolt;
 
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
-public abstract class Fighter : MonoBehaviour
+public abstract class Fighter : NetworkBehaviour
 {
     public enum Status
     {
@@ -19,7 +19,7 @@ public abstract class Fighter : MonoBehaviour
         Stunned
     }
 
-    protected BoltEntity entity;
+    protected NetworkObject entity;
     protected Guid entityId;
 
     float centreOffset, topOffset, bottomOffset;
@@ -44,7 +44,7 @@ public abstract class Fighter : MonoBehaviour
     bool grounded = true;
     protected bool movementsBlocked = false;
 
-    public BoltEntity Entity { get => entity; }
+    public NetworkObject Entity { get => entity; }
     public Guid EntityId { get => entityId; }
     public Rigidbody Rb { get => rb; set => rb = value; }
     public Dictionary<StatisticManager.StatisticId, FighterStatistic> Stats { get => stats; }
@@ -53,7 +53,7 @@ public abstract class Fighter : MonoBehaviour
         get => (Status) State.status;
         set
         {
-            if (entity.IsOwner)
+            if (entity.HasStateAuthority)
                 State.status = (int) value;
             else
                 ChangeStatusEvent.Post(entity.Source, ReliabilityModes.ReliableOrdered, entityId, (int) value);
@@ -91,7 +91,7 @@ public abstract class Fighter : MonoBehaviour
 
     public virtual void EntityStart()
     {
-        entity = GetComponent<BoltEntity>();
+        entity = GetComponent<NetworkObject>();
 
         UnwrapAttachedToken();
 
@@ -123,7 +123,7 @@ public abstract class Fighter : MonoBehaviour
         {
             State.statistics[i] = stats[(StatisticManager.StatisticId) i].CurrentValue;
         }
-        if (entity.IsOwner)
+        if (entity.HasStateAuthority)
             State.status = (int) fighterStatus;
 
         State.AddCallback("statistics[]", StatisticChanged);
@@ -190,7 +190,7 @@ public abstract class Fighter : MonoBehaviour
 
     public void EndAbility()
     {
-        if (entity.IsOwner)
+        if (entity.HasStateAuthority)
             OnEndAbility();
         else
             EndAbilityEvent.Post(entity.Source, ReliabilityModes.ReliableOrdered, entityId);
@@ -213,7 +213,7 @@ public abstract class Fighter : MonoBehaviour
 
     public void UseEnergy(int abilityEnergy)
     {
-        if (entity.IsOwner)
+        if (entity.HasStateAuthority)
             ChangeEnergy(- abilityEnergy);
         else
             UseEnergyEvent.Post(entity.Source, ReliabilityModes.ReliableOrdered, entityId, abilityEnergy);
@@ -221,7 +221,7 @@ public abstract class Fighter : MonoBehaviour
 
     public void ChangeStat(StatisticManager.StatisticId statId, int change)
     {
-        if (!entity.IsOwner)
+        if (!entity.HasStateAuthority)
         {
             ChangeStatisticEvent evnt = ChangeStatisticEvent.Create(entity.Source, ReliabilityModes.ReliableOrdered);
             evnt.entityId = entityId;
@@ -253,7 +253,7 @@ public abstract class Fighter : MonoBehaviour
         if (healthBar)
             healthBar.value = stats[StatisticManager.StatisticId.HP].PercentageValue;
         
-        if (entity.IsOwner && stats[StatisticManager.StatisticId.HP].CurrentValue == 0)
+        if (entity.HasStateAuthority && stats[StatisticManager.StatisticId.HP].CurrentValue == 0)
             Die();
     }
 
@@ -319,7 +319,7 @@ public abstract class Fighter : MonoBehaviour
                 fighter.fighterStatus == Status.Waiting || fighter.fighterStatus == Status.Using))
                 fighter.EndAbility();
 
-        BoltNetwork.Destroy(gameObject);
+        Destroy(gameObject);
     }
 
     public void EntityDestroyed()
