@@ -1,6 +1,6 @@
-using Fusion;
 using System.Collections;
 using UnityEngine;
+using Photon.Bolt;
 
 public static class Effects
 {
@@ -136,7 +136,7 @@ public static class Effects
 
     public static void FireRay(Enemy user, Ability ability)
     {
-        GameObject ray = NetworkRunner.Instantiate(BoltPrefabs.EnemyAttackRay, user.FirePosition, user.transform.rotation);
+        GameObject ray = BoltNetwork.Instantiate(BoltPrefabs.EnemyAttackRay, user.FirePosition, user.transform.rotation);
         ray.GetComponent<EnemyAbilityRay>().FireRay(user, ability);
     }
 }

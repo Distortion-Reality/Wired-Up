@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Bolt;
 
 public class Boss : Enemy
 {
@@ -40,7 +41,7 @@ public class Boss : Enemy
         healthBar.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = bossName;
 
         State.SetAnimator(animator);
-        State.Animator.applyRootMotion = entity.HasStateAuthority;
+        State.Animator.applyRootMotion = entity.IsOwner;
     }
 
     protected override void UpdateHealthBar()

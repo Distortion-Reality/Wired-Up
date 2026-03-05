@@ -1,5 +1,6 @@
-using Fusion;
+using System;
 using UnityEngine;
+using Photon.Bolt;
 
 public class EntitySpawner : MonoBehaviour
 {
@@ -7,15 +8,27 @@ public class EntitySpawner : MonoBehaviour
 
     void Start()
     {
-        if (NetworkManager.runner.IsServer)
-            InstantiateNetworkObject();
+        if (BoltNetwork.IsServer)
+            InstantiateBoltEntity();
 
         Destroy(gameObject);
     }
 
-    protected virtual NetworkObject InstantiateNetworkObject()
+    protected virtual FighterToken CreateToken()
     {
-        NetworkObject entity = NetworkRunner.Instantiate(prefab, BuildToken(), transform.position, transform.rotation);
+        return new FighterToken();
+    }
+
+    protected virtual FighterToken BuildToken()
+    {
+        FighterToken token = CreateToken();
+        token.guid = Guid.NewGuid();
+        return token; 
+    }
+
+    protected virtual BoltEntity InstantiateBoltEntity()
+    {
+        BoltEntity entity = BoltNetwork.Instantiate(prefab, BuildToken(), transform.position, transform.rotation);
         entity.transform.SetParent(transform.parent);
         return entity;
     }

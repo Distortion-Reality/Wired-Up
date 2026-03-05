@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using Photon.Bolt;
 
 public class RedAttack1 : Ability
 {

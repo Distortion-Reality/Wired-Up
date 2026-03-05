@@ -1,8 +1,8 @@
-using Fusion;
 using System.Collections;
 using UnityEngine;
+using Photon.Bolt;
 
-public class Wire : NetworkBehaviour
+public class Wire : EntityBehaviour<IPlayerState>
 {
     Player player;
     WireHead wireHead;
@@ -20,7 +20,7 @@ public class Wire : NetworkBehaviour
 
     float Extension => Length - defaultLength;
 
-    public override void Spawned()
+    public override void Attached()
     {
         WireStart();
     }
@@ -59,7 +59,7 @@ public class Wire : NetworkBehaviour
     {
         if (!gameObject.activeSelf)
             return;
-        if (!Object.HasStateAuthority)
+        if (!entity.IsOwner)
             player.FighterStatusLocal = Fighter.Status.Disconnecting;
         StartCoroutine(Retract());
     }
@@ -102,7 +102,7 @@ public class Wire : NetworkBehaviour
     {
         while (player.FighterStatusLocal == Fighter.Status.Connecting)
         {
-            if (player.Entity.HasStateAuthority && Length >= player.AbilityRange)
+            if (player.Entity.IsOwner && Length >= player.AbilityRange)
                 player.EndAbility();
             else
             {

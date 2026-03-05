@@ -1,4 +1,4 @@
-using Fusion;
+using Photon.Bolt;
 
 public class EnemySpawner : EntitySpawner
 {
@@ -16,9 +16,9 @@ public class EnemySpawner : EntitySpawner
         return token; 
     }
 
-    protected override NetworkObject InstantiateNetworkObject()
+    protected override BoltEntity InstantiateBoltEntity()
     {
-        NetworkObject entity = base.InstantiateNetworkObject();
+        BoltEntity entity = base.InstantiateBoltEntity();
         GetComponentInParent<EnemyGroup>().AddEnemy(entity.GetComponent<Enemy>());
         return entity;
     }

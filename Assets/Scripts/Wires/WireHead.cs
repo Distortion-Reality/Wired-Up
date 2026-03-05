@@ -1,10 +1,10 @@
-using Fusion;
 using UnityEngine;
+using Photon.Bolt;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
-public class WireHead : NetworkBehaviour
+public class WireHead : EntityBehaviour<IPlayerState>
 {
     Player player;
 
@@ -37,7 +37,7 @@ public class WireHead : NetworkBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (!Object.HasStateAuthority || other.CompareTag("Terrain"))
+        if (!entity.IsOwner || other.CompareTag("Terrain"))
             return;
 
         switch (player.FighterStatusLocal)

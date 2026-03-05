@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Photon.Bolt;
 
 public abstract class TargetAbilityManager : MonoBehaviour
 {
@@ -49,7 +50,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
 
     public virtual void EnqueueUserAbility(Fighter user, Ability ability)
     {
-        if (target.Entity.HasStateAuthority)
+        if (target.Entity.IsOwner)
         {
             UserAbility userAbility = new UserAbility(user, ability);
             userAbilityQueue.Enqueue(userAbility);
@@ -62,7 +63,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
 
     public void RemoveUserAbility(Fighter user)
     {
-        if (target.Entity.HasStateAuthority)
+        if (target.Entity.IsOwner)
             userAbilityQueue = new Queue<UserAbility>(userAbilityQueue.Where(
                 userAbility => userAbility.User != user));
         else
