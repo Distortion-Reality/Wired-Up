@@ -39,14 +39,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7107733466584490672}
-  - component: {fileID: 2211907226005546936}
+  - component: {fileID: 733949279616200482}
   - component: {fileID: 4678336661130057148}
   - component: {fileID: 7107733466688752750}
   - component: {fileID: 2237140014869720875}
   - component: {fileID: -827520432576169068}
   - component: {fileID: -5885889925447717737}
   - component: {fileID: 6759349716841108013}
-  - component: {fileID: 733949279616200482}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -70,18 +69,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &2211907226005546936
-BoxCollider:
+--- !u!143 &733949279616200482
+CharacterController:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7107733466688752751}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 0
+  m_IsTrigger: 0
+  m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.2, y: 2, z: 0.7}
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 0
+  m_StepOffset: 0
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &4678336661130057148
 MonoBehaviour:
@@ -181,24 +185,6 @@ MonoBehaviour:
   _center: {x: 0, y: 1, z: 0}
   _boxSize: {x: 1.2, y: 2, z: 0.7}
   _sphereRadius: 0.25
---- !u!143 &733949279616200482
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7107733466688752751}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 2
-  m_Radius: 0.5
-  m_SlopeLimit: 0
-  m_StepOffset: 0
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1001 &8412429383267997489
 PrefabInstance:
   m_ObjectHideFlags: 0
