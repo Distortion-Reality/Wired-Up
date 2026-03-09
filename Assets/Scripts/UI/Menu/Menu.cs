@@ -1,57 +1,86 @@
+using Fusion;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UdpKit;
-using Photon.Bolt;
-using Photon.Bolt.Matchmaking;
+using UnityEngine.SceneManagement;
 
-public class Menu : GlobalEventListener
+public class Menu : MonoBehaviour
 {
+    private const int MAX_PLAYERS = 3;
+
     public TMPro.TMP_InputField playerName;
+    public NetworkRunner runner;
+
+    private NetworkSceneManagerDefault sceneManager;
 
     void Start()
     {
         if (!PlayerPrefs.HasKey(PlayerPrefKey.PlayerName))
         {
-            PlayerPrefs.SetString(PlayerPrefKey.PlayerName, "Player #" 
-            + (((uint) Guid.NewGuid().GetHashCode()).ToString().Substring(0, 4)));
+            PlayerPrefs.SetString(PlayerPrefKey.PlayerName, GeneratePlayerName());
         }
         playerName.text = PlayerPrefs.GetString(PlayerPrefKey.PlayerName);
+
+        sceneManager = runner.GetComponent<NetworkSceneManagerDefault>();
     }
 
-    public void PlayerNameEndEdit(string playerName)
+    public void PlayerNameEndEdit()
     {
-        PlayerPrefs.SetString(PlayerPrefKey.PlayerName, playerName);
+        if (playerName.text.CompareTo(string.Empty) == 0)
+        {
+            playerName.text = GeneratePlayerName();
+        }
+
+        PlayerPrefs.SetString(PlayerPrefKey.PlayerName, playerName.text);
+    }
+
+    private string GeneratePlayerName()
+    {
+        return "Player #" + ((uint)Guid.NewGuid().GetHashCode()).ToString().Substring(0, 4);
     }
 
     public void Host()
     {
-        if (!BoltNetwork.IsRunning)
-            BoltLauncher.StartServer();
-    }
+        if (runner.gameObject.activeSelf)
+            return;
 
-    public override void BoltStartDone()
-    {
-        if (BoltNetwork.IsServer)
+        runner.gameObject.SetActive(true);
+        runner.ProvideInput = true;
+
+        runner.StartGame(new StartGameArgs()
         {
-            string matchName = Guid.NewGuid().ToString();
-            BoltMatchmaking.CreateSession(sessionID: matchName, sceneToLoad: "Lobby");
-        }
+            GameMode = GameMode.Host,
+            SessionName = Guid.NewGuid().ToString(),
+            Scene = SceneUtility.GetBuildIndexByScenePath("Lobby"),
+            SceneManager = sceneManager
+        });
     }
 
     public void Join()
     {
-        if (!BoltNetwork.IsRunning)
-            BoltLauncher.StartClient();
+        if (runner.gameObject.activeSelf)
+            return;
+
+        runner.gameObject.SetActive(true);
+        runner.ProvideInput = true;
+        runner.JoinSessionLobby(SessionLobby.ClientServer);
     }
 
-    public override void SessionListUpdated(Map<Guid, UdpSession> sessionList)
+    public void OnSessionListUpdate(NetworkRunner runner, List<SessionInfo> sessionList)
     {
-        foreach (var session in sessionList)
-        {
-            UdpSession photonSession = session.Value;
+        var session = sessionList.FirstOrDefault(
+            s => s.IsValid && s.IsVisible && s.IsOpen &&
+            s.PlayerCount < s.MaxPlayers && s.PlayerCount < MAX_PLAYERS);
 
-            if (photonSession.Source == UdpSessionSource.Photon)
-                BoltMatchmaking.JoinSession(photonSession);
+        if (session != null)
+        {
+            runner.StartGame(new StartGameArgs
+            {
+                GameMode = GameMode.Client,
+                SessionName = session.Name,
+                SceneManager = sceneManager
+            });
         }
     }
 

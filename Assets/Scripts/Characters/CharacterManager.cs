@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class CharacterManager : MonoBehaviour
 {
+    public static CharacterManager Instance { get; private set; }
+
     public GameObject redPrefab, bluePrefab, greenPrefab, purplePrefab, yellowPrefab;
 
     public Material redWireMaterial, blueWireMaterial, greenWireMaterial, purpleWireMaterial, yellowWireMaterial;
@@ -49,6 +51,13 @@ public class CharacterManager : MonoBehaviour
 
     void Awake() 
     {
-        DontDestroyOnLoad(transform.gameObject);
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 }

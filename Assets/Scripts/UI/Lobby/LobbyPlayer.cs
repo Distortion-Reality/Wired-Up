@@ -1,33 +1,39 @@
+using Fusion;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Photon.Bolt;
 
-public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
+[RequireComponent(typeof(NetworkObject))]
+public class LobbyPlayer : NetworkBehaviour
 {
-    List<GameObject> models = new List<GameObject>();
-    int currentIndex = 0;
-    public int CurrentCharacter { get => currentIndex; }
-    bool ready = false;
-    public bool IsReady { get => ready; }
+    readonly List<GameObject> models = new List<GameObject>();
 
-    CharacterManager characterManager;
-    LobbyManager lobbyManager;
-    TMPro.TextMeshProUGUI playerName;
+    [Networked(OnChanged = nameof(OnNameChanged))]
+    public NetworkString<_16> PlayerName { get; private set; }
+
+    [Networked(OnChanged = nameof(OnCharacterChanged))]
+    public int CurrentCharacterIndex { get; private set; } = 0;
+
+    [Networked(OnChanged = nameof(OnReadyChanged))]
+    public bool IsReady { get; private set; } = false;
+
+    TextMeshProUGUI playerNameText;
     Button nextCharacterButton;
     Button previousCharacterButton;
     Button readyButton;
+
     public Button ReadyButton { get => readyButton; }
 
-    public override void Attached()
+    public override void Spawned()
     {
-        characterManager = GameObject.FindObjectOfType<CharacterManager>();
-        lobbyManager = GameObject.FindObjectOfType<LobbyManager>();
-        playerName = GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        playerNameText = GetComponentInChildren<TextMeshProUGUI>();
+
+        LobbyManager.Instance.RegisterPlayer(this);
 
         CreateCharactersModels();
 
-        if (entity.IsOwner)
+        if (Object.HasInputAuthority)
         {
             nextCharacterButton = GameObject.Find("NextCharacterButton").GetComponent<Button>();
             nextCharacterButton.onClick.AddListener(NextCharacter);
@@ -36,22 +42,17 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
             previousCharacterButton.onClick.AddListener(PreviousCharacter);
 
             Button leaveButton = GameObject.Find("LeaveButton").GetComponent<Button>();
-            leaveButton.onClick.AddListener(() => lobbyManager.ReturnToMenu());
+            leaveButton.onClick.AddListener(OnLeave);
 
             readyButton = GameObject.Find("ReadyButton").GetComponent<Button>();
-            readyButton.onClick.AddListener(() => state.ready = !ready);
+            readyButton.onClick.AddListener(OnReady);
 
-            state.name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName);
-            state.character = 0;
-            state.ready = false;
+            RPC_SetPlayerName(PlayerPrefs.GetString(PlayerPrefKey.PlayerName));
+            RPC_SetCharacter(0);
+            RPC_SetReady(false);
         }
 
-        state.AddCallback("name", NameChanged);
-        state.AddCallback("character", CharacterChanged);
-        state.AddCallback("ready", ReadyChanged);
-
-        NameChanged();
-        models[currentIndex].SetActive(true);
+        models[CurrentCharacterIndex].SetActive(true);
     }
 
     void CreateCharactersModels()
@@ -60,74 +61,112 @@ public class LobbyPlayer : EntityBehaviour<ILobbyPlayerState>
 
         foreach (var color in CharacterColorHelper.Values())
         {
-            GameObject model = Instantiate(characterManager.GetPrefab(color), parent: characterModel);
+            GameObject model = Instantiate(CharacterManager.Instance.GetPrefab(color), parent: characterModel);
             model.SetActive(false);
             models.Add(model);
         }
     }
 
-    void NextCharacter()
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_SetPlayerName(string name)
     {
-        int index = currentIndex + 1;
-        if (index == models.Count)
-        {
-            index = 0;
-        }
-        state.character = index; 
+        PlayerName = name;
     }
 
-    void PreviousCharacter()
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_SetCharacter(int index)
     {
-        int index = currentIndex - 1;
-        if (index == -1) {
-            index = models.Count - 1;
-        }
-        state.character = index;
+        CurrentCharacterIndex = index;
     }
 
-    void CharacterChanged()
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_SetReady(bool ready)
     {
-        models[currentIndex].SetActive(false);
-        currentIndex = state.character;
-        models[currentIndex].SetActive(true);
-
-        lobbyManager.CheckOwnerCharacterAvailable();
+        IsReady = ready;
     }
 
-     void NameChanged()
+    static void OnNameChanged(Changed<LobbyPlayer> changed)
     {
-        playerName.text = state.name;
+        changed.Behaviour.NameChanged();
+    }
+
+    static void OnCharacterChanged(Changed<LobbyPlayer> changed)
+    {
+        changed.LoadOld();
+        int oldIndex = changed.Behaviour.CurrentCharacterIndex;
+
+        changed.LoadNew();
+        int newIndex = changed.Behaviour.CurrentCharacterIndex;
+
+        changed.Behaviour.CharacterChanged(oldIndex, newIndex);
+    }
+
+    static void OnReadyChanged(Changed<LobbyPlayer> changed)
+    {
+        changed.Behaviour.ReadyChanged();
+    }
+
+    void NameChanged()
+    {
+        playerNameText.text = PlayerName.ToString();
+    }
+
+    void CharacterChanged(int oldIndex, int newIndex)
+    {
+        models[oldIndex].SetActive(false);
+        models[newIndex].SetActive(true);
+
+        if (Object.HasInputAuthority)
+            LobbyManager.Instance.CheckOwnerCharacterAvailable(Runner);
     }
 
     void ReadyChanged()
     {
-        ready = state.ready;
-
-        playerName.color = ready ? Color.green : Color.white;
-
-        if (entity.IsOwner)
+        playerNameText.color = IsReady ? Color.green : Color.white;
+        if (Object.HasInputAuthority)
         {
-            nextCharacterButton.interactable = !ready;
-            previousCharacterButton.interactable = !ready;
-
-            if (ready)
-                characterManager.CurrentCharacter = (CharacterColor) currentIndex;
+            nextCharacterButton.interactable = !IsReady;
+            previousCharacterButton.interactable = !IsReady;
+            if (IsReady)
+                CharacterManager.Instance.CurrentCharacter = (CharacterColor)CurrentCharacterIndex;
         }
         else
         {
-            lobbyManager.CheckOwnerCharacterAvailable();
+            LobbyManager.Instance.CheckOwnerCharacterAvailable(Runner);
         }
 
-        if ((BoltNetwork.IsServer && (lobbyManager.CanStart() || lobbyManager.ForceStart(entity))))
+        if (Object.HasStateAuthority)
         {
-            LevelSpawnToken token = new LevelSpawnToken();
-            if (!lobbyManager.forceStart)
-            {
-                token.left = (CharacterColor) lobbyManager.Players[1].currentIndex;
-                token.right = (CharacterColor) lobbyManager.Players[2].currentIndex;
-            }
-            
-            BoltNetwork.LoadScene("Level2Scene", token);
+            LobbyManager.Instance.StartGame(Runner, this);
         }
+    }
+
+    void NextCharacter()
+    {
+        int index = CurrentCharacterIndex + 1;
+        if (index == models.Count)
+        {
+            index = 0;
+        }
+        RPC_SetCharacter(index);
+    }
+
+    void PreviousCharacter()
+    {
+        int index = CurrentCharacterIndex - 1;
+        if (index == -1) {
+            index = models.Count - 1;
+        }
+        RPC_SetCharacter(index);
+    }
+
+    void OnLeave()
+    {
+        LobbyManager.Instance.Shutdown(Runner);
+    }
+
+    void OnReady()
+    {
+        RPC_SetReady(!IsReady);
     }
 }

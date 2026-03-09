@@ -1,61 +1,94 @@
+using Fusion;
+using Fusion.Sockets;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Photon.Bolt;
 
-public class LobbyManager : GlobalEventListener
+public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 {
+    private const int MAX_PLAYERS = 3;
+
+    public static LobbyManager Instance { get; private set; }
+
+    NetworkRunner runner;
     Transform canvas;
 
-    List<LobbyPlayer> allPlayers = new List<LobbyPlayer>(3);
-
+    public NetworkObject lobbyPlayerPrefab;
     public float xSpawnPosOffset = 250.0f;
     public bool forceStart = false;
 
-    public List<LobbyPlayer> Players { get => allPlayers; }
+    private Dictionary<PlayerRef, LobbyPlayer> allPlayers =
+        new Dictionary<PlayerRef, LobbyPlayer>();
+    public List<LobbyPlayer> Players => new List<LobbyPlayer>(allPlayers.Values);
+
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
 
     void Start()
     {
+        runner = FindObjectOfType<NetworkRunner>();
+        runner.AddCallbacks(this);
+
         canvas = GetComponent<Canvas>().transform;
     }
 
-    public override void SceneLoadLocalDone(string scene, IProtocolToken token)
+    private void SpawnPlayer(NetworkRunner runner, PlayerRef player)
     {
         // Spawn lobby player
-        BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.LobbyPlayer);
-        entity.transform.SetParent(canvas, false);
+        // Force reset position and rotation because they start with weird values (?)
+        runner.Spawn(lobbyPlayerPrefab, Vector3.zero, Quaternion.identity, player);
     }
 
-    public override void EntityAttached(BoltEntity entity)
+    private void DespawnPlayer(NetworkRunner runner, PlayerRef player)
     {
-        if (entity.StateIs<ILobbyPlayerState>())
+        if (allPlayers.TryGetValue(player, out LobbyPlayer lobbyPlayer))
         {
-            if (!entity.IsOwner)
-            {
-                // Force reset position and rotation because they start with weird values (?)
-                entity.transform.localPosition = Vector3.zero;
-                entity.transform.localRotation = Quaternion.identity;
-
-                entity.transform.localPosition += FindAvailableSpawnPosition();
-                entity.transform.SetParent(canvas, false);
-            }
-            allPlayers.Add(entity.GetComponent<LobbyPlayer>());
+            runner.Despawn(lobbyPlayer.Object);
         }
     }
 
-    public override void EntityDetached(BoltEntity entity)
+    public void RegisterPlayer(LobbyPlayer player)
     {
-        if (entity.StateIs<ILobbyPlayerState>())
+        player.transform.SetParent(canvas, false);
+
+        if (!player.Object.HasInputAuthority)
         {
-            allPlayers.Remove(entity.GetComponent<LobbyPlayer>());
+            player.transform.localPosition += FindAvailableSpawnPosition();
         }
+
+        allPlayers[player.Object.InputAuthority] = player;
+    }
+
+    public void UnregisterPlayer(PlayerRef player)
+    {
+        allPlayers.Remove(player);
+
+        allPlayers = allPlayers
+            .Where(player => player.Value != null)
+            .ToDictionary(player => player.Key, player => player.Value);
     }
 
     Vector3 FindAvailableSpawnPosition()
     {
         float x;
-        // Owner is always the first
-        if (allPlayers.Count == 1)
+
+        // Owner is always the center
+        List<LobbyPlayer> otherPlayers = Players
+            .Where(player => player != null && !player.Object.HasInputAuthority)
+            .ToList();
+
+        if (otherPlayers.Count == 0)
         {
             // Choose left
             x = -xSpawnPosOffset;
@@ -63,48 +96,120 @@ public class LobbyManager : GlobalEventListener
         else
         {
             // Choose opposite of the occupied slot
-            x = -allPlayers[1].transform.localPosition.x;
+            x = -otherPlayers[0].transform.localPosition.x;
         }
         return new Vector3(x, 0.0f, 0.0f);
     }
 
-    public override void Disconnected(BoltConnection connection)
+    public void Shutdown(NetworkRunner runner)
     {
-        if (BoltNetwork.Server != null && BoltNetwork.Server.Equals(connection))
-        {
-            ReturnToMenu();
-        }
+        runner.Shutdown();
     }
 
-    public void ReturnToMenu()
+    void ReturnToMenu()
     {
-        BoltLauncher.Shutdown();
         SceneManager.LoadScene("Menu", LoadSceneMode.Single);
     }
 
-    public void CheckOwnerCharacterAvailable()
+    public void CheckOwnerCharacterAvailable(NetworkRunner runner)
     {
-        LobbyPlayer owner = allPlayers[0];
-        
-        bool available = true;
-        for (int i = 1; i < allPlayers.Count; i++)
+        if (allPlayers.TryGetValue(runner.LocalPlayer, out LobbyPlayer owner))
         {
-            if (allPlayers[i].IsReady && allPlayers[i].CurrentCharacter == owner.CurrentCharacter)
+            List<LobbyPlayer> otherPlayers = Players
+                .Where(player => player != null && player != owner)
+                .ToList();
+
+            bool available = true;
+            for (int i = 0; i < otherPlayers.Count; i++)
             {
-                available = false;
+                if (otherPlayers[i].IsReady &&
+                    otherPlayers[i].CurrentCharacterIndex == owner.CurrentCharacterIndex)
+                {
+                    available = false;
+                }
             }
+
+            owner.ReadyButton.interactable = available;
+        }
+    }
+
+    private bool ForceStart(LobbyPlayer player)
+    {
+        return player.Object.HasInputAuthority && forceStart;
+    }
+
+    private bool CanStart()
+    {
+        return Players.Count == 3 && Players.TrueForAll(player => player.IsReady);
+    }
+
+    public void StartGame(NetworkRunner runner, LobbyPlayer player)
+    {
+        if (runner.IsServer && (CanStart() || ForceStart(player)))
+        {
+            LevelSpawnInfo info = new LevelSpawnInfo();
+            if (!forceStart)
+            {
+                info.Center = (CharacterColor)Players[0].CurrentCharacterIndex;
+                info.Left = (CharacterColor)Players[1].CurrentCharacterIndex;
+                info.Right = (CharacterColor)Players[2].CurrentCharacterIndex;
+            }
+
+            runner.SetActiveScene("Level2Scene");
+        }
+    }
+
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+    {
+        if (runner.ActivePlayers.Count() > MAX_PLAYERS)
+        {
+            runner.Disconnect(player);
+        }
+        else if (runner.IsServer)
+        {
+            SpawnPlayer(runner, player);
+        }
+    }
+
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    {
+        if (runner.IsServer)
+        {
+            DespawnPlayer(runner, player);
         }
 
-        owner.ReadyButton.interactable = available;
+        UnregisterPlayer(player);
+        CheckOwnerCharacterAvailable(runner);
     }
 
-    public bool ForceStart(BoltEntity entity)
+    public void OnInput(NetworkRunner runner, NetworkInput input) { }
+
+    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
+
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
-        return entity.IsOwner && forceStart;
+        ReturnToMenu();
     }
 
-    public bool CanStart()
-    {
-        return allPlayers.Count == 3 && allPlayers.TrueForAll(player => player.IsReady);
-    }
+    void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) { }
+
+    void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner) { }
+
+    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
+
+    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
+
+    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
+
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+
+    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
+
+    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+
+    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
+
+    public void OnSceneLoadDone(NetworkRunner runner) { }
+
+    public void OnSceneLoadStart(NetworkRunner runner) { }
 }

@@ -225,7 +225,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3114695021649787970}
   - component: {fileID: 596240642486737660}
-  - component: {fileID: 8626692428529411927}
+  - component: {fileID: 5858493335655775140}
   m_Layer: 5
   m_Name: LobbyPlayer
   m_TagString: Untagged
@@ -266,7 +266,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0ef5a3de101e4785aed22be750e8bb7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &8626692428529411927
+  WordOffset: 0
+  WordCount: 0
+  _interpolationDataSource: 0
+  _PlayerName: 
+  _CurrentCharacterIndex: 0
+  _IsReady: 0
+--- !u!114 &5858493335655775140
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -275,26 +281,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 4207456644996174530}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 155943207, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sceneGuid: 
-  _serializerGuid: b0a440aa-934d-409f-a29e-96da25445051
-  _prefabId: 5
-  _updateRate: 1
-  _autoFreezeProxyFrames: 0
-  _clientPredicted: 1
-  _allowInstantiateOnClient: 1
-  _persistThroughSceneLoads: 0
-  _sceneObjectDestroyOnDetach: 1
-  _sceneObjectAutoAttach: 1
-  _alwaysProxy: 0
-  _detachOnDisable: 1
-  _allowFirstReplicationWhenFrozen: 0
-  _autoRemoveChildEntities: 0
-  _entityBehaviourQueryOption: 0
-  _entityPriorityCalculatorQueryOption: 1
-  _entityReplicationFilterQueryOption: 1
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: bea383e8467df6b66825cd3e48b60355
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 596240642486737660}
+  SimulationBehaviours: []
 --- !u!1 &4540070083373612606
 GameObject:
   m_ObjectHideFlags: 0

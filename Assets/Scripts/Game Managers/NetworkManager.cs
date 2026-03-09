@@ -17,7 +17,7 @@ public class NetworkManager : GlobalEventListener {
     void Start()
     {
         particlesManager = GetComponent<ParticlesManager>();
-        gameOver = GameObject.FindObjectOfType<GameOver>();
+        gameOver = FindObjectOfType<GameOver>();
     }
 
     public override void SceneLoadLocalDone(string scene, IProtocolToken token)
@@ -33,14 +33,14 @@ public class NetworkManager : GlobalEventListener {
             character = characterManager.CurrentCharacter
         };
 
-        LevelSpawnToken spawnInfo = (LevelSpawnToken) token;
+        LevelSpawnInfo spawnInfo = new LevelSpawnInfo();
         Transform spawnPoint = GameObject.Find("PlayersSpawnPoint").transform;
         Vector3 spawnPosition = spawnPoint.position;
         if (!BoltNetwork.IsServer)
         {
-            if (characterManager.CurrentCharacter == spawnInfo.left)
+            if (characterManager.CurrentCharacter == spawnInfo.Left)
                 spawnPosition += Vector3.left * 5;
-            else if (characterManager.CurrentCharacter == spawnInfo.right)
+            else if (characterManager.CurrentCharacter == spawnInfo.Right)
                 spawnPosition += Vector3.right * 5;
         }
 
