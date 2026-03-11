@@ -1,12 +1,13 @@
+using Fusion;
 using System.Collections;
 using UnityEngine;
-using Photon.Bolt;
 
 public class GameOver : MonoBehaviour
 {
     public GameObject panel;
     public GameObject resultText;
     public GameObject messageText;
+    readonly NetworkRunner runner = NetworkRunnerManager.Instance.Runner;
 
     bool isGameOver = false;
     
@@ -32,13 +33,13 @@ public class GameOver : MonoBehaviour
 
         panel.SetActive(true);
 
-        if (BoltNetwork.IsServer)
+        if (runner.IsServer)
             StartCoroutine(Countdown());
     }
 
     IEnumerator Countdown()
     {
         yield return new WaitForSeconds(5);
-        BoltNetwork.LoadScene("Lobby");
+        runner.SetActiveScene("Lobby");
     }
 }

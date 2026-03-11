@@ -1,10 +1,11 @@
+using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Photon.Bolt;
 
 public class GameMenu : MonoBehaviour
 {
     public GameObject panel;
+    readonly NetworkRunner runner = NetworkRunnerManager.Instance.Runner;
 
     public bool IsOpen => panel.activeSelf;
 
@@ -20,7 +21,11 @@ public class GameMenu : MonoBehaviour
 
     public void ReturnToMenu()
     {
-        BoltLauncher.Shutdown();
+        if (runner != null)
+        {
+            runner.Shutdown();
+        }
+
         SceneManager.LoadScene("Menu", LoadSceneMode.Single);
     }
 

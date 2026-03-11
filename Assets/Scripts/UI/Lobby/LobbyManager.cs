@@ -12,10 +12,11 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public static LobbyManager Instance { get; private set; }
 
-    NetworkRunner runner;
+    readonly NetworkRunner runner = NetworkRunnerManager.Instance.Runner;
     Transform canvas;
 
     public NetworkObject lobbyPlayerPrefab;
+    public NetworkPrefabRef levelSpawnInfoPrefab;
     public float xSpawnPosOffset = 250.0f;
     public bool forceStart = false;
 
@@ -37,9 +38,7 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     void Start()
     {
-        runner = FindObjectOfType<NetworkRunner>();
         runner.AddCallbacks(this);
-
         canvas = GetComponent<Canvas>().transform;
     }
 
@@ -147,12 +146,13 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (runner.IsServer && (CanStart() || ForceStart(player)))
         {
-            LevelSpawnInfo info = new LevelSpawnInfo();
-            if (!forceStart)
+            runner.Spawn(levelSpawnInfoPrefab);
+
+            if (!forceStart && player.Object.HasStateAuthority)
             {
-                info.Center = (CharacterColor)Players[0].CurrentCharacterIndex;
-                info.Left = (CharacterColor)Players[1].CurrentCharacterIndex;
-                info.Right = (CharacterColor)Players[2].CurrentCharacterIndex;
+                LevelSpawnInfo.Instance.Center = (CharacterColor)Players[0].CurrentCharacterIndex;
+                LevelSpawnInfo.Instance.Left = (CharacterColor)Players[1].CurrentCharacterIndex;
+                LevelSpawnInfo.Instance.Right = (CharacterColor)Players[2].CurrentCharacterIndex;
             }
 
             runner.SetActiveScene("Level2Scene");

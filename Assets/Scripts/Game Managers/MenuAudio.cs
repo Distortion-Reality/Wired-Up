@@ -27,6 +27,7 @@ public class MenuAudio : MonoBehaviour
         if (next != SceneManager.GetSceneByName("Menu") &&
             next != SceneManager.GetSceneByName("Lobby"))
         {
+            SceneManager.activeSceneChanged -= ChangedActiveScene;
             Destroy(gameObject);
         }
     }
