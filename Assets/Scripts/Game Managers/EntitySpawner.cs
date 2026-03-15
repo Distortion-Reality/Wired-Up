@@ -1,15 +1,14 @@
-using System;
+using Fusion;
 using UnityEngine;
-using Photon.Bolt;
 
 public class EntitySpawner : MonoBehaviour
 {
-    public GameObject prefab;
+    public NetworkPrefabRef prefab;
 
-    void Start()
+    public void StartEntitySpawner()
     {
-        if (BoltNetwork.IsServer)
-            InstantiateBoltEntity();
+        if (NetworkRunnerManager.Instance.Runner.IsServer)
+            SpawnEntity();
 
         Destroy(gameObject);
     }
@@ -22,13 +21,24 @@ public class EntitySpawner : MonoBehaviour
     protected virtual FighterToken BuildToken()
     {
         FighterToken token = CreateToken();
-        token.guid = Guid.NewGuid();
-        return token; 
+        return token;
     }
 
-    protected virtual BoltEntity InstantiateBoltEntity()
+    protected virtual NetworkObject SpawnEntity()
     {
-        BoltEntity entity = BoltNetwork.Instantiate(prefab, BuildToken(), transform.position, transform.rotation);
+        BuildToken();
+
+        NetworkObject entity = NetworkRunnerManager.Instance.Runner.Spawn(
+            prefab,
+            transform.position,
+            transform.rotation,
+            NetworkManager.Instance.Runner.LocalPlayer,
+            (runner, obj) =>
+            {
+                FighterEntity fighterEntity = obj.GetComponent<FighterEntity>();
+                fighterEntity.Token = BuildToken();
+            });
+
         entity.transform.SetParent(transform.parent);
         return entity;
     }

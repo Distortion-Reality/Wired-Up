@@ -5,9 +5,14 @@ using UnityEngine.SceneManagement;
 public class GameMenu : MonoBehaviour
 {
     public GameObject panel;
-    readonly NetworkRunner runner = NetworkRunnerManager.Instance.Runner;
+    NetworkRunner runner;
 
     public bool IsOpen => panel.activeSelf;
+
+    void Start()
+    {
+        runner = NetworkRunnerManager.Instance.Runner;
+    }
 
     public void Trigger()
     {

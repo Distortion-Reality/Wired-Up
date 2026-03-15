@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Photon.Bolt;
 
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
 public class Player : Fighter
 {
-    string playerName;
-    CharacterColor character;
+    public PlayerEntity PlayerEntity => Entity as PlayerEntity;
+    string PlayerName => PlayerEntity.PlayerName.Value;
+    CharacterColor Character => PlayerEntity.Character;
 
     GameMenu gameMenu;
     GameOver gameOver;
@@ -27,14 +27,12 @@ public class Player : Fighter
     Ability interaction;
     Wire wire;
 
-    public string PlayerName { get => playerName; }
     public Wire Wire { get => wire; }
 
-    protected new IPlayerState State => entity.GetState<IPlayerState>();
     protected override Quaternion DefaultRotation =>
         new Quaternion(transform.rotation.x, cam.rotation.y, transform.rotation.z, cam.rotation.w);
     public override ParticlesId DamageParticles => ParticlesId.PlayerDamage;
-    public override Color CharacterUnityColor { get => character.UnityColor(); }
+    public override Color CharacterUnityColor { get => Character.UnityColor(); }
 
     protected override void InitStats()
     {
@@ -56,19 +54,10 @@ public class Player : Fighter
         };
     }
 
-    protected override void UnwrapAttachedToken()
-    {
-        base.UnwrapAttachedToken();
-
-        PlayerToken token = (PlayerToken) entity.AttachToken;
-        playerName = token.name;
-        character = token.character;
-    }
-
     protected override void LoadModel()
     {
         CharacterManager characterManager = FindObjectOfType<CharacterManager>();
-        GameObject prefab = characterManager.GetPrefab(character);
+        GameObject prefab = characterManager.GetPrefab(Character);
         Instantiate(prefab, parent: transform);
     }
 
@@ -76,7 +65,7 @@ public class Player : Fighter
     {
         base.EntityStart();
 
-        AbilityRegistry.CharacterAbilities abilities = AbilityRegistry.GetAbilities(character);
+        AbilityRegistry.CharacterAbilities abilities = AbilityRegistry.GetAbilities(Character);
         attacks = abilities.attacks;
         assists = abilities.assists;
 
@@ -86,16 +75,25 @@ public class Player : Fighter
         wire = GetComponentInChildren<Wire>(true);
         CharacterManager characterManager = FindObjectOfType<CharacterManager>();
         foreach (Renderer renderer in wire.GetComponentsInChildren<Renderer>())
-            renderer.material = characterManager.GetWireMaterial(character);
+            renderer.material = characterManager.GetWireMaterial(Character);
+
+        // Setup player camera
+        if (Entity.HasInputAuthority)
+        {
+            GameObject playerCamera = GameObject.Find("PlayerCamera");
+            Cinemachine.CinemachineFreeLook cinemachine = playerCamera.GetComponent<Cinemachine.CinemachineFreeLook>();
+            cinemachine.Follow = PlayerEntity.transform;
+            cinemachine.LookAt = PlayerEntity.transform.Find("CameraLookTarget");
+        }
 
         cam = Camera.main.transform;
 
         // UI initialization
         gameMenu = gui.GetComponent<GameMenu>();
         gameOver = gui.GetComponent<GameOver>();
-        Color color = character.UnityColor();
+        Color color = Character.UnityColor();
 
-        if (entity.IsOwner)
+        if (Entity.HasInputAuthority)
         {
             healthBar = GameObject.Find("PlayerEnergyBar").GetComponent<Slider>();
             energyBar = GameObject.Find("PlayerHealthBar").GetComponent<Slider>();
@@ -111,13 +109,20 @@ public class Player : Fighter
             allyInfo.transform.position += new Vector3(0, yOffset, 0);
 
             TMPro.TextMeshProUGUI allyName = allyInfo.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-            allyName.text = playerName;
+            allyName.text = PlayerName;
 
             allyInfo.transform.Find("AllyPortrait").GetComponent<Image>().color = color;
 
             healthBar = allyInfo.GetComponentInChildren<Slider>();
             healthBar.transform.Find("Fill Area").Find("Fill").GetComponent<Image>().color = color;
         }
+
+        foreach (EnemyGroup enemyGroup in enemyGroups)
+        {
+            enemyGroup.RegisterPlayer(this);
+        }
+
+        BossArenaEntrance.Instance.RegisterPlayer(this);
     }
 
     public override void OwnerUpdate()
@@ -263,7 +268,7 @@ public class Player : Fighter
     {
         CheckAndUpdatePlayerStatus();
         currentAbility = ability;
-        WireConnectEvent.Post(ReliabilityModes.ReliableOrdered, entityId);
+        PlayerEntity.RPC_WireConnect();
     }
 
     protected override void OnEndAbility()
@@ -273,7 +278,7 @@ public class Player : Fighter
         if (wire.gameObject.activeSelf)
         {
             FighterStatusLocal = Status.Disconnecting;
-            WireDisconnectEvent.Post(ReliabilityModes.ReliableOrdered, entityId);
+            PlayerEntity.RPC_WireDisconnect();
         }
     }
 
@@ -288,7 +293,7 @@ public class Player : Fighter
         target = actualTarget;
         target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
         
-        WireStayConnectedTargetEvent.Post(ReliabilityModes.ReliableOrdered, entityId, target.EntityId);
+        PlayerEntity.RPC_WireStayConnected(target.Entity.Object.Id);
     }
 
     void CheckAndUpdatePlayerStatus()
@@ -308,6 +313,16 @@ public class Player : Fighter
     {
         base.Die();
 
-        GameLoseEvent.Post(ReliabilityModes.ReliableOrdered, playerName, (int) character);
+        PlayerEntity.RPC_GameLose(PlayerName, Character);
+    }
+
+    public override void EntityDestroyed()
+    {
+        base.EntityDestroyed();
+
+        foreach (EnemyGroup enemyGroup in enemyGroups)
+        {
+            enemyGroup.UnregisterPlayer(this);
+        }
     }
 }

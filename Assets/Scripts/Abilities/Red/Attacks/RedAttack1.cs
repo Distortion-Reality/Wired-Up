@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using Photon.Bolt;
 
 public class RedAttack1 : Ability
 {
@@ -12,10 +11,10 @@ public class RedAttack1 : Ability
     public override void DoAbility(Fighter user, Fighter target)
     {
         /*
-        if (user.Entity.IsOwner)
+        if (user.entity.HasStateAuthority)
             DoCharge(user, target);
         else
-            ChargeEvent.Post(user.Entity.Source, ReliabilityModes.ReliableOrdered, user.EntityId);
+            user.entity.RPC_ChargeEvent();
         */
 
         Effects.CalculateAndApplyDamage(user, target, power);

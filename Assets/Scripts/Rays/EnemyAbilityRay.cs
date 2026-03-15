@@ -1,28 +1,28 @@
+using Fusion;
 using System.Collections;
 using UnityEngine;
-using Photon.Bolt;
 
 [RequireComponent(typeof(LineRenderer))]
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
-public class EnemyAbilityRay : EntityBehaviour<IEnemyRayState>
+[RequireComponent(typeof(NetworkObject))]
+[RequireComponent(typeof(NetworkTransform))]
+public class EnemyAbilityRay : NetworkBehaviour
 {
     const float speed = 20f;
 
     Fighter user;
     Ability ability;
 
-    public override void Attached()
-    {
-        state.SetTransforms(state.transform, transform, transform);
-    }
-
     public void FireRay(Fighter user, Ability ability)
     {
         this.user = user;
         this.ability = ability;
 
-        StartCoroutine(MoveRay());
+        if (Object.HasStateAuthority)
+        {
+            StartCoroutine(MoveRay());
+        }
     }
 
     IEnumerator MoveRay()
@@ -38,12 +38,15 @@ public class EnemyAbilityRay : EntityBehaviour<IEnemyRayState>
             yield return null;
         }
 
-        BoltNetwork.Destroy(gameObject);
+        Runner.Despawn(Object);
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject == user.gameObject)
+        if (!Object.HasStateAuthority)
+            return;
+
+        if (user == null || other.gameObject == user.gameObject)
             return;
 
         if (other.CompareTag("Player"))
@@ -52,6 +55,6 @@ public class EnemyAbilityRay : EntityBehaviour<IEnemyRayState>
             ability.DoAbility(user, target);
         }
         
-        BoltNetwork.Destroy(gameObject);
+        Runner.Despawn(Object);
     }
 }

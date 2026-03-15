@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 2713759259705538954}
   - component: {fileID: 2688363776154063435}
   - component: {fileID: 8850780665165184388}
+  - component: {fileID: 6763204123569933269}
   m_Layer: 0
   m_Name: Wire Body
   m_TagString: Untagged
@@ -157,6 +158,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1252b273d3cdc6541a627d11a6506e47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WordOffset: 0
+  WordCount: 0
+  _interpolationDataSource: 0
+--- !u!114 &6763204123569933269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3925769924650513358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 0
+  NetworkGuid:
+    RawGuidValue: 00000000000000000000000000000000
+  NestedObjects: []
+  NetworkedBehaviours: []
+  SimulationBehaviours: []
 --- !u!1 &6896090122394528999
 GameObject:
   m_ObjectHideFlags: 0
@@ -167,6 +194,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8303989425114495921}
   - component: {fileID: 4995625816809083043}
+  - component: {fileID: 5301672011304588660}
   m_Layer: 0
   m_Name: Wire
   m_TagString: Untagged
@@ -202,6 +230,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef10399a9fc28c64aa52f8066353fa59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WordOffset: 0
+  WordCount: 0
+  _interpolationDataSource: 0
+--- !u!114 &5301672011304588660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6896090122394528999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 0
+  NetworkGuid:
+    RawGuidValue: 00000000000000000000000000000000
+  NestedObjects: []
+  NetworkedBehaviours: []
+  SimulationBehaviours: []
 --- !u!1 &7753401688514450470
 GameObject:
   m_ObjectHideFlags: 0
@@ -216,6 +270,7 @@ GameObject:
   - component: {fileID: 8014009994115899636}
   - component: {fileID: 8275381113054126095}
   - component: {fileID: 459890916266217226}
+  - component: {fileID: 9021192322488911486}
   m_Layer: 0
   m_Name: Wire Head
   m_TagString: Untagged
@@ -328,6 +383,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dde9d04bdf37b334eb65df7464103788, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WordOffset: 0
+  WordCount: 0
+  _interpolationDataSource: 0
+--- !u!114 &9021192322488911486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7753401688514450470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 0
+  NetworkGuid:
+    RawGuidValue: 00000000000000000000000000000000
+  NestedObjects: []
+  NetworkedBehaviours: []
+  SimulationBehaviours: []
 --- !u!1 &9175250470116971113
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Photon.Bolt;
 
 public abstract class TargetAbilityManager : MonoBehaviour
 {
@@ -50,24 +49,23 @@ public abstract class TargetAbilityManager : MonoBehaviour
 
     public virtual void EnqueueUserAbility(Fighter user, Ability ability)
     {
-        if (target.Entity.IsOwner)
+        if (target.Entity.HasStateAuthority)
         {
             UserAbility userAbility = new UserAbility(user, ability);
             userAbilityQueue.Enqueue(userAbility);
             CheckUserAbilityQueue(userAbility);
         }
         else
-            EnqueueAbilityEvent.Post(target.Entity.Source, ReliabilityModes.ReliableOrdered, user.EntityId,
-            target.EntityId, (int) ability.Id);
+            target.Entity.RPC_EnqueueAbility(user.Entity.Object.Id, ability.Id);
     }
 
     public void RemoveUserAbility(Fighter user)
     {
-        if (target.Entity.IsOwner)
+        if (target.Entity.HasStateAuthority)
             userAbilityQueue = new Queue<UserAbility>(userAbilityQueue.Where(
                 userAbility => userAbility.User != user));
         else
-            RemoveAbilityEvent.Post(target.Entity.Source, ReliabilityModes.ReliableOrdered, user.EntityId, target.EntityId);
+            target.Entity.RPC_RemoveAbility(user.Entity.Object.Id);
     }
 
     public void ClearUserAbilityQueue()

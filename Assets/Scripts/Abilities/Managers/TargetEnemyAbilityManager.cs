@@ -11,7 +11,7 @@ public class TargetEnemyAbilityManager : TargetAbilityManager
         base.EnqueueUserAbility(user, ability);
 
         if (userAbilityQueue.Count < minAbilities && user is Player player)
-            Effects.SendSpawnParticleEvent(target, ParticlesId.Target, player.CharacterUnityColor);
+            Effects.CallSpawnParticleRPC(target, ParticlesId.Target, player.CharacterUnityColor);
     }
 
     protected override void CheckUserAbilityQueue(UserAbility userAbility)

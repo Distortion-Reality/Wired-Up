@@ -504,6 +504,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebc1df54a962d4eb18f3c6428a482834, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerPrefab:
+    RawGuidValue: 62c549990336e8a7eab21400bc9b8781
 --- !u!4 &336945207
 Transform:
   m_ObjectHideFlags: 0
@@ -3921,6 +3923,14 @@ PrefabInstance:
     - target: {fileID: 4198742555656190177, guid: 22a6c0c9a0d25ec47a38cb4158998b72, type: 3}
       propertyPath: enemyId
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4198742555656190177, guid: 22a6c0c9a0d25ec47a38cb4158998b72, type: 3}
+      propertyPath: prefab.RawGuidValue.Array.data[0]
+      value: -3606710383813175578
+      objectReference: {fileID: 0}
+    - target: {fileID: 4198742555656190177, guid: 22a6c0c9a0d25ec47a38cb4158998b72, type: 3}
+      propertyPath: prefab.RawGuidValue.Array.data[1]
+      value: 9196663836274014392
       objectReference: {fileID: 0}
     - target: {fileID: 4198742556330058328, guid: 22a6c0c9a0d25ec47a38cb4158998b72, type: 3}
       propertyPath: enemyId

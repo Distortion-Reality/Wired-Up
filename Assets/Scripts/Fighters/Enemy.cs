@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Photon.Bolt;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(TargetEnemyAbilityManager))]
 public class Enemy : Fighter
 {
-    EnemyId id;
+    public EnemyEntity EnemyEntity => Entity as EnemyEntity;
+    EnemyId Id => EnemyEntity.EnemyId;
 
     public GameObject enemyHealthBarPrefab;
     const float HealthBarMinDistance = 10f;
@@ -17,7 +17,6 @@ public class Enemy : Fighter
 
     protected NavMeshAgent agent;
 
-    protected new IEnemyState State => entity.GetState<IEnemyState>();
     protected override float MovementSpeed => 1.5f * base.MovementSpeed;
     public override float AbilityRange => 1.5f * base.AbilityRange;
     public override ParticlesId DamageParticles => ParticlesId.EnemyDamage;
@@ -44,18 +43,10 @@ public class Enemy : Fighter
         };
     }
 
-    protected override void UnwrapAttachedToken()
-    {
-        base.UnwrapAttachedToken();
-
-        EnemyToken token = (EnemyToken) entity.AttachToken;
-        id = token.enemyId;
-    }
-
     protected override void LoadModel()
     {
         EnemyManager enemyManager = FindObjectOfType<EnemyManager>();
-        GameObject prefab = enemyManager.GetPrefab(id);
+        GameObject prefab = enemyManager.GetPrefab(Id);
         Instantiate(prefab, parent: transform);
     }
 
@@ -178,5 +169,15 @@ public class Enemy : Fighter
         FighterStatus = Status.Free;
 
         StartCoroutine(UseAbilityCooldown());
+    }
+
+    public override void EntityDestroyed()
+    {
+        base.EntityDestroyed();
+
+        foreach (EnemyGroup enemyGroup in enemyGroups)
+        {
+            enemyGroup.RemoveEnemy(this);
+        }
     }
 }

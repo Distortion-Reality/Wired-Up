@@ -1,6 +1,6 @@
+using Fusion;
 using System.Collections;
 using UnityEngine;
-using Photon.Bolt;
 
 public static class Effects
 {
@@ -28,7 +28,7 @@ public static class Effects
     static void ApplyDamage(ParticlesId damageParticlesId, Color particlesColor, Fighter target, int damage)
     {
         ChangeHP(target, -damage);
-        SendSpawnParticleEvent(target, damageParticlesId, particlesColor);
+        CallSpawnParticleRPC(target, damageParticlesId, particlesColor);
     }
 
     public static int CalculateAndApplyDamage(Fighter user, Fighter target, int power)
@@ -66,7 +66,7 @@ public static class Effects
     public static void ApplyHealing(Fighter user, Fighter target, int healing)
     {
         ChangeHP(target, healing);
-        SendSpawnParticleEvent(target, ParticlesId.Heal, user.CharacterUnityColor);
+        CallSpawnParticleRPC(target, ParticlesId.Heal, user.CharacterUnityColor);
     }
 
     public static int CalculateAndApplyHealing(Fighter user, Fighter target, float percentage)
@@ -84,14 +84,14 @@ public static class Effects
     public static void BuffStat(Fighter user, Fighter target, StatisticManager.StatisticId statId, int stages)
     {
         target.TargetAbilityManager.StartCoroutine(ApplyStatBuff(target, statId, stages));
-        SendSpawnParticleEvent(target, ParticlesId.Buff, user.CharacterUnityColor);
+        CallSpawnParticleRPC(target, ParticlesId.Buff, user.CharacterUnityColor);
 
     }
 
     public static void DebuffStat(Fighter user, Fighter target, StatisticManager.StatisticId statId, int stages)
     {
         target.TargetAbilityManager.StartCoroutine(ApplyStatBuff(target, statId, -stages));
-        SendSpawnParticleEvent(target, ParticlesId.Debuff, user.CharacterUnityColor);
+        CallSpawnParticleRPC(target, ParticlesId.Debuff, user.CharacterUnityColor);
     }
 
     static IEnumerator ApplyStatBuff(Fighter target, StatisticManager.StatisticId statId, int stages)
@@ -104,13 +104,13 @@ public static class Effects
     public static void Stun(Fighter user, Fighter target, float time = 5f)
     {
         target.ApplyStatus(Fighter.Status.Stunned, time);
-        SendSpawnParticleEvent(target, ParticlesId.Stun, user.CharacterUnityColor);
+        CallSpawnParticleRPC(target, ParticlesId.Stun, user.CharacterUnityColor);
     }
 
     public static void BlockMovements(Fighter user, Fighter target, float time)
     {
         target.TargetAbilityManager.StartCoroutine(ApplyBlockMovements(target, time));
-        SendSpawnParticleEvent(target, ParticlesId.Stun, user.CharacterUnityColor);
+        CallSpawnParticleRPC(target, ParticlesId.Stun, user.CharacterUnityColor);
     }
 
     static IEnumerator ApplyBlockMovements(Fighter target, float time)
@@ -129,14 +129,22 @@ public static class Effects
         return colliders;
     }
 
-    public static void SendSpawnParticleEvent(Fighter target, ParticlesId particlesId, Color particlesColor)
+    public static void CallSpawnParticleRPC(Fighter target, ParticlesId particlesId, Color particlesColor)
     {
-        SpawnParticleEvent.Post(ReliabilityModes.ReliableOrdered, target.EntityId, (int)particlesId, particlesColor);
+        target.Entity.RPC_SpawnParticle(particlesId, particlesColor);
     }
 
     public static void FireRay(Enemy user, Ability ability)
     {
-        GameObject ray = BoltNetwork.Instantiate(BoltPrefabs.EnemyAttackRay, user.FirePosition, user.transform.rotation);
+        if (!user.Entity.HasStateAuthority)
+            return;
+
+        NetworkObject ray = user.Entity.Runner.Spawn(
+            user.EnemyEntity.enemyAttackRayPrefab,
+            user.FirePosition,
+            user.transform.rotation
+            );
+
         ray.GetComponent<EnemyAbilityRay>().FireRay(user, ability);
     }
 }

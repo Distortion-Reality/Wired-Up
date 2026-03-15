@@ -1,10 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Bolt;
 
-public class BossArenaEntrance : GlobalEventListener
+public class BossArenaEntrance : MonoBehaviour
 {
     readonly List<Player> players = new List<Player>();
+
+    public static BossArenaEntrance Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
 
     // Update is called once per frame
     void Update()
@@ -19,9 +31,8 @@ public class BossArenaEntrance : GlobalEventListener
         }
     }
 
-    public override void EntityAttached(BoltEntity entity)
+    public void RegisterPlayer(Player player)
     {
-        if (entity.StateIs<IPlayerState>())
-            players.Add(entity.GetComponent<Player>());
+        players.Add(player);
     }
 }

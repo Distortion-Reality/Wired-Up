@@ -7,10 +7,15 @@ public class GameOver : MonoBehaviour
     public GameObject panel;
     public GameObject resultText;
     public GameObject messageText;
-    readonly NetworkRunner runner = NetworkRunnerManager.Instance.Runner;
+    NetworkRunner runner;
 
     bool isGameOver = false;
-    
+
+    void Start()
+    {
+        runner = NetworkRunnerManager.Instance.Runner;
+    }
+
     public bool IsGameOver { get => isGameOver; }
 
     public void Lose(string playerDeadName, CharacterColor playerDeadCharacter)

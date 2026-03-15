@@ -108,7 +108,7 @@ public class LobbyPlayer : NetworkBehaviour
 
     void NameChanged()
     {
-        playerNameText.text = PlayerName.ToString();
+        playerNameText.text = PlayerName.Value;
     }
 
     void CharacterChanged(int oldIndex, int newIndex)

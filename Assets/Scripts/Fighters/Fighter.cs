@@ -1,9 +1,7 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Photon.Bolt;
 
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
@@ -18,9 +16,6 @@ public abstract class Fighter : MonoBehaviour
         Disconnecting,
         Stunned
     }
-
-    protected BoltEntity entity;
-    protected Guid entityId;
 
     float centreOffset, topOffset, bottomOffset;
 
@@ -37,6 +32,7 @@ public abstract class Fighter : MonoBehaviour
     TargetAbilityManager targetAbilityManager;
     protected Fighter target = null;
     protected Animator animator;
+    protected EnemyGroup[] enemyGroups;
 
     bool charging = false;
     Fighter charged = null;
@@ -44,19 +40,18 @@ public abstract class Fighter : MonoBehaviour
     bool grounded = true;
     protected bool movementsBlocked = false;
 
-    public BoltEntity Entity { get => entity; }
-    public Guid EntityId { get => entityId; }
+    public FighterEntity Entity { get; set; }
     public Rigidbody Rb { get => rb; set => rb = value; }
     public Dictionary<StatisticManager.StatisticId, FighterStatistic> Stats { get => stats; }
     public Status FighterStatus
     {
-        get => (Status) State.status;
+        get => Entity.Status;
         set
         {
-            if (entity.IsOwner)
-                State.status = (int) value;
+            if (Entity.Object.HasStateAuthority)
+                Entity.Status = value;
             else
-                ChangeStatusEvent.Post(entity.Source, ReliabilityModes.ReliableOrdered, entityId, (int) value);
+                Entity.RPC_SetStatus(value);
         }
     }
     public Status FighterStatusLocal { get => fighterStatus; set => fighterStatus = value; }
@@ -68,7 +63,6 @@ public abstract class Fighter : MonoBehaviour
     public bool Grounded { get => grounded; set => grounded = value; }
     public bool MovementsBlocked { set => movementsBlocked = value; }
 
-    protected IFighterState State => entity.GetState<IFighterState>();
     public Vector3 CentrePosition => transform.position + OffsetVector(centreOffset);
     public Vector3 TopPosition => transform.position + OffsetVector(topOffset);
     public Vector3 BottomPosition => transform.position + OffsetVector(bottomOffset);
@@ -91,7 +85,7 @@ public abstract class Fighter : MonoBehaviour
 
     public virtual void EntityStart()
     {
-        entity = GetComponent<BoltEntity>();
+        Entity = GetComponent<FighterEntity>();
 
         UnwrapAttachedToken();
 
@@ -117,23 +111,23 @@ public abstract class Fighter : MonoBehaviour
 
         animator = GetComponentInChildren<Animator>();
 
-        // Setup Bolt states
-        State.SetTransforms(State.transform, transform, transform);
-        for (int i = 0; i < 5; i++)
+        // Setup Networked states
+        if (Entity.Object.HasStateAuthority)
         {
-            State.statistics[i] = stats[(StatisticManager.StatisticId) i].CurrentValue;
-        }
-        if (entity.IsOwner)
-            State.status = (int) fighterStatus;
+            for (int i = 0; i < 5; i++)
+            {
+                Entity.Stats.Set(i, stats[(StatisticManager.StatisticId)i].CurrentValue);
+            }
 
-        State.AddCallback("statistics[]", StatisticChanged);
-        State.AddCallback("status", StatusChanged);
+            Entity.Status = fighterStatus;
+        }
+
+        enemyGroups = FindObjectsOfType<EnemyGroup>();
     }
 
     protected virtual void UnwrapAttachedToken()
     {
-        FighterToken token = (FighterToken) entity.AttachToken;
-        entityId = token.guid;
+        Entity.UnwrapAttachedToken();
     }
 
     protected abstract void InitStats();
@@ -190,10 +184,10 @@ public abstract class Fighter : MonoBehaviour
 
     public void EndAbility()
     {
-        if (entity.IsOwner)
+        if (Entity.HasStateAuthority)
             OnEndAbility();
         else
-            EndAbilityEvent.Post(entity.Source, ReliabilityModes.ReliableOrdered, entityId);
+            Entity.RPC_EndAbility();
     }
 
     protected virtual void OnEndAbility()
@@ -213,37 +207,27 @@ public abstract class Fighter : MonoBehaviour
 
     public void UseEnergy(int abilityEnergy)
     {
-        if (entity.IsOwner)
-            ChangeEnergy(- abilityEnergy);
+        if (Entity.HasStateAuthority)
+            ChangeEnergy(-abilityEnergy);
         else
-            UseEnergyEvent.Post(entity.Source, ReliabilityModes.ReliableOrdered, entityId, abilityEnergy);
+            Entity.RPC_UseEnergy(abilityEnergy);
     }
 
     public void ChangeStat(StatisticManager.StatisticId statId, int change)
     {
-        if (!entity.IsOwner)
+        if (!Entity.Object.HasStateAuthority)
         {
-            ChangeStatisticEvent evnt = ChangeStatisticEvent.Create(entity.Source, ReliabilityModes.ReliableOrdered);
-            evnt.entityId = entityId;
-            evnt.statisticId = (int) statId;
-            evnt.change = change;
-            evnt.Send();
+            Entity.RPC_ChangeStat(statId, change);
         }
         else
         {
-            State.statistics[(int) statId] = stats[statId].ApplyChange(change);
+            Entity.Stats.Set((int) statId, stats[statId].ApplyChange(change));
         }
     }
 
-    void StatisticChanged(IState state, string propertyPath, ArrayIndices arrayIndices)
+    public void StatisticChanged(StatisticManager.StatisticId statId, int newValue)
     {
-        int index = arrayIndices[0];
-        IFighterState localState = (IFighterState) state;
-        int value = localState.statistics[index];
-
-        StatisticManager.StatisticId statId = (StatisticManager.StatisticId) index;
-        stats[statId].CurrentValue = value;
-
+        stats[statId].CurrentValue = newValue;
         if (statId == StatisticManager.StatisticId.HP)
             HpChanged();
     }
@@ -253,7 +237,7 @@ public abstract class Fighter : MonoBehaviour
         if (healthBar)
             healthBar.value = stats[StatisticManager.StatisticId.HP].PercentageValue;
         
-        if (entity.IsOwner && stats[StatisticManager.StatisticId.HP].CurrentValue == 0)
+        if (Entity.HasStateAuthority && stats[StatisticManager.StatisticId.HP].CurrentValue == 0)
             Die();
     }
 
@@ -270,9 +254,9 @@ public abstract class Fighter : MonoBehaviour
         StartCoroutine(ApplyStatusForTime(status, time));
     }
 
-    void StatusChanged()
+    public void StatusChanged(Status status)
     {
-        fighterStatus = (Status) State.status;
+        fighterStatus = status;
     }
 
     IEnumerator ApplyStatusForTime(Status status, float time)
@@ -319,10 +303,10 @@ public abstract class Fighter : MonoBehaviour
                 fighter.fighterStatus == Status.Waiting || fighter.fighterStatus == Status.Using))
                 fighter.EndAbility();
 
-        BoltNetwork.Destroy(gameObject);
+        Entity.Runner.Despawn(Entity.Object);
     }
 
-    public void EntityDestroyed()
+    public virtual void EntityDestroyed()
     {
         if (healthBar)
             Destroy(healthBar.gameObject);

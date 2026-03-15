@@ -15,7 +15,8 @@ GameObject:
   - component: {fileID: -5666458750499802599}
   - component: {fileID: 8811423665481132916}
   - component: {fileID: 4926753982981743751}
-  - component: {fileID: 1160451499801872718}
+  - component: {fileID: 2362949081489767487}
+  - component: {fileID: 8053604856043726894}
   m_Layer: 8
   m_Name: Peripheral
   m_TagString: Enemy
@@ -97,9 +98,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 7446445931601703244}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6ee45fcc9aa19214aca6b37a13ff6a3, type: 3}
+  m_Script: {fileID: 11500000, guid: 73b9ca83143565641bcfa2f6af8cd8cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WordOffset: 0
+  WordCount: 0
+  _interpolationDataSource: 0
+  _Status: 0
+  _Stats: 
+  _EnemyId: 0
+  enemyAttackRayPrefab:
+    RawGuidValue: db12d9f27854a6f44a1f69c7d50639ca
 --- !u!114 &8811423665481132916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,7 +136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minAbilities: 2
   waitingTime: 1.5
---- !u!114 &1160451499801872718
+--- !u!114 &2362949081489767487
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -136,23 +145,49 @@ MonoBehaviour:
   m_GameObject: {fileID: 7446445931601703244}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 155943207, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sceneGuid: 
-  _serializerGuid: 799b3f77-3c57-471d-a6ab-aafd43b42df6
-  _prefabId: 2
-  _updateRate: 1
-  _autoFreezeProxyFrames: 0
-  _clientPredicted: 1
-  _allowInstantiateOnClient: 1
-  _persistThroughSceneLoads: 0
-  _sceneObjectDestroyOnDetach: 1
-  _sceneObjectAutoAttach: 1
-  _alwaysProxy: 0
-  _detachOnDisable: 1
-  _allowFirstReplicationWhenFrozen: 0
-  _autoRemoveChildEntities: 0
-  _entityBehaviourQueryOption: 0
-  _entityPriorityCalculatorQueryOption: 1
-  _entityReplicationFilterQueryOption: 1
+  WordOffset: 0
+  WordCount: 0
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03
+--- !u!114 &8053604856043726894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7446445931601703244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: db33c37bd65726a4d87a44dc347d3f92
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: -5666458750499802599}
+  - {fileID: 2362949081489767487}
+  SimulationBehaviours: []

@@ -12,7 +12,7 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public static LobbyManager Instance { get; private set; }
 
-    readonly NetworkRunner runner = NetworkRunnerManager.Instance.Runner;
+    NetworkRunner runner;
     Transform canvas;
 
     public NetworkObject lobbyPlayerPrefab;
@@ -38,6 +38,8 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     void Start()
     {
+        runner = NetworkRunnerManager.Instance.Runner;
+
         runner.AddCallbacks(this);
         canvas = GetComponent<Canvas>().transform;
     }

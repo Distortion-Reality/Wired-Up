@@ -14,8 +14,9 @@ GameObject:
   - component: {fileID: 2490772642427339829}
   - component: {fileID: 1292706225819353749}
   - component: {fileID: 3916351171801944950}
-  - component: {fileID: 4723767060238987593}
   - component: {fileID: 3747318571579402807}
+  - component: {fileID: 8412639290897934824}
+  - component: {fileID: 6741379583994081419}
   m_Layer: 0
   m_Name: KirinBoss
   m_TagString: Enemy
@@ -115,35 +116,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyHealthBarPrefab: {fileID: 1291064108427742335, guid: b4b8b790658118b5ea84d5ac2bb32e19, type: 3}
---- !u!114 &4723767060238987593
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2156102497409713576}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 155943207, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _sceneGuid: 
-  _serializerGuid: 22283a25-470f-453f-b013-fe4346c9982f
-  _prefabId: 1
-  _updateRate: 1
-  _autoFreezeProxyFrames: 0
-  _clientPredicted: 1
-  _allowInstantiateOnClient: 1
-  _persistThroughSceneLoads: 0
-  _sceneObjectDestroyOnDetach: 1
-  _sceneObjectAutoAttach: 1
-  _alwaysProxy: 0
-  _detachOnDisable: 1
-  _allowFirstReplicationWhenFrozen: 0
-  _autoRemoveChildEntities: 0
-  _entityBehaviourQueryOption: 0
-  _entityPriorityCalculatorQueryOption: 1
-  _entityReplicationFilterQueryOption: 1
 --- !u!114 &3747318571579402807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -153,6 +125,72 @@ MonoBehaviour:
   m_GameObject: {fileID: 2156102497409713576}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6ee45fcc9aa19214aca6b37a13ff6a3, type: 3}
+  m_Script: {fileID: 11500000, guid: 894b944247f7eef4982d8341840cb99d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WordOffset: 0
+  WordCount: 0
+  _interpolationDataSource: 0
+  _Status: 0
+  _Stats: 
+  _EnemyId: 0
+  enemyAttackRayPrefab:
+    RawGuidValue: db12d9f27854a6f44a1f69c7d50639ca
+  _Speed: 0
+  _Direction: 0
+  _OnGround: 0
+--- !u!114 &8412639290897934824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2156102497409713576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: e6561add0364f2cdb838cb77081da17f
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 3747318571579402807}
+  - {fileID: 6741379583994081419}
+  SimulationBehaviours: []
+--- !u!114 &6741379583994081419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2156102497409713576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WordOffset: 0
+  WordCount: 0
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03

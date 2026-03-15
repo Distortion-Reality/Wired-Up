@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Bolt;
 
-public class EnemyGroup : GlobalEventListener
+public class EnemyGroup : MonoBehaviour
 {
     readonly List<Player> players = new List<Player>();
     readonly List<Enemy> enemies = new List<Enemy>();
@@ -15,26 +14,24 @@ public class EnemyGroup : GlobalEventListener
                 enemies[i].Target = players[i];
     }
 
-    public override void EntityAttached(BoltEntity entity)
+    public void RegisterPlayer(Player player)
     {
-        if (entity.StateIs<IPlayerState>())
-            players.Add(entity.GetComponent<Player>());
+        players.Add(player);
     }
 
-    public override void EntityDetached(BoltEntity entity)
+    public void UnregisterPlayer(Player player)
     {
-        if (entity.StateIs<IPlayerState>())
-            players.Remove(entity.GetComponent<Player>());
-        else if (entity.StateIs<IEnemyState>())
-        {
-            Enemy enemy = entity.GetComponent<Enemy>();
-            if (enemies.Contains(enemy))
-                enemies.Remove(enemy);
-        }
+        players.Remove(player);
     }
 
     public void AddEnemy(Enemy enemy)
     {
         enemies.Add(enemy);
+    }
+
+    public void RemoveEnemy(Enemy enemy)
+    {
+        if (enemies.Contains(enemy))
+            enemies.Remove(enemy);
     }
 }

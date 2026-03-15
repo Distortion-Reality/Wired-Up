@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 2762421164124679331}
   - component: {fileID: 2559468193901753958}
   - component: {fileID: -7649132947553219902}
+  - component: {fileID: 2783299174349185207}
+  - component: {fileID: 8980704283546132044}
   - component: {fileID: 7350308166267236701}
-  - component: {fileID: -1333229034447047169}
   m_Layer: 0
   m_Name: EnemyAttackRay
   m_TagString: Untagged
@@ -162,6 +163,61 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 116
   m_CollisionDetection: 0
+--- !u!114 &2783299174349185207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4410735498059918412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectInterest: 1
+  DefaultInterestGroups: []
+  DestroyWhenStateAuthorityLeaves: 0
+  AllowStateAuthorityOverride: 1
+  AoiPositionSource: {fileID: 0}
+  Flags: 2305
+  NetworkGuid:
+    RawGuidValue: db12d9f27854a6f44a1f69c7d50639ca
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 8980704283546132044}
+  - {fileID: 7350308166267236701}
+  SimulationBehaviours: []
+--- !u!114 &8980704283546132044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4410735498059918412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WordOffset: 0
+  WordCount: 0
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03
 --- !u!114 &7350308166267236701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,32 +230,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2732b8af2f7a1514bad94cb11fc1e9fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &-1333229034447047169
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4410735498059918412}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 155943207, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _sceneGuid: 
-  _serializerGuid: ce076215-6ca6-4cab-a2ee-cd4ca544fb2d
-  _prefabId: 4
-  _updateRate: 1
-  _autoFreezeProxyFrames: 0
-  _clientPredicted: 1
-  _allowInstantiateOnClient: 1
-  _persistThroughSceneLoads: 0
-  _sceneObjectDestroyOnDetach: 1
-  _sceneObjectAutoAttach: 1
-  _alwaysProxy: 0
-  _detachOnDisable: 1
-  _allowFirstReplicationWhenFrozen: 0
-  _autoRemoveChildEntities: 0
-  _entityBehaviourQueryOption: 0
-  _entityPriorityCalculatorQueryOption: 1
-  _entityReplicationFilterQueryOption: 1
+  WordOffset: 0
+  WordCount: 0
+  _interpolationDataSource: 0

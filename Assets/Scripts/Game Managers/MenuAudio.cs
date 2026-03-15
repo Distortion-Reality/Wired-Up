@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class MenuAudio : MonoBehaviour
 {
@@ -15,20 +14,5 @@ public class MenuAudio : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-    }
-
-    void Start()
-    {
-        SceneManager.activeSceneChanged += ChangedActiveScene;
-    }
-
-    void ChangedActiveScene(Scene current, Scene next)
-    {
-        if (next != SceneManager.GetSceneByName("Menu") &&
-            next != SceneManager.GetSceneByName("Lobby"))
-        {
-            SceneManager.activeSceneChanged -= ChangedActiveScene;
-            Destroy(gameObject);
-        }
     }
 }

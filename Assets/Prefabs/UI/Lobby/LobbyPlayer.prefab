@@ -269,7 +269,10 @@ MonoBehaviour:
   WordOffset: 0
   WordCount: 0
   _interpolationDataSource: 0
-  _PlayerName: 
+  _PlayerName:
+    _length: 0
+    _data:
+      Data: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   _CurrentCharacterIndex: 0
   _IsReady: 0
 --- !u!114 &5858493335655775140

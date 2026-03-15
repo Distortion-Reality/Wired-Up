@@ -1,195 +1,137 @@
+using Fusion;
+using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Photon.Bolt;
 
-public class NetworkManager : GlobalEventListener {
-
-    ParticlesManager particlesManager;
+public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
+{
+    public NetworkPrefabRef playerPrefab;
     GameOver gameOver;
 
-    readonly Dictionary<Guid, Fighter> fighters = new Dictionary<Guid, Fighter>();
     int allyCount = -1;
 
     public int AllyCount { get => allyCount; }
+    public ParticlesManager ParticlesManager { get; private set; }
+
+    public static NetworkManager Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
 
     void Start()
     {
-        particlesManager = GetComponent<ParticlesManager>();
+        ParticlesManager = GetComponent<ParticlesManager>();
         gameOver = FindObjectOfType<GameOver>();
+
+        Runner = NetworkRunnerManager.Instance.Runner;
+        Runner.AddCallbacks(this);
     }
 
-    public override void SceneLoadLocalDone(string scene, IProtocolToken token)
+    public void IncrementAllyCount()
+    {
+        allyCount++;
+    }
+
+    public void GameLose(string playerName, CharacterColor character)
+    {
+        gameOver.Lose(playerName, character);
+    }
+
+    public void GameWin()
+    {
+        gameOver.Win();
+    }
+
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
+
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    {
+        runner.Shutdown();
+    }
+
+    public void OnInput(NetworkRunner runner, NetworkInput input) { }
+
+    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
+
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+    {
+        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+    }
+
+    void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) { }
+
+    void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner)
+    {
+        runner.Shutdown();
+    }
+
+    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
+
+    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
+
+    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
+
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+
+    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
+
+    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
+
+    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
+
+    public void OnSceneLoadDone(NetworkRunner runner)
     {
         Destroy(GameObject.Find("Menu Audio"));
 
+        if (!runner.IsServer)
+            return;
+
         // Spawn player
         CharacterManager characterManager = FindObjectOfType<CharacterManager>();
-        PlayerToken info = new PlayerToken
-        {
-            guid = Guid.NewGuid(),
-            name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName),
-            character = characterManager.CurrentCharacter
-        };
 
-        LevelSpawnInfo spawnInfo = new LevelSpawnInfo();
+        LevelSpawnInfo spawnInfo = LevelSpawnInfo.Instance;
         Transform spawnPoint = GameObject.Find("PlayersSpawnPoint").transform;
         Vector3 spawnPosition = spawnPoint.position;
-        if (!BoltNetwork.IsServer)
+
+        foreach (var player in runner.ActivePlayers)
         {
             if (characterManager.CurrentCharacter == spawnInfo.Left)
                 spawnPosition += Vector3.left * 5;
             else if (characterManager.CurrentCharacter == spawnInfo.Right)
                 spawnPosition += Vector3.right * 5;
+
+            PlayerToken token = new PlayerToken();
+            token.name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName);
+            token.character = characterManager.CurrentCharacter;
+
+            runner.Spawn(
+                playerPrefab,
+                spawnPosition,
+                spawnPoint.rotation,
+                player,
+                (runner, obj) =>
+                {
+                    PlayerEntity playerEntity = obj.GetComponent<PlayerEntity>();
+                    playerEntity.PlayerToken = token;
+                }
+            );
         }
 
-        BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Player, info, spawnPosition, spawnPoint.rotation);
-
-        // Setup player camera
-        GameObject playerCamera = GameObject.Find("PlayerCamera");
-        Cinemachine.CinemachineFreeLook cinemachine = playerCamera.GetComponent<Cinemachine.CinemachineFreeLook>();
-        cinemachine.Follow = entity.transform;
-        cinemachine.LookAt = entity.transform.Find("CameraLookTarget");
-    }
-
-    public override void Disconnected(BoltConnection connection)
-    {
-        BoltLauncher.Shutdown();
-        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
-    }
-
-    public override void EntityAttached(BoltEntity entity)
-    {
-        if (entity.StateIs<IFighterState>())
+        foreach (EntitySpawner spawner in FindObjectsOfType<EntitySpawner>())
         {
-            Fighter fighter = entity.GetComponent<Fighter>();
-            fighters[fighter.EntityId] = fighter;
-
-            if (fighter is Player)
-                allyCount++;
+            spawner.StartEntitySpawner();
         }
     }
 
-    public override void EntityDetached(BoltEntity entity)
-    {
-        if (entity.StateIs<IFighterState>())
-        {
-            Fighter fighter = entity.GetComponent<Fighter>();
-            fighters.Remove(fighter.EntityId);
-        }
-    }
-
-    public override void OnEvent(ChangeStatisticEvent evnt)
-    {
-        Fighter fighter = fighters[evnt.entityId];
-        fighter.ChangeStat((StatisticManager.StatisticId) evnt.statisticId, evnt.change);
-    }
-
-    public override void OnEvent(ChangeStatusEvent evnt)
-    {
-        Fighter fighter = fighters[evnt.entityId];
-        fighter.FighterStatus = (Fighter.Status) evnt.statusId;
-    }
-
-    public override void OnEvent(UseEnergyEvent evnt)
-    {
-        Fighter fighter = fighters[evnt.entityId];
-        fighter.UseEnergy(evnt.amount);
-    }
-
-    public override void OnEvent(EnqueueAbilityEvent evnt)
-    {
-        Ability ability = AbilityRegistry.Get((AbilityId) evnt.abilityId);
-        Fighter target = fighters[evnt.targetId];
-        Fighter user = fighters[evnt.senderId];
-        user.Target = target;
-        target.TargetAbilityManager.EnqueueUserAbility(user, ability);
-    }
-
-    public override void OnEvent(RemoveAbilityEvent evnt)
-    {
-        fighters[evnt.targetId].TargetAbilityManager.RemoveUserAbility(fighters[evnt.senderId]);
-    }
-
-    public override void OnEvent(EndAbilityEvent evnt)
-    {
-        fighters[evnt.entityId].EndAbility();
-    }
-
-    public override void OnEvent(ChargeEvent evnt)
-    {
-        Fighter user = fighters[evnt.entityId];
-        RedAttack1.DoCharge(user, user.Target);
-    }
-
-    public override void OnEvent(ChangeWireRotationEvent evnt)
-    {
-        Transform wire = ((Player) fighters[evnt.entityId]).Wire.transform.parent;
-        if (evnt.reset)
-            wire.transform.localRotation = Quaternion.identity;
-        else
-            wire.transform.LookAt(evnt.lookAt);
-    }
-
-    public override void OnEvent(WireConnectEvent evnt)
-    {
-        ((Player) fighters[evnt.entityId]).Wire.Connect();
-    }
-
-    public override void OnEvent(WireStayConnectedTargetEvent evnt)
-    {
-        Player sender = (Player) fighters[evnt.senderId];
-        sender.Target = fighters[evnt.targetId];
-        sender.Wire.StayConnected();
-    }
-
-    public override void OnEvent(WireDisconnectEvent evnt)
-    {
-        ((Player) fighters[evnt.entityId]).Wire.Disconnect();
-    }
-
-    public override void OnEvent(SpawnParticleEvent evnt)
-    {
-        ParticlesId id = (ParticlesId) evnt.particleId;
-        Fighter target = fighters[evnt.entityId];
-        Vector3 position;
-        switch (id)
-        {
-            case ParticlesId.EnemyDamage:
-            case ParticlesId.PlayerDamage:
-            case ParticlesId.KirinDamage:
-            case ParticlesId.KirinBurst:
-            case ParticlesId.Heal:
-            case ParticlesId.Death:
-                position = target.CentrePosition;
-                break;
-            case ParticlesId.Buff:
-            case ParticlesId.Debuff:
-            case ParticlesId.Stun:
-                position = target.TopPosition;
-                break;
-            case ParticlesId.Target:
-                position = target.BottomPosition;
-                break;
-            default:
-                position = Vector3.zero;
-                break;
-        }
-        GameObject prefab = particlesManager.GetParticlesPrefab(id);
-        GameObject particle = Instantiate(prefab, position, target.transform.rotation);
-        ParticleSystem.MainModule main = particle.GetComponent<ParticleSystem>().main;
-        main.startColor = new ParticleSystem.MinMaxGradient(evnt.color);
-        particle.transform.SetParent(target.transform, true);
-    }
-
-    public override void OnEvent(GameLoseEvent evnt)
-    {
-        gameOver.Lose(evnt.playerName, (CharacterColor) evnt.character);
-    }
-
-    public override void OnEvent(GameWinEvent evnt)
-    {
-        gameOver.Win();
-    }
+    public void OnSceneLoadStart(NetworkRunner runner) { }
 }

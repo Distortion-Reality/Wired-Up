@@ -1,15 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Bolt;
 
 public class Boss : Enemy
 {
+    public BossEntity BossEntity => EnemyEntity as BossEntity;
+
+    float Speed { get => BossEntity.Speed; set => BossEntity.Speed = value; }
+    float Direction { get => BossEntity.Direction; set => BossEntity.Direction = value; }
+    bool OnGround { get => BossEntity.OnGround; set => BossEntity.OnGround = value; }
+
     readonly string bossName = "Kirin";
     const float HealthBarMaxDistance = 60f;
     private float velocity;
 
-    protected new IBossState State => entity.GetState<IBossState>();
     public override ParticlesId DamageParticles => ParticlesId.KirinDamage;
     public override Vector3 FirePosition =>
         new Vector3(base.FirePosition.x, target.CentrePosition.y, base.FirePosition.z);
@@ -40,8 +44,7 @@ public class Boss : Enemy
 
         healthBar.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = bossName;
 
-        State.SetAnimator(animator);
-        State.Animator.applyRootMotion = entity.IsOwner;
+        animator.applyRootMotion = Entity.Object.HasInputAuthority;
     }
 
     protected override void UpdateHealthBar()
@@ -63,27 +66,32 @@ public class Boss : Enemy
 
         float speed = Mathf.Abs(agent.velocity.x) + Mathf.Abs(agent.velocity.z);
         speed = Mathf.Clamp(speed, 0f, 0.2f);
-        //State.Speed = Mathf.SmoothDamp(State.Speed, speed, ref velocity, 0.1f);
+        //Speed = Mathf.SmoothDamp(Speed, speed, ref velocity, 0.1f);
         if (agent.isStopped)
             speed = 0f;
-        //State.Speed = speed; owner sees it in wrong position
-        State.Direction = 0f;
-        State.OnGround = true;
+        //Speed = speed; // owner sees it in wrong position
+        Direction = 0f;
+        OnGround = true;
     }
 
     protected override void Die()
     {
         base.Die();
 
-        GameWinEvent.Post(ReliabilityModes.ReliableOrdered);
+        BossEntity.RPC_GameWin();
     }
 
     protected override void UseAbility(Ability ability)
     {
         FighterStatus = Status.Using;
-        State.AttackShoot();
+        BossEntity.RPC_AttackShoot();
 
         StartCoroutine(WaitForAnimation(ability));
+    }
+
+    public void AttackShoot()
+    {
+        animator.SetTrigger("AttackShoot");
     }
 
     IEnumerator WaitForAnimation(Ability ability)
