@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 3916351171801944950}
   - component: {fileID: 3747318571579402807}
   - component: {fileID: 8412639290897934824}
-  - component: {fileID: 6741379583994081419}
+  - component: {fileID: -8255825582649271240}
   m_Layer: 0
   m_Name: KirinBoss
   m_TagString: Enemy
@@ -74,7 +74,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2156102497409713576}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
@@ -162,9 +162,9 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 3747318571579402807}
-  - {fileID: 6741379583994081419}
+  - {fileID: -8255825582649271240}
   SimulationBehaviours: []
---- !u!114 &6741379583994081419
+--- !u!114 &-8255825582649271240
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -145,13 +145,16 @@ public abstract class Fighter : MonoBehaviour
         RegenEnergy();
     }
 
-    public virtual void OwnerFixedUpdate()
+    public virtual void StateFixedUpdate()
     {
         if (FighterStatus != Status.Stunned)
             UpdateRotation();
     }
 
-    protected abstract void UpdateMovement();
+    protected virtual void UpdateMovement()
+    {
+
+    }
 
     void UpdateTarget()
     {
@@ -269,7 +272,7 @@ public abstract class Fighter : MonoBehaviour
         }
     }
 
-    protected virtual void UpdateRotation()
+    protected Quaternion GetRotationUpdate()
     {
         Quaternion rotation;
         if (FighterStatusLocal != Status.Free &&
@@ -278,10 +281,15 @@ public abstract class Fighter : MonoBehaviour
         else
         {
             Quaternion finalRotation = (target == null) ? DefaultRotation : LookAtTargetRotation();
-            rotation = Quaternion.Slerp(rb.rotation, finalRotation, RotationSpeed * Time.fixedDeltaTime);
+            rotation = Quaternion.Slerp(rb.rotation, finalRotation, RotationSpeed * Entity.Runner.DeltaTime);
         }
 
-        rb.MoveRotation(rotation);
+        return rotation;
+    }
+
+    protected virtual void UpdateRotation()
+    {
+
     }
 
     public Quaternion LookAtTargetRotation()

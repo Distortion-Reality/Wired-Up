@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(BossEntity))]
 public class Boss : Enemy
 {
     public BossEntity BossEntity => EnemyEntity as BossEntity;
@@ -45,6 +46,7 @@ public class Boss : Enemy
         healthBar.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = bossName;
 
         animator.applyRootMotion = Entity.Object.HasInputAuthority;
+        animator.fireEvents = false;
     }
 
     protected override void UpdateHealthBar()
@@ -60,9 +62,9 @@ public class Boss : Enemy
         }
     }
 
-    public override void OwnerFixedUpdate()
+    public override void StateFixedUpdate()
     {
-        base.OwnerFixedUpdate();
+        base.StateFixedUpdate();
 
         float speed = Mathf.Abs(agent.velocity.x) + Mathf.Abs(agent.velocity.z);
         speed = Mathf.Clamp(speed, 0f, 0.2f);

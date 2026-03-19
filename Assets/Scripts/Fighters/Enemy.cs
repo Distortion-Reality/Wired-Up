@@ -6,6 +6,7 @@ using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(TargetEnemyAbilityManager))]
+[RequireComponent(typeof(EnemyEntity))]
 public class Enemy : Fighter
 {
     public EnemyEntity EnemyEntity => Entity as EnemyEntity;
@@ -71,6 +72,11 @@ public class Enemy : Fighter
         currentAbility = attacks[Random.Range(0, attacks.Count)];
     }
 
+    void Start()
+    {
+        agent.enabled = true;
+    }
+
     public override void OwnerUpdate()
     {
         base.OwnerUpdate();
@@ -90,6 +96,8 @@ public class Enemy : Fighter
             agent.destination = target.BottomPosition;
             agent.stoppingDistance = target.AbilityRange + 3;
             agent.speed = MovementSpeed;
+
+            base.UpdateMovement();
         }
     }
 
@@ -111,7 +119,7 @@ public class Enemy : Fighter
         else
         {
             Quaternion finalRotation = LookAtTargetRotation();
-            rotation = Quaternion.Slerp(transform.rotation, finalRotation, 10f * Time.fixedDeltaTime);
+            rotation = Quaternion.Slerp(transform.rotation, finalRotation, 10f * EnemyEntity.Runner.DeltaTime);
         }
 
         transform.rotation = rotation;

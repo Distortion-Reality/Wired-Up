@@ -3,7 +3,6 @@ using UnityEngine;
 using static Fighter;
 
 [RequireComponent(typeof(NetworkObject))]
-[RequireComponent(typeof(NetworkTransform))]
 public abstract class FighterEntity : NetworkBehaviour
 {
     protected Fighter fighter;
@@ -45,13 +44,13 @@ public abstract class FighterEntity : NetworkBehaviour
         fighter.EntityUpdate();
     }
 
-    // FixedUpdateNetwork is a FixedUpdate (this is run only if Object.HasInputAuthority)
+    // FixedUpdateNetwork is a FixedUpdate (this is run only if Object.HasStateAuthority)
     public override void FixedUpdateNetwork()
     {
-        if (!Object.HasInputAuthority || (gameOver != null && gameOver.IsGameOver))
+        if (!Object.HasStateAuthority || (gameOver != null && gameOver.IsGameOver))
             return;
         
-        fighter.OwnerFixedUpdate();
+        fighter.StateFixedUpdate();
     }
 
     static void OnStatusChanged(Changed<FighterEntity> changed)

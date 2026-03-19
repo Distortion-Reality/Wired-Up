@@ -4,12 +4,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static PlayerEntity;
 
 public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
 {
     public NetworkPrefabRef playerPrefab;
     GameOver gameOver;
 
+    readonly Dictionary<PlayerRef, PlayerEntity> players = new Dictionary<PlayerRef, PlayerEntity>();
     int allyCount = -1;
 
     public int AllyCount { get => allyCount; }
@@ -37,9 +39,15 @@ public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
         Runner.AddCallbacks(this);
     }
 
-    public void IncrementAllyCount()
+    public void RegisterPlayer(PlayerRef playerRef, PlayerEntity player)
     {
+        players.Add(playerRef, player);
         allyCount++;
+    }
+
+    public void UnregisterPlayer(PlayerRef playerRef)
+    {
+        players.Remove(playerRef);
     }
 
     public void GameLose(string playerName, CharacterColor character)
@@ -59,7 +67,16 @@ public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
         runner.Shutdown();
     }
 
-    public void OnInput(NetworkRunner runner, NetworkInput input) { }
+    public void OnInput(NetworkRunner runner, NetworkInput input)
+    {
+        if (players.TryGetValue(runner.LocalPlayer, out PlayerEntity playerEntity))
+        {
+            NetworkInputData data = new NetworkInputData();
+            data.dir = playerEntity.Player.GetMovementInput();
+            data.rotation = playerEntity.Player.GetRotationInput();
+            input.Set(data);
+        }
+    }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
 
@@ -97,33 +114,16 @@ public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
             return;
 
         // Spawn player
-        CharacterManager characterManager = FindObjectOfType<CharacterManager>();
-
-        LevelSpawnInfo spawnInfo = LevelSpawnInfo.Instance;
         Transform spawnPoint = GameObject.Find("PlayersSpawnPoint").transform;
         Vector3 spawnPosition = spawnPoint.position;
 
         foreach (var player in runner.ActivePlayers)
         {
-            if (characterManager.CurrentCharacter == spawnInfo.Left)
-                spawnPosition += Vector3.left * 5;
-            else if (characterManager.CurrentCharacter == spawnInfo.Right)
-                spawnPosition += Vector3.right * 5;
-
-            PlayerToken token = new PlayerToken();
-            token.name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName);
-            token.character = characterManager.CurrentCharacter;
-
             runner.Spawn(
                 playerPrefab,
                 spawnPosition,
                 spawnPoint.rotation,
-                player,
-                (runner, obj) =>
-                {
-                    PlayerEntity playerEntity = obj.GetComponent<PlayerEntity>();
-                    playerEntity.PlayerToken = token;
-                }
+                player
             );
         }
 

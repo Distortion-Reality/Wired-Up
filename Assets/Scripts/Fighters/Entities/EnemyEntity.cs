@@ -1,5 +1,9 @@
 using Fusion;
+using UnityEngine;
+using UnityEngine.AI;
 
+[RequireComponent(typeof(Enemy))]
+[RequireComponent(typeof(NetworkTransform))]
 public class EnemyEntity : FighterEntity
 {
     [Networked] public EnemyId EnemyId { get; private set; }
@@ -9,10 +13,19 @@ public class EnemyEntity : FighterEntity
 
     public NetworkPrefabRef enemyAttackRayPrefab;
 
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    void RPC_UnwrapAttachedToken(EnemyId enemyId)
+    {
+        EnemyId = enemyId;
+    }
+
     public override void UnwrapAttachedToken()
     {
         base.UnwrapAttachedToken();
 
-        EnemyId = EnemyToken.enemyId;
+        if (Object.HasInputAuthority)
+        {
+            RPC_UnwrapAttachedToken(EnemyToken.enemyId);
+        }
     }
 }

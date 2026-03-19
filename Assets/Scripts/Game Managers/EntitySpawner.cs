@@ -1,5 +1,6 @@
 using Fusion;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EntitySpawner : MonoBehaviour
 {
@@ -26,8 +27,6 @@ public class EntitySpawner : MonoBehaviour
 
     protected virtual NetworkObject SpawnEntity()
     {
-        BuildToken();
-
         NetworkObject entity = NetworkRunnerManager.Instance.Runner.Spawn(
             prefab,
             transform.position,

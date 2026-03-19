@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(TargetPlayerAbilityManager))]
+[RequireComponent(typeof(PlayerEntity))]
 public class Player : Fighter
 {
     public PlayerEntity PlayerEntity => Entity as PlayerEntity;
@@ -63,6 +64,29 @@ public class Player : Fighter
 
     public override void EntityStart()
     {
+        CharacterManager characterManager = FindObjectOfType<CharacterManager>();
+
+        PlayerEntity playerEntity = GetComponent<PlayerEntity>();
+        if (playerEntity.HasInputAuthority)
+        {
+            LevelSpawnInfo spawnInfo = LevelSpawnInfo.Instance;
+            Transform spawnPoint = GameObject.Find("PlayersSpawnPoint").transform;
+            Vector3 spawnPosition = spawnPoint.position;
+
+            if (characterManager.CurrentCharacter == spawnInfo.Left)
+                spawnPosition += Vector3.left * 5;
+            else if (characterManager.CurrentCharacter == spawnInfo.Right)
+                spawnPosition += Vector3.right * 5;
+
+            playerEntity.RPC_SetSpawnPosition(spawnPosition);
+
+            PlayerToken token = new PlayerToken();
+            token.name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName);
+            token.character = characterManager.CurrentCharacter;
+
+            playerEntity.PlayerToken = token;
+        }
+
         base.EntityStart();
 
         AbilityRegistry.CharacterAbilities abilities = AbilityRegistry.GetAbilities(Character);
@@ -73,7 +97,6 @@ public class Player : Fighter
         interaction = new RedAttack1();
 
         wire = GetComponentInChildren<Wire>(true);
-        CharacterManager characterManager = FindObjectOfType<CharacterManager>();
         foreach (Renderer renderer in wire.GetComponentsInChildren<Renderer>())
             renderer.material = characterManager.GetWireMaterial(Character);
 
@@ -155,16 +178,6 @@ public class Player : Fighter
         }
     }
 
-    public override void OwnerFixedUpdate()
-    {
-        if (gameMenu.IsOpen)
-            return;
-        
-        UpdateMovement();
-
-        base.OwnerFixedUpdate();
-    }
-
     void CheckDashInput()
     {
         if (Input.GetButtonDown("Dash") && Time.time > nextDashTime &&
@@ -173,7 +186,7 @@ public class Player : Fighter
             StartCoroutine(Dash());
     }
 
-    protected override void UpdateMovement()
+    public Vector3 GetMovementInput()
     {
         Vector3 dir;
 
@@ -191,6 +204,12 @@ public class Player : Fighter
         }
 
         dir.y = rb.velocity.y;
+
+        return dir;
+    }
+
+    public void Move(Vector3 dir)
+    {
         rb.velocity = dir;
     }
 
@@ -201,6 +220,16 @@ public class Player : Fighter
         yield return new WaitForSeconds(DashDuration);
 
         movementSpeedMultiplier = 1f;
+    }
+
+    public Quaternion GetRotationInput()
+    {
+        return GetRotationUpdate();
+    }
+
+    public void Rotate(Quaternion rotation)
+    {
+        rb.MoveRotation(rotation);
     }
 
     void CheckTargetInput()

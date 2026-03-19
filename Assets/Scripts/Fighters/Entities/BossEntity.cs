@@ -1,5 +1,7 @@
 using Fusion;
+using UnityEngine;
 
+[RequireComponent(typeof(Boss))]
 public class BossEntity : EnemyEntity
 {
     [Networked] public float Speed { get; set; }
