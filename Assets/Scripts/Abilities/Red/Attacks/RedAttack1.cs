@@ -11,10 +11,10 @@ public class RedAttack1 : Ability
     public override void DoAbility(Fighter user, Fighter target)
     {
         /*
-        if (user.entity.HasStateAuthority)
+        if (user.Entity.HasStateAuthority)
             DoCharge(user, target);
         else
-            user.entity.RPC_ChargeEvent();
+            user.Entity.RPC_Charge();
         */
 
         Effects.CalculateAndApplyDamage(user, target, power);

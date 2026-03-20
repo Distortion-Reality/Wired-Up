@@ -1,11 +1,9 @@
-using Fusion;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(NetworkObject))]
-public class WireBody : NetworkBehaviour
+public class WireBody : MonoBehaviour
 {
     Player player;
 
@@ -20,13 +18,10 @@ public class WireBody : NetworkBehaviour
 
     public float Length => defaultLength * LocalScale.y;
 
-    public override void Spawned()
-    {
-        defaultLocalScale = LocalScale;
-    }
-
     public void Init(Wire wire, WireHead wireHead)
     {
+        defaultLocalScale = LocalScale;
+
         player = GetComponentInParent<Player>();
 
         defaultLocalLength = GetComponent<MeshFilter>().mesh.bounds.size.y;
@@ -49,7 +44,7 @@ public class WireBody : NetworkBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (!Object.HasInputAuthority || other.CompareTag("Terrain"))
+        if (!player.PlayerEntity.Object.HasInputAuthority || other.CompareTag("Terrain"))
             return;
 
         switch (player.FighterStatusLocal)

@@ -1,11 +1,9 @@
-using Fusion;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(NetworkObject))]
-public class WireHead : NetworkBehaviour
+public class WireHead : MonoBehaviour
 {
     Player player;
 
@@ -38,7 +36,7 @@ public class WireHead : NetworkBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (!Object.HasInputAuthority || other.CompareTag("Terrain"))
+        if (!player.PlayerEntity.Object.HasInputAuthority || other.CompareTag("Terrain"))
             return;
 
         switch (player.FighterStatusLocal)

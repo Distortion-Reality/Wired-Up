@@ -117,7 +117,7 @@ public abstract class FighterEntity : NetworkBehaviour
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_ChargeEvent()
+    public void RPC_Charge()
     {
         RedAttack1.DoCharge(fighter, fighter.Target);
     }

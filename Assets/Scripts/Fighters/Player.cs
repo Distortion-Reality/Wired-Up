@@ -100,6 +100,8 @@ public class Player : Fighter
         foreach (Renderer renderer in wire.GetComponentsInChildren<Renderer>())
             renderer.material = characterManager.GetWireMaterial(Character);
 
+        wire.Init();
+
         // Setup player camera
         if (Entity.HasInputAuthority)
         {

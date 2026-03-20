@@ -1,9 +1,7 @@
-using Fusion;
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(NetworkObject))]
-public class Wire : NetworkBehaviour
+public class Wire : MonoBehaviour
 {
     Player player;
     WireHead wireHead;
@@ -21,7 +19,7 @@ public class Wire : NetworkBehaviour
 
     float Extension => Length - defaultLength;
 
-    public override void Spawned()
+    public void Init()
     {
         WireStart();
     }
@@ -60,7 +58,7 @@ public class Wire : NetworkBehaviour
     {
         if (!gameObject.activeSelf)
             return;
-        if (!Object.HasInputAuthority)
+        if (!player.PlayerEntity.Object.HasInputAuthority)
             player.FighterStatusLocal = Fighter.Status.Disconnecting;
         StartCoroutine(Retract());
     }
