@@ -58,8 +58,8 @@ public class Wire : MonoBehaviour
     {
         if (!gameObject.activeSelf)
             return;
-        if (!player.PlayerEntity.Object.HasInputAuthority)
-            player.FighterStatusLocal = Fighter.Status.Disconnecting;
+        
+        player.FighterStatusLocal = Fighter.Status.Disconnecting;
         StartCoroutine(Retract());
     }
 
