@@ -15,7 +15,7 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
     NetworkRunner runner;
     Transform canvas;
 
-    public NetworkObject lobbyPlayerPrefab;
+    public NetworkPrefabRef lobbyPlayerPrefab;
     public NetworkPrefabRef levelSpawnInfoPrefab;
     public float xSpawnPosOffset = 250.0f;
     public bool forceStart = false;
@@ -150,9 +150,8 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             runner.Spawn(levelSpawnInfoPrefab);
 
-            if (!forceStart && player.Object.HasStateAuthority)
+            if (!forceStart && LevelSpawnInfo.Instance.Object.HasStateAuthority)
             {
-                LevelSpawnInfo.Instance.Center = (CharacterColor)Players[0].CurrentCharacterIndex;
                 LevelSpawnInfo.Instance.Left = (CharacterColor)Players[1].CurrentCharacterIndex;
                 LevelSpawnInfo.Instance.Right = (CharacterColor)Players[2].CurrentCharacterIndex;
             }

@@ -45,12 +45,6 @@ public class PlayerEntity : FighterEntity
         base.FixedUpdateNetwork();
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    public void RPC_SetSpawnPosition(Vector3 spawnPosition)
-    {
-        transform.position = spawnPosition;
-    }
-
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_WireConnect()
     {
@@ -88,20 +82,14 @@ public class PlayerEntity : FighterEntity
         NetworkManager.Instance.GameLose(playerName, character);
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    void RPC_UnwrapAttachedToken(NetworkString<_16> name, CharacterColor character)
-    {
-        PlayerName = name;
-        Character = character;
-    }
-
     public override void UnwrapAttachedToken()
     {
         base.UnwrapAttachedToken();
 
-        if (Object.HasInputAuthority)
+        if (Object.HasStateAuthority)
         {
-            RPC_UnwrapAttachedToken(PlayerToken.name, PlayerToken.character);
+            PlayerName = PlayerToken.data.name;
+            Character = PlayerToken.data.character;
         }
     }
 }

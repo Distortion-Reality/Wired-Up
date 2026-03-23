@@ -86,7 +86,7 @@ public abstract class FighterEntity : NetworkBehaviour
         fighter.ChangeStat(statId, change);
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.InputAuthority)]
     public void RPC_UseEnergy(int amount)
     {
         fighter.UseEnergy(amount);

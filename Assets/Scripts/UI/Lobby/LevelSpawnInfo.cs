@@ -1,5 +1,7 @@
 using Fusion;
+using UnityEngine;
 
+[RequireComponent(typeof(NetworkObject))]
 public class LevelSpawnInfo : NetworkBehaviour
 {
     public static LevelSpawnInfo Instance { get; private set; }
@@ -8,16 +10,24 @@ public class LevelSpawnInfo : NetworkBehaviour
     [Networked] public CharacterColor Left { get; set; }
     [Networked] public CharacterColor Right { get; set; }
 
-    public override void Spawned()
+    void Awake()
     {
         if (Instance != null && Instance != this)
         {
-            Runner.Despawn(Object);
             return;
         }
 
         Instance = this;
-        DontDestroyOnLoad(Object);
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public override void Spawned()
+    {
+        if (Instance != null && Instance != this && Object.HasStateAuthority)
+        {
+            Runner.Despawn(Object);
+            return;
+        }
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState)

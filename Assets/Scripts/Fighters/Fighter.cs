@@ -210,7 +210,7 @@ public abstract class Fighter : MonoBehaviour
 
     public void UseEnergy(int abilityEnergy)
     {
-        if (Entity.HasStateAuthority)
+        if (Entity.HasInputAuthority)
             ChangeEnergy(-abilityEnergy);
         else
             Entity.RPC_UseEnergy(abilityEnergy);

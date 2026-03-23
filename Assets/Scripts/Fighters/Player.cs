@@ -64,29 +64,6 @@ public class Player : Fighter
 
     public override void EntityStart()
     {
-        CharacterManager characterManager = FindObjectOfType<CharacterManager>();
-
-        PlayerEntity playerEntity = GetComponent<PlayerEntity>();
-        if (playerEntity.HasInputAuthority)
-        {
-            LevelSpawnInfo spawnInfo = LevelSpawnInfo.Instance;
-            Transform spawnPoint = GameObject.Find("PlayersSpawnPoint").transform;
-            Vector3 spawnPosition = spawnPoint.position;
-
-            if (characterManager.CurrentCharacter == spawnInfo.Left)
-                spawnPosition += Vector3.left * 5;
-            else if (characterManager.CurrentCharacter == spawnInfo.Right)
-                spawnPosition += Vector3.right * 5;
-
-            playerEntity.RPC_SetSpawnPosition(spawnPosition);
-
-            PlayerToken token = new PlayerToken();
-            token.name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName);
-            token.character = characterManager.CurrentCharacter;
-
-            playerEntity.PlayerToken = token;
-        }
-
         base.EntityStart();
 
         AbilityRegistry.CharacterAbilities abilities = AbilityRegistry.GetAbilities(Character);
@@ -97,6 +74,7 @@ public class Player : Fighter
         interaction = new RedAttack1();
 
         wire = GetComponentInChildren<Wire>(true);
+        CharacterManager characterManager = FindObjectOfType<CharacterManager>();
         foreach (Renderer renderer in wire.GetComponentsInChildren<Renderer>())
             renderer.material = characterManager.GetWireMaterial(Character);
 

@@ -12,7 +12,7 @@ public class EnemySpawner : EntitySpawner
     protected override FighterToken BuildToken()
     {
         EnemyToken token = (EnemyToken) base.BuildToken();
-        token.enemyId = enemyId;
+        token.data.enemyId = enemyId;
         return token; 
     }
 

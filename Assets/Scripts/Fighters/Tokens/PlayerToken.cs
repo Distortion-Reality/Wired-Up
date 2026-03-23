@@ -1,5 +1,13 @@
+using Fusion;
+
 public class PlayerToken : FighterToken
 {
-    public string name;
-    public CharacterColor character;
+    public struct PlayerData : INetworkStruct
+    {
+        public FighterData fighterData;
+        public NetworkString<_16> name;
+        public CharacterColor character;
+    }
+
+    public new PlayerData data = new PlayerData();
 }

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6034410304579394562}
   - component: {fileID: 6034410304579394563}
-  - component: {fileID: 6034410304579394560}
+  - component: {fileID: 4099362181407046585}
   m_Layer: 0
   m_Name: LevelSpawnInfo
   m_TagString: Untagged
@@ -50,7 +50,7 @@ MonoBehaviour:
   _Center: 0
   _Left: 0
   _Right: 0
---- !u!114 &6034410304579394560
+--- !u!114 &4099362181407046585
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

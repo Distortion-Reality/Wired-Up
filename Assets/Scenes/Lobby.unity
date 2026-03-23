@@ -594,11 +594,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b269d4d2738e7a7f8a4fc104d23503a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lobbyPlayerPrefab: {fileID: 5858493335655775140, guid: bea383e8467df6b66825cd3e48b60355, type: 3}
+  lobbyPlayerPrefab:
+    RawGuidValue: bea383e8467df6b66825cd3e48b60355
   levelSpawnInfoPrefab:
     RawGuidValue: 2f225fe3d5ef0eb4b8eb8e58b2642554
   xSpawnPosOffset: 250
-  forceStart: 1
+  forceStart: 0
 --- !u!1 &586100993
 GameObject:
   m_ObjectHideFlags: 0

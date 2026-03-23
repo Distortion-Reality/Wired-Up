@@ -60,6 +60,42 @@ public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
         gameOver.Win();
     }
 
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public static void RPC_SpawnPlayer(NetworkRunner runner, NetworkPrefabRef playerPrefab,
+        PlayerRef player, PlayerToken.PlayerData tokenData)
+    {
+        if (!runner.IsServer)
+            return;
+
+        PlayerToken token = new PlayerToken()
+        {
+            data = tokenData
+        };
+
+        LevelSpawnInfo spawnInfo = LevelSpawnInfo.Instance;
+        Transform spawnPoint = GameObject.Find("PlayersSpawnPoint").transform;
+        Vector3 spawnPosition = spawnPoint.position;
+        if (player != runner.LocalPlayer)
+        {
+            if (tokenData.character == spawnInfo.Left)
+                spawnPosition += Vector3.left * 5;
+            else if (tokenData.character == spawnInfo.Right)
+                spawnPosition += Vector3.right * 5;
+        }
+
+        runner.Spawn(
+            playerPrefab,
+            spawnPosition,
+            spawnPoint.rotation,
+            player,
+            (runner, obj) =>
+            {
+                PlayerEntity playerEntity = obj.GetComponent<PlayerEntity>();
+                playerEntity.PlayerToken = token;
+            }
+        );
+    }
+
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -110,22 +146,17 @@ public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
     {
         Destroy(GameObject.Find("Menu Audio"));
 
+        // Spawn player
+        CharacterManager characterManager = FindObjectOfType<CharacterManager>();
+        PlayerToken token = new PlayerToken();
+        token.data.name = PlayerPrefs.GetString(PlayerPrefKey.PlayerName);
+        token.data.character = characterManager.CurrentCharacter;
+
+        RPC_SpawnPlayer(runner, playerPrefab,
+            runner.LocalPlayer, token.data);
+
         if (!runner.IsServer)
             return;
-
-        // Spawn player
-        Transform spawnPoint = GameObject.Find("PlayersSpawnPoint").transform;
-        Vector3 spawnPosition = spawnPoint.position;
-
-        foreach (var player in runner.ActivePlayers)
-        {
-            runner.Spawn(
-                playerPrefab,
-                spawnPosition,
-                spawnPoint.rotation,
-                player
-            );
-        }
 
         foreach (EntitySpawner spawner in FindObjectsOfType<EntitySpawner>())
         {
