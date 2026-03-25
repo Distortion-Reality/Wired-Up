@@ -48,8 +48,12 @@ public class LobbyPlayer : NetworkBehaviour
             readyButton.onClick.AddListener(OnReady);
 
             RPC_SetPlayerName(PlayerPrefs.GetString(PlayerPrefKey.PlayerName));
-            RPC_SetCharacter(0);
-            RPC_SetReady(false);
+        }
+
+        if (Object.HasStateAuthority)
+        {
+            CurrentCharacterIndex = 0;
+            IsReady = false;
         }
 
         models[CurrentCharacterIndex].SetActive(true);

@@ -40,7 +40,7 @@ public class Menu : MonoBehaviour
         return "Player #" + ((uint)Guid.NewGuid().GetHashCode()).ToString().Substring(0, 4);
     }
 
-    public void Host()
+    public async void Host()
     {
         if (runner.gameObject.activeSelf)
             return;
@@ -48,7 +48,7 @@ public class Menu : MonoBehaviour
         runner.gameObject.SetActive(true);
         runner.ProvideInput = true;
 
-        runner.StartGame(new StartGameArgs()
+        await runner.StartGame(new StartGameArgs()
         {
             GameMode = GameMode.Host,
             SessionName = Guid.NewGuid().ToString(),
@@ -57,17 +57,17 @@ public class Menu : MonoBehaviour
         });
     }
 
-    public void Join()
+    public async void Join()
     {
         if (runner.gameObject.activeSelf)
             return;
 
         runner.gameObject.SetActive(true);
         runner.ProvideInput = true;
-        runner.JoinSessionLobby(SessionLobby.ClientServer);
+        await runner.JoinSessionLobby(SessionLobby.ClientServer);
     }
 
-    public void OnSessionListUpdate(NetworkRunner runner, List<SessionInfo> sessionList)
+    public async void OnSessionListUpdate(NetworkRunner runner, List<SessionInfo> sessionList)
     {
         var session = sessionList.FirstOrDefault(
             s => s.IsValid && s.IsVisible && s.IsOpen &&
@@ -75,7 +75,7 @@ public class Menu : MonoBehaviour
 
         if (session != null)
         {
-            runner.StartGame(new StartGameArgs
+            await runner.StartGame(new StartGameArgs
             {
                 GameMode = GameMode.Client,
                 SessionName = session.Name,

@@ -320,9 +320,9 @@ public class Player : Fighter
 
     protected override void Die()
     {
-        base.Die();
+        NetworkManager.RPC_GameLose(PlayerEntity.Runner, PlayerName, Character);
 
-        PlayerEntity.RPC_GameLose(PlayerName, Character);
+        base.Die();
     }
 
     public override void EntityDestroyed()
@@ -333,5 +333,7 @@ public class Player : Fighter
         {
             enemyGroup.UnregisterPlayer(this);
         }
+
+        BossArenaEntrance.Instance.UnregisterPlayer(this);
     }
 }

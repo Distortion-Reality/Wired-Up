@@ -1,11 +1,10 @@
 using Fusion;
 using UnityEngine;
 
-public class NetworkRunnerManager : MonoBehaviour
+[RequireComponent(typeof(NetworkRunner))]
+public class NetworkRunnerManager : SimulationBehaviour
 {
     public static NetworkRunnerManager Instance { get; private set; }
-
-    public NetworkRunner Runner { get; private set; }
 
     void Awake()
     {

@@ -35,4 +35,9 @@ public class BossArenaEntrance : MonoBehaviour
     {
         players.Add(player);
     }
+
+    public void UnregisterPlayer(Player player)
+    {
+        players.Remove(player);
+    }
 }

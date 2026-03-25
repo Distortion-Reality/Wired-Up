@@ -27,8 +27,8 @@ public static class Effects
 
     static void ApplyDamage(ParticlesId damageParticlesId, Color particlesColor, Fighter target, int damage)
     {
-        ChangeHP(target, -damage);
         CallSpawnParticleRPC(target, damageParticlesId, particlesColor);
+        ChangeHP(target, -damage);
     }
 
     public static int CalculateAndApplyDamage(Fighter user, Fighter target, int power)
@@ -65,8 +65,8 @@ public static class Effects
 
     public static void ApplyHealing(Fighter user, Fighter target, int healing)
     {
-        ChangeHP(target, healing);
         CallSpawnParticleRPC(target, ParticlesId.Heal, user.CharacterUnityColor);
+        ChangeHP(target, healing);
     }
 
     public static int CalculateAndApplyHealing(Fighter user, Fighter target, float percentage)
@@ -131,6 +131,9 @@ public static class Effects
 
     public static void CallSpawnParticleRPC(Fighter target, ParticlesId particlesId, Color particlesColor)
     {
+        if (!target.Entity.Object || !target.Entity.Object.IsValid)
+            return;
+
         target.Entity.RPC_SpawnParticle(particlesId, particlesColor);
     }
 

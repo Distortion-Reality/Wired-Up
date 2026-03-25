@@ -1,12 +1,10 @@
 using Fusion;
-using Fusion.Sockets;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static PlayerEntity;
 
-public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
+public class NetworkManager : SimulationBehaviour
 {
     public NetworkPrefabRef playerPrefab;
     GameOver gameOver;
@@ -36,7 +34,6 @@ public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
         gameOver = FindObjectOfType<GameOver>();
 
         Runner = NetworkRunnerManager.Instance.Runner;
-        Runner.AddCallbacks(this);
     }
 
     public void RegisterPlayer(PlayerRef playerRef, PlayerEntity player)
@@ -50,6 +47,7 @@ public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
         players.Remove(playerRef);
     }
 
+
     public void GameLose(string playerName, CharacterColor character)
     {
         gameOver.Lose(playerName, character);
@@ -58,6 +56,16 @@ public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
     public void GameWin()
     {
         gameOver.Win();
+    }
+
+    async void Shutdown(NetworkRunner runner)
+    {
+        await runner.Shutdown();
+    }
+
+    void ReturnToMenu()
+    {
+        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -96,16 +104,22 @@ public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
         );
     }
 
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
-
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public static void RPC_GameLose(NetworkRunner runner, string playerName, CharacterColor character)
     {
-        runner.Shutdown();
+        Instance.GameLose(playerName, character);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public static void RPC_GameWin(NetworkRunner runner)
+    {
+        Instance.GameWin();
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        if (players.TryGetValue(runner.LocalPlayer, out PlayerEntity playerEntity))
+        if (players.TryGetValue(runner.LocalPlayer, out PlayerEntity playerEntity) &&
+            playerEntity.Object && playerEntity.Object.IsValid)
         {
             NetworkInputData data = new NetworkInputData();
             data.dir = playerEntity.Player.GetMovementInput();
@@ -114,33 +128,20 @@ public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
         }
     }
 
-    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
+    public void OnRunnerDisconnectedFromServer(NetworkRunner runner)
+    {
+        Shutdown(runner);
+    }
+
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    {
+        Shutdown(runner);
+    }
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
-        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+        ReturnToMenu();
     }
-
-    void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) { }
-
-    void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner)
-    {
-        runner.Shutdown();
-    }
-
-    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
-
-    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
-
-    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
-
-    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
-
-    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-
-    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
@@ -163,6 +164,4 @@ public class NetworkManager : SimulationBehaviour, INetworkRunnerCallbacks
             spawner.StartEntitySpawner();
         }
     }
-
-    public void OnSceneLoadStart(NetworkRunner runner) { }
 }

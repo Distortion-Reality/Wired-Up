@@ -1,18 +1,15 @@
 using Fusion;
-using Fusion.Sockets;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
+public class LobbyManager : SimulationBehaviour
 {
     private const int MAX_PLAYERS = 3;
 
     public static LobbyManager Instance { get; private set; }
 
-    NetworkRunner runner;
     Transform canvas;
 
     public NetworkPrefabRef lobbyPlayerPrefab;
@@ -38,17 +35,20 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     void Start()
     {
-        runner = NetworkRunnerManager.Instance.Runner;
-
-        runner.AddCallbacks(this);
         canvas = GetComponent<Canvas>().transform;
+
+        Runner = NetworkRunnerManager.Instance.Runner;
     }
 
     private void SpawnPlayer(NetworkRunner runner, PlayerRef player)
     {
         // Spawn lobby player
         // Force reset position and rotation because they start with weird values (?)
-        runner.Spawn(lobbyPlayerPrefab, Vector3.zero, Quaternion.identity, player);
+        runner.Spawn(
+            lobbyPlayerPrefab,
+            Vector3.zero,
+            Quaternion.identity,
+            player);
     }
 
     private void DespawnPlayer(NetworkRunner runner, PlayerRef player)
@@ -102,9 +102,9 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         return new Vector3(x, 0.0f, 0.0f);
     }
 
-    public void Shutdown(NetworkRunner runner)
+    public async void Shutdown(NetworkRunner runner)
     {
-        runner.Shutdown();
+        await runner.Shutdown();
     }
 
     void ReturnToMenu()
@@ -136,7 +136,7 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private bool ForceStart(LobbyPlayer player)
     {
-        return player.Object.HasInputAuthority && forceStart;
+        return player.Object.HasStateAuthority && forceStart;
     }
 
     private bool CanStart()
@@ -158,6 +158,11 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
             runner.SetActiveScene("Level2Scene");
         }
+    }
+
+    public void OnRunnerDisconnectedFromServer(NetworkRunner runner)
+    {
+        Shutdown(runner);
     }
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
@@ -183,34 +188,19 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         CheckOwnerCharacterAvailable(runner);
     }
 
-    public void OnInput(NetworkRunner runner, NetworkInput input) { }
-
-    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
-
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
         ReturnToMenu();
     }
 
-    void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) { }
+    public void OnSceneLoadDone(NetworkRunner runner)
+    {
+        if (!runner.IsServer || runner.ActivePlayers.Count() < MAX_PLAYERS)
+            return;
 
-    void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner) { }
-
-    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
-
-    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
-
-    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
-
-    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
-
-    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-
-    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
-
-    public void OnSceneLoadDone(NetworkRunner runner) { }
-
-    public void OnSceneLoadStart(NetworkRunner runner) { }
+        foreach (PlayerRef player in runner.ActivePlayers)
+        {
+            SpawnPlayer(runner, player);
+        }
+    }
 }

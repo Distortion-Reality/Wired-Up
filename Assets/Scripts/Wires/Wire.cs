@@ -58,8 +58,8 @@ public class Wire : MonoBehaviour
     {
         if (!gameObject.activeSelf)
             return;
-        
-        player.FighterStatusLocal = Fighter.Status.Disconnecting;
+        if (!player.PlayerEntity.Object.HasStateAuthority)
+            player.FighterStatusLocal = Fighter.Status.Disconnecting;
         StartCoroutine(Retract());
     }
 
@@ -101,7 +101,7 @@ public class Wire : MonoBehaviour
     {
         while (player.FighterStatusLocal == Fighter.Status.Connecting)
         {
-            if (player.PlayerEntity.HasInputAuthority && Length >= player.AbilityRange)
+            if (player.PlayerEntity.HasStateAuthority && Length >= player.AbilityRange)
                 player.EndAbility();
             else
             {

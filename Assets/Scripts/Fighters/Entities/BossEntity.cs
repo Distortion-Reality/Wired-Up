@@ -15,10 +15,4 @@ public class BossEntity : EnemyEntity
     {
         Boss.AttackShoot();
     }
-
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_GameWin()
-    {
-        NetworkManager.Instance.GameWin();
-    }
 }

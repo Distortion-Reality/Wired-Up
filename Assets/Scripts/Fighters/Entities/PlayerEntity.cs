@@ -66,7 +66,7 @@ public class PlayerEntity : FighterEntity
         Player.Wire.Disconnect();
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_ChangeWireRotation(Vector3 lookAt, bool reset)
     {
         Transform wire = Player.Wire.transform.parent;
@@ -74,12 +74,6 @@ public class PlayerEntity : FighterEntity
             wire.transform.localRotation = Quaternion.identity;
         else
             wire.transform.LookAt(lookAt);
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_GameLose(string playerName, CharacterColor character)
-    {
-        NetworkManager.Instance.GameLose(playerName, character);
     }
 
     public override void UnwrapAttachedToken()

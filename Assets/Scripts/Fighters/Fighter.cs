@@ -158,7 +158,8 @@ public abstract class Fighter : MonoBehaviour
 
     void UpdateTarget()
     {
-        if (target != null && TargetDistance > TargetRange && FighterStatus == Status.Free)
+        if (target != null && TargetDistance > TargetRange &&
+            (FighterStatus == Status.Free || FighterStatusLocal == Status.Free))
             target = null;
     }
 

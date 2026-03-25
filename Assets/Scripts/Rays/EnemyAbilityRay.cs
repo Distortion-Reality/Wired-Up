@@ -43,7 +43,7 @@ public class EnemyAbilityRay : NetworkBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (!Object.HasStateAuthority)
+        if (!Object || !Object.HasStateAuthority)
             return;
 
         if (user == null || other.gameObject == user.gameObject)
@@ -54,7 +54,7 @@ public class EnemyAbilityRay : NetworkBehaviour
             Player target = other.GetComponent<Player>();
             ability.DoAbility(user, target);
         }
-        
+
         Runner.Despawn(Object);
     }
 }

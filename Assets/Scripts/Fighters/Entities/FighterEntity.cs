@@ -5,13 +5,15 @@ using static Fighter;
 [RequireComponent(typeof(NetworkObject))]
 public abstract class FighterEntity : NetworkBehaviour
 {
+    const int STATS_COUNT = 5;
+
     protected Fighter fighter;
     GameOver gameOver;
 
     [Networked(OnChanged = nameof(OnStatusChanged))]
     public Status Status { get; set; }
 
-    [Networked(OnChanged = nameof(OnStatsChanged)), Capacity(5)]
+    [Networked(OnChanged = nameof(OnStatsChanged)), Capacity(STATS_COUNT)]
     public NetworkArray<int> Stats => default;
 
     public FighterToken Token { get; set; }
@@ -60,7 +62,7 @@ public abstract class FighterEntity : NetworkBehaviour
 
     static void OnStatsChanged(Changed<FighterEntity> changed)
     {
-        for (int i = 0; i < changed.Behaviour.Stats.Length; i++)
+        for (int i = 0; i < STATS_COUNT; i++)
         {
             changed.LoadOld();
             int oldValue = changed.Behaviour.Stats[i];

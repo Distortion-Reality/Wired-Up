@@ -1,0 +1,106 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7977735385086189439
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7977735385086189437}
+  - component: {fileID: 7977735385086189438}
+  - component: {fileID: 7977735385086189436}
+  m_Layer: 0
+  m_Name: Network Events
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7977735385086189437
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7977735385086189439}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7977735385086189438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7977735385086189439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -232609262, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnInput:
+    m_PersistentCalls:
+      m_Calls: []
+  OnInputMissing:
+    m_PersistentCalls:
+      m_Calls: []
+  OnConnectedToServer:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDisconnectedFromServer:
+    m_PersistentCalls:
+      m_Calls: []
+  OnConnectRequest:
+    m_PersistentCalls:
+      m_Calls: []
+  OnConnectFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  PlayerJoined:
+    m_PersistentCalls:
+      m_Calls: []
+  PlayerLeft:
+    m_PersistentCalls:
+      m_Calls: []
+  OnSimulationMessage:
+    m_PersistentCalls:
+      m_Calls: []
+  OnShutdown:
+    m_PersistentCalls:
+      m_Calls: []
+  OnSessionListUpdate:
+    m_PersistentCalls:
+      m_Calls: []
+  OnCustomAuthenticationResponse:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHostMigration:
+    m_PersistentCalls:
+      m_Calls: []
+  OnSceneLoadDone:
+    m_PersistentCalls:
+      m_Calls: []
+  OnSceneLoadStart:
+    m_PersistentCalls:
+      m_Calls: []
+  OnReliableData:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &7977735385086189436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7977735385086189439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6eb7ab47f8aa074c853e1970df5e6ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

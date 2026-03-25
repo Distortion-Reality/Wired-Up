@@ -78,9 +78,9 @@ public class Boss : Enemy
 
     protected override void Die()
     {
-        base.Die();
+        NetworkManager.RPC_GameWin(BossEntity.Runner);
 
-        BossEntity.RPC_GameWin();
+        base.Die();
     }
 
     protected override void UseAbility(Ability ability)
