@@ -12,6 +12,19 @@ public class AudioManager : MonoBehaviour
 
     Dictionary<AudioClip, float> audioClipVolumes;
 
+    public static AudioManager Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -24,6 +37,8 @@ public class AudioManager : MonoBehaviour
             { bossBattle, 0.1f },
             { bossDefeated, 0.1f }
         };
+
+        enabled = false;
     }
 
     // Update is called once per frame

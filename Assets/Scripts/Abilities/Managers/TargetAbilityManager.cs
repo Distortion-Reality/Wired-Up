@@ -56,7 +56,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
             CheckUserAbilityQueue(userAbility);
         }
         else
-            target.Entity.RPC_EnqueueAbility(user.Entity.Object.Id, ability.Id);
+            target.Entity.RPC_EnqueueAbility(user.Entity.Id, ability.Id);
     }
 
     public void RemoveUserAbility(Fighter user)
@@ -65,7 +65,7 @@ public abstract class TargetAbilityManager : MonoBehaviour
             userAbilityQueue = new Queue<UserAbility>(userAbilityQueue.Where(
                 userAbility => userAbility.User != user));
         else
-            target.Entity.RPC_RemoveAbility(user.Entity.Object.Id);
+            target.Entity.RPC_RemoveAbility(user.Entity.Id);
     }
 
     public void ClearUserAbilityQueue()

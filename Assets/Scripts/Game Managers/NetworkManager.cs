@@ -48,12 +48,12 @@ public class NetworkManager : SimulationBehaviour
     }
 
 
-    public void GameLose(string playerName, CharacterColor character)
+    void GameLose(string playerName, CharacterColor character)
     {
         gameOver.Lose(playerName, character);
     }
 
-    public void GameWin()
+    void GameWin()
     {
         gameOver.Win();
     }
@@ -69,7 +69,7 @@ public class NetworkManager : SimulationBehaviour
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public static void RPC_SpawnPlayer(NetworkRunner runner, NetworkPrefabRef playerPrefab,
+    static void RPC_SpawnPlayer(NetworkRunner runner, NetworkPrefabRef playerPrefab,
         PlayerRef player, PlayerToken.PlayerData tokenData)
     {
         if (!runner.IsServer)
@@ -105,6 +105,27 @@ public class NetworkManager : SimulationBehaviour
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
+    public static void RPC_SpawnParticle(NetworkRunner runner, NetworkBehaviourId targetId,
+        Vector3 position, Quaternion rotation,
+        ParticlesId particlesId, Color color)
+    {
+        bool targetValid = runner.TryFindBehaviour(targetId, out FighterEntity fighterEntity);
+        if (targetValid || Instance.ParticlesManager.CanParticlesAfterDeath(particlesId))
+        {
+            GameObject prefab = Instance.ParticlesManager.GetParticlesPrefab(particlesId);
+            GameObject particle = Instantiate(prefab, position, rotation);
+            ParticleSystem.MainModule main = particle.GetComponent<ParticleSystem>().main;
+            main.startColor = new ParticleSystem.MinMaxGradient(color);
+
+            if (targetValid)
+            {
+                Fighter target = fighterEntity.fighter;
+                particle.transform.SetParent(target.transform, true);
+            }
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
     public static void RPC_GameLose(NetworkRunner runner, string playerName, CharacterColor character)
     {
         Instance.GameLose(playerName, character);
@@ -118,6 +139,9 @@ public class NetworkManager : SimulationBehaviour
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
+        if (gameOver != null && gameOver.IsGameOver)
+            return;
+
         if (players.TryGetValue(runner.LocalPlayer, out PlayerEntity playerEntity) &&
             playerEntity.Object && playerEntity.Object.IsValid)
         {

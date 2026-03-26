@@ -74,7 +74,7 @@ public class Enemy : Fighter
 
     void Start()
     {
-        agent.enabled = true;
+        agent.enabled = EnemyEntity.Object.HasStateAuthority;
     }
 
     public override void OwnerUpdate()

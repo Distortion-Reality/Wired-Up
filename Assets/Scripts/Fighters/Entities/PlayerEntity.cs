@@ -52,12 +52,15 @@ public class PlayerEntity : FighterEntity
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_WireStayConnected(NetworkId targetId)
+    public void RPC_WireStayConnected(NetworkBehaviourId targetId)
     {
-        Fighter target = Runner.FindObject(targetId).GetComponent<Fighter>();
+        if (Runner.TryFindBehaviour(targetId, out FighterEntity targetEntity))
+        {
+            Fighter target = targetEntity.fighter;
 
-        Player.Target = target;
-        Player.Wire.StayConnected();
+            Player.Target = target;
+            Player.Wire.StayConnected();
+        }
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]

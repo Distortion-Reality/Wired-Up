@@ -7,7 +7,7 @@ public abstract class FighterEntity : NetworkBehaviour
 {
     const int STATS_COUNT = 5;
 
-    protected Fighter fighter;
+    public Fighter fighter;
     GameOver gameOver;
 
     [Networked(OnChanged = nameof(OnStatusChanged))]
@@ -95,21 +95,27 @@ public abstract class FighterEntity : NetworkBehaviour
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_EnqueueAbility(NetworkId userId, AbilityId abilityId)
+    public void RPC_EnqueueAbility(NetworkBehaviourId userId, AbilityId abilityId)
     {
-        Fighter user = Runner.FindObject(userId).GetComponent<Fighter>();
-        Ability ability = AbilityRegistry.Get(abilityId);
+        if (Runner.TryFindBehaviour(userId, out FighterEntity userEntity))
+        {
+            Fighter user = userEntity.fighter;
+            Ability ability = AbilityRegistry.Get(abilityId);
 
-        user.Target = fighter;
-        fighter.TargetAbilityManager.EnqueueUserAbility(user, ability);
+            user.Target = fighter;
+            fighter.TargetAbilityManager.EnqueueUserAbility(user, ability);
+        }
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_RemoveAbility(NetworkId userId)
+    public void RPC_RemoveAbility(NetworkBehaviourId userId)
     {
-        Fighter user = Runner.FindObject(userId).GetComponent<Fighter>();
+        if (Runner.TryFindBehaviour(userId, out FighterEntity userEntity))
+        {
+            Fighter user = userEntity.fighter;
 
-        fighter.TargetAbilityManager.RemoveUserAbility(user);
+            fighter.TargetAbilityManager.RemoveUserAbility(user);
+        }
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -122,40 +128,6 @@ public abstract class FighterEntity : NetworkBehaviour
     public void RPC_Charge()
     {
         RedAttack1.DoCharge(fighter, fighter.Target);
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_SpawnParticle(ParticlesId particleId, Color color)
-    {
-        Fighter target = fighter;
-        Vector3 position;
-        switch (particleId)
-        {
-            case ParticlesId.EnemyDamage:
-            case ParticlesId.PlayerDamage:
-            case ParticlesId.KirinDamage:
-            case ParticlesId.KirinBurst:
-            case ParticlesId.Heal:
-            case ParticlesId.Death:
-                position = target.CentrePosition;
-                break;
-            case ParticlesId.Buff:
-            case ParticlesId.Debuff:
-            case ParticlesId.Stun:
-                position = target.TopPosition;
-                break;
-            case ParticlesId.Target:
-                position = target.BottomPosition;
-                break;
-            default:
-                position = Vector3.zero;
-                break;
-        }
-        GameObject prefab = NetworkManager.Instance.ParticlesManager.GetParticlesPrefab(particleId);
-        GameObject particle = Instantiate(prefab, position, target.transform.rotation);
-        ParticleSystem.MainModule main = particle.GetComponent<ParticleSystem>().main;
-        main.startColor = new ParticleSystem.MinMaxGradient(color);
-        particle.transform.SetParent(target.transform, true);
     }
 
     public virtual void UnwrapAttachedToken()

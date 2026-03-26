@@ -13,7 +13,6 @@ public class Boss : Enemy
 
     readonly string bossName = "Kirin";
     const float HealthBarMaxDistance = 60f;
-    private float velocity;
 
     public override ParticlesId DamageParticles => ParticlesId.KirinDamage;
     public override Vector3 FirePosition =>
@@ -45,8 +44,9 @@ public class Boss : Enemy
 
         healthBar.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = bossName;
 
-        animator.applyRootMotion = Entity.Object.HasInputAuthority;
         animator.fireEvents = false;
+
+        AudioManager.Instance.enabled = true;
     }
 
     protected override void UpdateHealthBar()
@@ -66,12 +66,11 @@ public class Boss : Enemy
     {
         base.StateFixedUpdate();
 
-        float speed = Mathf.Abs(agent.velocity.x) + Mathf.Abs(agent.velocity.z);
-        speed = Mathf.Clamp(speed, 0f, 0.2f);
-        //Speed = Mathf.SmoothDamp(Speed, speed, ref velocity, 0.1f);
-        if (agent.isStopped)
-            speed = 0f;
-        //Speed = speed; // owner sees it in wrong position
+        float speed = (agent.isStopped) ? 0f : agent.velocity.magnitude;
+        float maxSpeed = agent.speed;
+        float animationSpeed = speed/maxSpeed;
+        Speed = animationSpeed;
+
         Direction = 0f;
         OnGround = true;
     }
@@ -91,6 +90,21 @@ public class Boss : Enemy
         StartCoroutine(WaitForAnimation(ability));
     }
 
+    public void SpeedChanged()
+    {
+        animator.SetFloat("Speed", Speed);
+    }
+
+    public void DirectionChanged()
+    {
+        animator.SetFloat("Direction", Direction);
+    }
+
+    public void OnGroundChanged()
+    {
+        animator.SetBool("OnGround", OnGround);
+    }
+
     public void AttackShoot()
     {
         animator.SetTrigger("AttackShoot");
@@ -99,6 +113,8 @@ public class Boss : Enemy
     IEnumerator WaitForAnimation(Ability ability)
     {
         yield return new WaitForSeconds(1f);
+
+        Effects.SpawnParticles(this, ParticlesId.KirinBurst, CharacterUnityColor);
         base.UseAbility(ability);
     }
 }

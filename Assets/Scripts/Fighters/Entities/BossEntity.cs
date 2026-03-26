@@ -4,11 +4,29 @@ using UnityEngine;
 [RequireComponent(typeof(Boss))]
 public class BossEntity : EnemyEntity
 {
-    [Networked] public float Speed { get; set; }
-    [Networked] public float Direction { get; set; }
-    [Networked] public bool OnGround { get; set; }
+    [Networked(OnChanged = nameof(OnSpeedChanged))]
+    public float Speed { get; set; } = 0f;
+    [Networked(OnChanged = nameof(OnDirectionChanged))]
+    public float Direction { get; set; } = 0f;
+    [Networked(OnChanged = nameof(OnGroundChanged))]
+    public bool OnGround { get; set; } = true;
 
-    Boss Boss => Enemy as Boss;
+    public Boss Boss => Enemy as Boss;
+
+    static void OnSpeedChanged(Changed<BossEntity> changed)
+    {
+        changed.Behaviour.Boss.SpeedChanged();
+    }
+
+    static void OnDirectionChanged(Changed<BossEntity> changed)
+    {
+        changed.Behaviour.Boss.DirectionChanged();
+    }
+
+    static void OnGroundChanged(Changed<BossEntity> changed)
+    {
+        changed.Behaviour.Boss.OnGroundChanged();
+    }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
     public void RPC_AttackShoot()

@@ -302,7 +302,7 @@ public class Player : Fighter
         target = actualTarget;
         target.TargetAbilityManager.EnqueueUserAbility(this, currentAbility);
         
-        PlayerEntity.RPC_WireStayConnected(target.Entity.Object.Id);
+        PlayerEntity.RPC_WireStayConnected(target.Entity.Id);
     }
 
     void CheckAndUpdatePlayerStatus()

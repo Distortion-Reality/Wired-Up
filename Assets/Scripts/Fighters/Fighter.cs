@@ -219,6 +219,9 @@ public abstract class Fighter : MonoBehaviour
 
     public void ChangeStat(StatisticManager.StatisticId statId, int change)
     {
+        if (!Entity.Object || !Entity.Object.IsValid)
+            return;
+
         if (!Entity.Object.HasStateAuthority)
         {
             Entity.RPC_ChangeStat(statId, change);
@@ -277,7 +280,8 @@ public abstract class Fighter : MonoBehaviour
     {
         Quaternion rotation;
         if (FighterStatusLocal != Status.Free &&
-            FighterStatusLocal != Status.Disconnecting)
+            FighterStatusLocal != Status.Disconnecting &&
+            target)
             rotation = LookAtTargetRotation();
         else
         {
@@ -306,6 +310,8 @@ public abstract class Fighter : MonoBehaviour
 
     protected virtual void Die()
     {
+        Effects.SpawnParticles(this, ParticlesId.Death, CharacterUnityColor);
+
         Fighter[] fighters = FindObjectsOfType<Fighter>();
         foreach (Fighter fighter in fighters)
             if (fighter.target == this && (fighter.fighterStatus == Status.Connecting ||

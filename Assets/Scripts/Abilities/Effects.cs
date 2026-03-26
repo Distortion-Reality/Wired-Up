@@ -27,7 +27,7 @@ public static class Effects
 
     static void ApplyDamage(ParticlesId damageParticlesId, Color particlesColor, Fighter target, int damage)
     {
-        CallSpawnParticleRPC(target, damageParticlesId, particlesColor);
+        SpawnParticles(target, damageParticlesId, particlesColor);
         ChangeHP(target, -damage);
     }
 
@@ -65,7 +65,7 @@ public static class Effects
 
     public static void ApplyHealing(Fighter user, Fighter target, int healing)
     {
-        CallSpawnParticleRPC(target, ParticlesId.Heal, user.CharacterUnityColor);
+        SpawnParticles(target, ParticlesId.Heal, user.CharacterUnityColor);
         ChangeHP(target, healing);
     }
 
@@ -84,14 +84,14 @@ public static class Effects
     public static void BuffStat(Fighter user, Fighter target, StatisticManager.StatisticId statId, int stages)
     {
         target.TargetAbilityManager.StartCoroutine(ApplyStatBuff(target, statId, stages));
-        CallSpawnParticleRPC(target, ParticlesId.Buff, user.CharacterUnityColor);
+        SpawnParticles(target, ParticlesId.Buff, user.CharacterUnityColor);
 
     }
 
     public static void DebuffStat(Fighter user, Fighter target, StatisticManager.StatisticId statId, int stages)
     {
         target.TargetAbilityManager.StartCoroutine(ApplyStatBuff(target, statId, -stages));
-        CallSpawnParticleRPC(target, ParticlesId.Debuff, user.CharacterUnityColor);
+        SpawnParticles(target, ParticlesId.Debuff, user.CharacterUnityColor);
     }
 
     static IEnumerator ApplyStatBuff(Fighter target, StatisticManager.StatisticId statId, int stages)
@@ -104,13 +104,13 @@ public static class Effects
     public static void Stun(Fighter user, Fighter target, float time = 5f)
     {
         target.ApplyStatus(Fighter.Status.Stunned, time);
-        CallSpawnParticleRPC(target, ParticlesId.Stun, user.CharacterUnityColor);
+        SpawnParticles(target, ParticlesId.Stun, user.CharacterUnityColor);
     }
 
     public static void BlockMovements(Fighter user, Fighter target, float time)
     {
         target.TargetAbilityManager.StartCoroutine(ApplyBlockMovements(target, time));
-        CallSpawnParticleRPC(target, ParticlesId.Stun, user.CharacterUnityColor);
+        SpawnParticles(target, ParticlesId.Stun, user.CharacterUnityColor);
     }
 
     static IEnumerator ApplyBlockMovements(Fighter target, float time)
@@ -129,12 +129,15 @@ public static class Effects
         return colliders;
     }
 
-    public static void CallSpawnParticleRPC(Fighter target, ParticlesId particlesId, Color particlesColor)
+    public static void SpawnParticles(Fighter target, ParticlesId particlesId, Color particlesColor)
     {
         if (!target.Entity.Object || !target.Entity.Object.IsValid)
             return;
 
-        target.Entity.RPC_SpawnParticle(particlesId, particlesColor);
+        Vector3 position = NetworkManager.Instance.ParticlesManager.GetParticlesPosition(particlesId, target);
+        NetworkManager.RPC_SpawnParticle(target.Entity.Runner, target.Entity.Id,
+            position, target.transform.rotation,
+            particlesId, particlesColor);
     }
 
     public static void FireRay(Enemy user, Ability ability)
