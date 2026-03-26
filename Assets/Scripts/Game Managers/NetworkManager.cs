@@ -1,4 +1,5 @@
 using Fusion;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,6 +12,8 @@ public class NetworkManager : SimulationBehaviour
 
     readonly Dictionary<PlayerRef, PlayerEntity> players = new Dictionary<PlayerRef, PlayerEntity>();
     int allyCount = -1;
+
+    static bool sceneLoadDone = false;
 
     public int AllyCount { get => allyCount; }
     public ParticlesManager ParticlesManager { get; private set; }
@@ -68,13 +71,17 @@ public class NetworkManager : SimulationBehaviour
         SceneManager.LoadScene("Menu", LoadSceneMode.Single);
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    static void RPC_SpawnPlayer(NetworkRunner runner, NetworkPrefabRef playerPrefab,
+    static IEnumerator WaitForSceneLoadDone(NetworkRunner runner, NetworkPrefabRef playerPrefab,
         PlayerRef player, PlayerToken.PlayerData tokenData)
     {
-        if (!runner.IsServer)
-            return;
+        yield return new WaitUntil(() => sceneLoadDone);
 
+        SpawnPlayer(runner, playerPrefab, player, tokenData);
+    }
+
+    static void SpawnPlayer(NetworkRunner runner, NetworkPrefabRef playerPrefab,
+        PlayerRef player, PlayerToken.PlayerData tokenData)
+    {
         PlayerToken token = new PlayerToken()
         {
             data = tokenData
@@ -102,6 +109,16 @@ public class NetworkManager : SimulationBehaviour
                 playerEntity.PlayerToken = token;
             }
         );
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    static void RPC_SpawnPlayer(NetworkRunner runner, NetworkPrefabRef playerPrefab,
+        PlayerRef player, PlayerToken.PlayerData tokenData)
+    {
+        if (!runner.IsServer)
+            return;
+
+        runner.StartCoroutine(WaitForSceneLoadDone(runner, playerPrefab, player, tokenData));
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
@@ -169,6 +186,8 @@ public class NetworkManager : SimulationBehaviour
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
+        sceneLoadDone = true;
+
         Destroy(GameObject.Find("Menu Audio"));
 
         // Spawn player
@@ -187,5 +206,10 @@ public class NetworkManager : SimulationBehaviour
         {
             spawner.StartEntitySpawner();
         }
+    }
+
+    private void OnDestroy()
+    {
+        sceneLoadDone = false;
     }
 }
