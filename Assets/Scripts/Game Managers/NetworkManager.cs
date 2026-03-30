@@ -42,7 +42,11 @@ public class NetworkManager : SimulationBehaviour
     public void RegisterPlayer(PlayerRef playerRef, PlayerEntity player)
     {
         players.Add(playerRef, player);
-        allyCount++;
+
+        if (playerRef != Runner.LocalPlayer)
+        {
+            allyCount++;
+        }
     }
 
     public void UnregisterPlayer(PlayerRef playerRef)

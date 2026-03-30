@@ -147,11 +147,12 @@ public class Enemy : Fighter
     protected virtual void UpdateHealthBar()
     {
         float cameraDistance = Vector3.Distance(Camera.main.transform.position, transform.position);
-        if (cameraDistance > HealthBarMaxDistance)
+        float cameraAngle = Vector3.Angle(Camera.main.transform.forward, transform.position - Camera.main.transform.position);
+        if (cameraDistance > HealthBarMaxDistance || cameraAngle > 90f)
             healthBar.gameObject.SetActive(false);
         else
         {
-            healthBar.transform.position  = Camera.main.WorldToScreenPoint(transform.position + new Vector3(0f, 2f, 0f));
+            healthBar.transform.position = Camera.main.WorldToScreenPoint(transform.position + new Vector3(0f, 2f, 0f));
             Vector3 scale = Vector3.one * (HealthBarMinDistance / cameraDistance);
             healthBar.transform.localScale = scale;
             healthBar.gameObject.SetActive(true);
