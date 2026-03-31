@@ -48,11 +48,11 @@ public class LobbyPlayer : NetworkBehaviour
             readyButton.onClick.AddListener(OnReady);
 
             RPC_SetPlayerName(PlayerPrefs.GetString(PlayerPrefKey.PlayerName));
+            RPC_SetCharacter((int)CharacterManager.Instance.CurrentCharacter);
         }
 
         if (Object.HasStateAuthority)
         {
-            CurrentCharacterIndex = 0;
             IsReady = false;
         }
 
@@ -121,7 +121,7 @@ public class LobbyPlayer : NetworkBehaviour
         models[newIndex].SetActive(true);
 
         if (Object.HasInputAuthority)
-            LobbyManager.Instance.CheckOwnerCharacterAvailable(Runner);
+            LobbyManager.Instance.CheckOwnerCharacterAvailable();
     }
 
     void ReadyChanged()
@@ -136,12 +136,12 @@ public class LobbyPlayer : NetworkBehaviour
         }
         else
         {
-            LobbyManager.Instance.CheckOwnerCharacterAvailable(Runner);
+            LobbyManager.Instance.CheckOwnerCharacterAvailable();
         }
 
         if (Object.HasStateAuthority)
         {
-            LobbyManager.Instance.StartGame(Runner, this);
+            LobbyManager.Instance.StartGame(this);
         }
     }
 

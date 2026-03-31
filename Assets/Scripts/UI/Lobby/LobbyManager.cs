@@ -112,9 +112,9 @@ public class LobbyManager : SimulationBehaviour
         SceneManager.LoadScene("Menu", LoadSceneMode.Single);
     }
 
-    public void CheckOwnerCharacterAvailable(NetworkRunner runner)
+    public void CheckOwnerCharacterAvailable()
     {
-        if (allPlayers.TryGetValue(runner.LocalPlayer, out LobbyPlayer owner))
+        if (allPlayers.TryGetValue(Runner.LocalPlayer, out LobbyPlayer owner))
         {
             List<LobbyPlayer> otherPlayers = Players
                 .Where(player => player != null && player != owner)
@@ -144,11 +144,11 @@ public class LobbyManager : SimulationBehaviour
         return Players.Count == 3 && Players.TrueForAll(player => player.IsReady);
     }
 
-    public void StartGame(NetworkRunner runner, LobbyPlayer player)
+    public void StartGame(LobbyPlayer player)
     {
-        if (runner.IsServer && (CanStart() || ForceStart(player)))
+        if (Runner.IsServer && (CanStart() || ForceStart(player)))
         {
-            runner.Spawn(levelSpawnInfoPrefab);
+            Runner.Spawn(levelSpawnInfoPrefab);
 
             if (!forceStart && LevelSpawnInfo.Instance.Object.HasStateAuthority)
             {
@@ -156,7 +156,7 @@ public class LobbyManager : SimulationBehaviour
                 LevelSpawnInfo.Instance.Right = (CharacterColor)Players[2].CurrentCharacterIndex;
             }
 
-            runner.SetActiveScene("Level2Scene");
+            Runner.SetActiveScene("Level2Scene");
         }
     }
 
@@ -185,7 +185,7 @@ public class LobbyManager : SimulationBehaviour
         }
 
         UnregisterPlayer(player);
-        CheckOwnerCharacterAvailable(runner);
+        CheckOwnerCharacterAvailable();
     }
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)

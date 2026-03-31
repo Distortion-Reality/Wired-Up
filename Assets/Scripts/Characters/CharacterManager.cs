@@ -8,8 +8,16 @@ public class CharacterManager : MonoBehaviour
 
     public Material redWireMaterial, blueWireMaterial, greenWireMaterial, purpleWireMaterial, yellowWireMaterial;
     
-    CharacterColor currentCharacter;
-    public CharacterColor CurrentCharacter { get => currentCharacter; set => currentCharacter = value; }
+    CharacterColor currentCharacter = CharacterColor.Red;
+    public CharacterColor CurrentCharacter
+    {
+        get => currentCharacter;
+        set
+        {
+            currentCharacter = value;
+            PlayerPrefs.SetInt(PlayerPrefKey.CharacterIndex, (int)currentCharacter);
+        }
+    }
 
     public GameObject GetPrefab(CharacterColor id)
     {
@@ -59,5 +67,17 @@ public class CharacterManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    void Start()
+    {
+        if (!PlayerPrefs.HasKey(PlayerPrefKey.CharacterIndex))
+        {
+            PlayerPrefs.SetInt(PlayerPrefKey.CharacterIndex, (int)currentCharacter);
+        }
+        else
+        {
+            currentCharacter = (CharacterColor)PlayerPrefs.GetInt(PlayerPrefKey.CharacterIndex);
+        }
     }
 }
