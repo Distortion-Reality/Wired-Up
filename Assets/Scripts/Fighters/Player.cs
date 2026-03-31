@@ -191,6 +191,7 @@ public class Player : Fighter
     public void Move(Vector3 dir)
     {
         rb.velocity = dir;
+        Speed = rb.velocity.magnitude;
     }
 
     IEnumerator Dash()

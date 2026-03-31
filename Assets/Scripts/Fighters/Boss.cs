@@ -7,7 +7,6 @@ public class Boss : Enemy
 {
     public BossEntity BossEntity => EnemyEntity as BossEntity;
 
-    float Speed { get => BossEntity.Speed; set => BossEntity.Speed = value; }
     float Direction { get => BossEntity.Direction; set => BossEntity.Direction = value; }
     bool OnGround { get => BossEntity.OnGround; set => BossEntity.OnGround = value; }
 
@@ -66,11 +65,6 @@ public class Boss : Enemy
     {
         base.StateFixedUpdate();
 
-        float speed = (agent.isStopped) ? 0f : agent.velocity.magnitude;
-        float maxSpeed = agent.speed;
-        float animationSpeed = speed/maxSpeed;
-        Speed = animationSpeed;
-
         Direction = 0f;
         OnGround = true;
     }
@@ -88,11 +82,6 @@ public class Boss : Enemy
         BossEntity.RPC_AttackShoot();
 
         StartCoroutine(WaitForAnimation(ability));
-    }
-
-    public void SpeedChanged()
-    {
-        animator.SetFloat("Speed", Speed);
     }
 
     public void DirectionChanged()

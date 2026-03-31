@@ -41,6 +41,9 @@ public abstract class Fighter : MonoBehaviour
     protected bool movementsBlocked = false;
 
     public FighterEntity Entity { get; set; }
+    protected float Speed { get => Entity.Speed; set => Entity.Speed = value; }
+    protected bool Ability { get => Entity.Ability; set => Entity.Ability = value; }
+
     public Rigidbody Rb { get => rb; set => rb = value; }
     public Dictionary<StatisticManager.StatisticId, FighterStatistic> Stats { get => stats; }
     public Status FighterStatus
@@ -325,6 +328,16 @@ public abstract class Fighter : MonoBehaviour
     {
         if (healthBar)
             Destroy(healthBar.gameObject);
+    }
+
+    public void SpeedChanged()
+    {
+        animator.SetFloat("Speed", Speed);
+    }
+
+    public void AbilityChanged()
+    {
+        animator.SetBool("Ability", Ability);
     }
 
     void OnCollisionEnter(Collision collision)

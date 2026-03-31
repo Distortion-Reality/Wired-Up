@@ -159,6 +159,16 @@ public class Enemy : Fighter
         }
     }
 
+    public override void StateFixedUpdate()
+    {
+        base.StateFixedUpdate();
+
+        float speed = (agent.isStopped) ? 0f : agent.velocity.magnitude;
+        float maxSpeed = agent.speed;
+        float animationSpeed = speed / maxSpeed;
+        Speed = animationSpeed;
+    }
+
     public void SetAgentUpdatePosition(bool agentUpdatePosition)
     {
         agent.updatePosition = agentUpdatePosition;

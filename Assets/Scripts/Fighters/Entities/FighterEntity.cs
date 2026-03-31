@@ -16,6 +16,12 @@ public abstract class FighterEntity : NetworkBehaviour
     [Networked(OnChanged = nameof(OnStatsChanged)), Capacity(STATS_COUNT)]
     public NetworkArray<int> Stats => default;
 
+    [Networked(OnChanged = nameof(OnSpeedChanged))]
+    public float Speed { get; set; } = 0f;
+
+    [Networked(OnChanged = nameof(OnAbilityChanged))]
+    public bool Ability { get; set; } = false;
+
     public FighterToken Token { get; set; }
 
     public override void Spawned()
@@ -74,6 +80,16 @@ public abstract class FighterEntity : NetworkBehaviour
                 changed.Behaviour.fighter.StatisticChanged((StatisticManager.StatisticId)i, newValue);
             }
         }
+    }
+
+    static void OnSpeedChanged(Changed<FighterEntity> changed)
+    {
+        changed.Behaviour.fighter.SpeedChanged();
+    }
+
+    static void OnAbilityChanged(Changed<FighterEntity> changed)
+    {
+        changed.Behaviour.fighter.AbilityChanged();
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
