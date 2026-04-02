@@ -321,15 +321,14 @@ public class Player : Fighter
 
     protected override void Die()
     {
-        NetworkManager.RPC_GameLose(PlayerEntity.Runner, PlayerName, Character);
+        if (gameOver != null && !gameOver.IsGameOver)
+            NetworkManager.RPC_GameLose(PlayerEntity.Runner, PlayerName, Character);
 
         base.Die();
     }
 
     public override void EntityDestroyed()
     {
-        base.EntityDestroyed();
-
         foreach (EnemyGroup enemyGroup in enemyGroups)
         {
             enemyGroup.UnregisterPlayer(this);

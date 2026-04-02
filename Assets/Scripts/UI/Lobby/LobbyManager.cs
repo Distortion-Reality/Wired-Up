@@ -136,7 +136,7 @@ public class LobbyManager : SimulationBehaviour
 
     private bool ForceStart(LobbyPlayer player)
     {
-        return player.Object.HasStateAuthority && forceStart;
+        return player.Object.HasStateAuthority && forceStart && player.IsReady;
     }
 
     private bool CanStart()

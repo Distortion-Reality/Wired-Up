@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Kirin : MonoBehaviour
 {
+    public Transform foreArmGunFire;
+
     private Transform root;
     private Vector3 defaultRootPosition;
 

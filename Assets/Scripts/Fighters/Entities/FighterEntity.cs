@@ -8,7 +8,7 @@ public abstract class FighterEntity : NetworkBehaviour
     const int STATS_COUNT = 5;
 
     public Fighter fighter;
-    GameOver gameOver;
+    public GameOver gameOver;
 
     [Networked(OnChanged = nameof(OnStatusChanged))]
     public Status Status { get; set; }

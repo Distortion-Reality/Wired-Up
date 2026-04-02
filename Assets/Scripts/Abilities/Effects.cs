@@ -140,7 +140,7 @@ public static class Effects
             particlesId, particlesColor);
     }
 
-    public static void FireRay(Enemy user, Ability ability)
+    public static void FireRay(Enemy user, Quaternion rotation, Ability ability)
     {
         if (!user.Entity.HasStateAuthority)
             return;
@@ -148,7 +148,7 @@ public static class Effects
         NetworkObject ray = user.Entity.Runner.Spawn(
             user.EnemyEntity.enemyAttackRayPrefab,
             user.FirePosition,
-            user.transform.rotation
+            rotation
             );
 
         ray.GetComponent<EnemyAbilityRay>().FireRay(user, ability);

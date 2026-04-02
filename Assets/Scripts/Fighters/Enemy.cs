@@ -177,9 +177,14 @@ public class Enemy : Fighter
     protected override void UseAbility(Ability ability)
     {
         FighterStatus = Status.Using;
-        Effects.FireRay(this, ability);
+        FireRay(transform.rotation, ability);
 
         StartCoroutine(AbilityAnimationCooldown());
+    }
+
+    protected virtual void FireRay(Quaternion rotation, Ability ability)
+    {
+        Effects.FireRay(this, rotation, ability);
     }
 
     protected override void OnEndAbility()

@@ -13,9 +13,10 @@ public class Boss : Enemy
     readonly string bossName = "Kirin";
     const float HealthBarMaxDistance = 60f;
 
+    public Transform gunFire;
+
     public override ParticlesId DamageParticles => ParticlesId.KirinDamage;
-    public override Vector3 FirePosition =>
-        new Vector3(base.FirePosition.x, target.CentrePosition.y, base.FirePosition.z);
+    public override Vector3 FirePosition => gunFire.position;
 
     protected override void InitStats()
     {
@@ -42,8 +43,9 @@ public class Boss : Enemy
         base.EntityStart();
 
         healthBar.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = bossName;
-
+        gunFire = GetComponentInChildren<Kirin>().foreArmGunFire;
         animator.fireEvents = false;
+        OnGround = true;
 
         AudioManager.Instance.enabled = true;
     }
@@ -71,7 +73,8 @@ public class Boss : Enemy
 
     protected override void Die()
     {
-        NetworkManager.RPC_GameWin(BossEntity.Runner);
+        if (BossEntity.gameOver != null && !BossEntity.gameOver.IsGameOver)
+            NetworkManager.RPC_GameWin(BossEntity.Runner);
 
         base.Die();
     }
@@ -82,6 +85,14 @@ public class Boss : Enemy
         BossEntity.RPC_AttackShoot();
 
         StartCoroutine(WaitForAnimation(ability));
+    }
+
+    protected override void FireRay(Quaternion rotation, Ability ability)
+    {
+        if (target)
+            rotation = Quaternion.LookRotation(target.CentrePosition - FirePosition);
+
+        base.FireRay(rotation, ability);
     }
 
     public void DirectionChanged()

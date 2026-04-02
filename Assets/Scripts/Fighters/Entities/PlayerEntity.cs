@@ -49,6 +49,7 @@ public class PlayerEntity : FighterEntity
     public void RPC_WireConnect()
     {
         Player.Wire.Connect();
+        Ability = true;
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]

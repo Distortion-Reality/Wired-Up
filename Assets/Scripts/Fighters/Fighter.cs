@@ -201,6 +201,7 @@ public abstract class Fighter : MonoBehaviour
     {
         currentAbility = null;
         charging = false;
+        Ability = false;
     }
 
     public bool CheckAndUseEnergy(int abilityEnergy)

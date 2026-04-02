@@ -12,11 +12,14 @@ public class LobbyPlayer : NetworkBehaviour
     [Networked(OnChanged = nameof(OnNameChanged))]
     public NetworkString<_16> PlayerName { get; private set; }
 
-    [Networked(OnChanged = nameof(OnCharacterChanged))]
+    [Networked(OnChanged = nameof(OnCharacterChanged)), UnityRange(0, 4)]
     public int CurrentCharacterIndex { get; private set; } = 0;
 
     [Networked(OnChanged = nameof(OnReadyChanged))]
     public bool IsReady { get; private set; } = false;
+
+    [Networked(OnChanged = nameof(OnLoadedChanged))]
+    public bool IsLoaded { get; private set; } = false;
 
     TextMeshProUGUI playerNameText;
     Button nextCharacterButton;
@@ -33,30 +36,32 @@ public class LobbyPlayer : NetworkBehaviour
 
         CreateCharactersModels();
 
+        if (Object.HasStateAuthority)
+        {
+            IsReady = false;
+        }
+
         if (Object.HasInputAuthority)
         {
             nextCharacterButton = GameObject.Find("NextCharacterButton").GetComponent<Button>();
             nextCharacterButton.onClick.AddListener(NextCharacter);
+            nextCharacterButton.interactable = IsLoaded;
 
             previousCharacterButton = GameObject.Find("PreviousCharacterButton").GetComponent<Button>();
             previousCharacterButton.onClick.AddListener(PreviousCharacter);
+            previousCharacterButton.interactable = IsLoaded;
 
             Button leaveButton = GameObject.Find("LeaveButton").GetComponent<Button>();
             leaveButton.onClick.AddListener(OnLeave);
 
             readyButton = GameObject.Find("ReadyButton").GetComponent<Button>();
             readyButton.onClick.AddListener(OnReady);
+            readyButton.interactable = IsLoaded;
 
             RPC_SetPlayerName(PlayerPrefs.GetString(PlayerPrefKey.PlayerName));
             RPC_SetCharacter((int)CharacterManager.Instance.CurrentCharacter);
+            RPC_SetLoaded(true);
         }
-
-        if (Object.HasStateAuthority)
-        {
-            IsReady = false;
-        }
-
-        models[CurrentCharacterIndex].SetActive(true);
     }
 
     void CreateCharactersModels()
@@ -89,6 +94,12 @@ public class LobbyPlayer : NetworkBehaviour
         IsReady = ready;
     }
 
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_SetLoaded(bool loaded)
+    {
+        IsLoaded = loaded;
+    }
+
     static void OnNameChanged(Changed<LobbyPlayer> changed)
     {
         changed.Behaviour.NameChanged();
@@ -108,6 +119,11 @@ public class LobbyPlayer : NetworkBehaviour
     static void OnReadyChanged(Changed<LobbyPlayer> changed)
     {
         changed.Behaviour.ReadyChanged();
+    }
+
+    static void OnLoadedChanged(Changed<LobbyPlayer> changed)
+    {
+        changed.Behaviour.LoadedChanged();
     }
 
     void NameChanged()
@@ -139,10 +155,23 @@ public class LobbyPlayer : NetworkBehaviour
             LobbyManager.Instance.CheckOwnerCharacterAvailable();
         }
 
-        if (Object.HasStateAuthority)
+        if (Object.HasStateAuthority && IsReady)
         {
             LobbyManager.Instance.StartGame(this);
         }
+    }
+
+    void LoadedChanged()
+    {
+        if (Object.HasInputAuthority)
+        {
+            nextCharacterButton.interactable = IsLoaded;
+            previousCharacterButton.interactable = IsLoaded;
+            readyButton.interactable = IsLoaded;
+        }
+
+        if (IsLoaded)
+            CharacterChanged(CurrentCharacterIndex, CurrentCharacterIndex);
     }
 
     void NextCharacter()

@@ -4,10 +4,10 @@ using UnityEngine;
 [RequireComponent(typeof(Boss))]
 public class BossEntity : EnemyEntity
 {
-    [Networked(OnChanged = nameof(OnDirectionChanged))]
+    [Networked(OnChanged = nameof(OnDirectionChanged)), UnityRange(-1f, 0f)]
     public float Direction { get; set; } = 0f;
     [Networked(OnChanged = nameof(OnGroundChanged))]
-    public bool OnGround { get; set; } = true;
+    public bool OnGround { get; set; } = false;
 
     public Boss Boss => Enemy as Boss;
 
