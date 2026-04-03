@@ -3,12 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static LevelSpawnInfo;
 
 public class LobbyManager : SimulationBehaviour
 {
     private const int MAX_PLAYERS = 3;
 
-    public static LobbyManager Instance { get; private set; }
+    public struct LobbyPlayerInfo
+    {
+        public PlayerRef playerRef;
+        public LobbyPlayer lobbyPlayer;
+
+        public bool IsValid => playerRef.IsValid && lobbyPlayer != null;
+
+        public void Set(LobbyPlayer player) => (playerRef, lobbyPlayer) = (player.Object.InputAuthority, player);
+
+        public void Reset() => (playerRef, lobbyPlayer) = (PlayerRef.None, null);
+    }
+
+    private static LobbyPlayerInfo left, center, right;
 
     Transform canvas;
 
@@ -21,6 +34,7 @@ public class LobbyManager : SimulationBehaviour
         new Dictionary<PlayerRef, LobbyPlayer>();
     public List<LobbyPlayer> Players => new List<LobbyPlayer>(allPlayers.Values);
 
+    public static LobbyManager Instance { get; private set; }
 
     void Awake()
     {
@@ -63,16 +77,20 @@ public class LobbyManager : SimulationBehaviour
     {
         player.transform.SetParent(canvas, false);
 
-        if (!player.Object.HasInputAuthority)
-        {
-            player.transform.localPosition += FindAvailableSpawnPosition();
-        }
+        player.transform.localPosition += FindAvailableSpawnPosition(player);
 
         allPlayers[player.Object.InputAuthority] = player;
     }
 
     public void UnregisterPlayer(PlayerRef player)
     {
+        if (player == center.playerRef)
+            center.Reset();
+        else if (player == left.playerRef)
+            left.Reset();
+        else if (player == right.playerRef)
+            right.Reset();
+
         allPlayers.Remove(player);
 
         allPlayers = allPlayers
@@ -80,26 +98,48 @@ public class LobbyManager : SimulationBehaviour
             .ToDictionary(player => player.Key, player => player.Value);
     }
 
-    Vector3 FindAvailableSpawnPosition()
+    Vector3 FindAvailableSpawnPosition(LobbyPlayer player)
     {
-        float x;
+        float x = 0f;
 
         // Owner is always the center
-        List<LobbyPlayer> otherPlayers = Players
-            .Where(player => player != null && !player.Object.HasInputAuthority)
-            .ToList();
+        if (!player.Object.HasInputAuthority)
+        {
+            List<LobbyPlayer> otherPlayers = Players
+                .Where(player => player != null && !player.Object.HasInputAuthority)
+                .ToList();
 
-        if (otherPlayers.Count == 0)
-        {
-            // Choose left
-            x = -xSpawnPosOffset;
+            if (player.Object.InputAuthority == right.playerRef)
+            {
+                // Choose right
+                x = xSpawnPosOffset;
+            }
+            else if (player.Object.InputAuthority == left.playerRef || otherPlayers.Count == 0)
+            {
+                // Choose left
+                x = -xSpawnPosOffset;
+            }
+            else
+            {
+                // Choose opposite of the occupied slot
+                x = -otherPlayers[0].transform.localPosition.x;
+            }
         }
-        else
+
+        if (x < 0)
         {
-            // Choose opposite of the occupied slot
-            x = -otherPlayers[0].transform.localPosition.x;
+            left.Set(player);
         }
-        return new Vector3(x, 0.0f, 0.0f);
+        else if (x == 0)
+        {
+            center.Set(player);
+        }
+        else if (x > 0)
+        {
+            right.Set(player);
+        }
+
+        return new Vector3(x, 0f, 0f);
     }
 
     public async void Shutdown(NetworkRunner runner)
@@ -136,7 +176,10 @@ public class LobbyManager : SimulationBehaviour
 
     private bool ForceStart(LobbyPlayer player)
     {
-        return player.Object.HasStateAuthority && forceStart && player.IsReady;
+        return player.Object.HasStateAuthority &&
+            player.Object.HasInputAuthority &&
+            forceStart &&
+            player.IsReady;
     }
 
     private bool CanStart()
@@ -148,12 +191,19 @@ public class LobbyManager : SimulationBehaviour
     {
         if (Runner.IsServer && (CanStart() || ForceStart(player)))
         {
-            Runner.Spawn(levelSpawnInfoPrefab);
+            if (LevelSpawnInfo.Instance == null)
+                Runner.Spawn(levelSpawnInfoPrefab);
 
-            if (!forceStart && LevelSpawnInfo.Instance.Object.HasStateAuthority)
+            if (LevelSpawnInfo.Instance.Object.HasStateAuthority)
             {
-                LevelSpawnInfo.Instance.Left = (CharacterColor)Players[1].CurrentCharacterIndex;
-                LevelSpawnInfo.Instance.Right = (CharacterColor)Players[2].CurrentCharacterIndex;
+                if (center.IsValid)
+                    LevelSpawnInfo.Instance.Center = new SpawnInfo(center);
+
+                if (left.IsValid)
+                    LevelSpawnInfo.Instance.Left = new SpawnInfo(left);
+
+                if (right.IsValid)
+                    LevelSpawnInfo.Instance.Right = new SpawnInfo(right);
             }
 
             Runner.SetActiveScene("Level2Scene");
@@ -195,12 +245,31 @@ public class LobbyManager : SimulationBehaviour
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        if (!runner.IsServer || runner.ActivePlayers.Count() < MAX_PLAYERS)
+        if (!runner.IsServer)
             return;
 
-        foreach (PlayerRef player in runner.ActivePlayers)
+        if (LevelSpawnInfo.Instance)
         {
-            SpawnPlayer(runner, player);
+            if (LevelSpawnInfo.Instance.Center.player.IsValid)
+            {
+                SpawnPlayer(runner, LevelSpawnInfo.Instance.Center.player);
+            }
+            if (LevelSpawnInfo.Instance.Left.player.IsValid)
+            {
+                SpawnPlayer(runner, LevelSpawnInfo.Instance.Left.player);
+            }
+            if (LevelSpawnInfo.Instance.Right.player.IsValid)
+            {
+                SpawnPlayer(runner, LevelSpawnInfo.Instance.Right.player);
+            }
+
+            runner.Despawn(LevelSpawnInfo.Instance.Object);
         }
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 }

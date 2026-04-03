@@ -1,14 +1,29 @@
 using Fusion;
+using System;
 using UnityEngine;
+using static LobbyManager;
 
 [RequireComponent(typeof(NetworkObject))]
 public class LevelSpawnInfo : NetworkBehaviour
 {
-    public static LevelSpawnInfo Instance { get; private set; }
+    [Serializable]
+    public struct SpawnInfo : INetworkStruct
+    {
+        [HideInInspector] public PlayerRef player;
+        public int playerId;
+        public CharacterColor character;
 
-    [Networked] public CharacterColor Center { get; set; }
-    [Networked] public CharacterColor Left { get; set; }
-    [Networked] public CharacterColor Right { get; set; }
+        public SpawnInfo(LobbyPlayerInfo playerInfo) => (player, playerId, character) =
+            (playerInfo.playerRef,
+            playerInfo.playerRef.PlayerId,
+            (CharacterColor)playerInfo.lobbyPlayer.CurrentCharacterIndex);
+    }
+
+    [Networked] public SpawnInfo Center { get; set; }
+    [Networked] public SpawnInfo Left { get; set; }
+    [Networked] public SpawnInfo Right { get; set; }
+
+    public static LevelSpawnInfo Instance { get; private set; }
 
     void Awake()
     {

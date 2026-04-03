@@ -96,9 +96,9 @@ public class NetworkManager : SimulationBehaviour
         Vector3 spawnPosition = spawnPoint.position;
         if (player != runner.LocalPlayer)
         {
-            if (tokenData.character == spawnInfo.Left)
+            if (player == spawnInfo.Left.player)
                 spawnPosition += Vector3.left * 5;
-            else if (tokenData.character == spawnInfo.Right)
+            else if (player == spawnInfo.Right.player)
                 spawnPosition += Vector3.right * 5;
         }
 
